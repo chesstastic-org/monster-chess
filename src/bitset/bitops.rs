@@ -81,7 +81,7 @@ impl<const T: usize> ops::ShlAssign<u128> for BitSet<T> {
             rhs -= 128;
         }
 
-        let mask: u128 = u128::MAX - ((1 << (128 - rhs)) - 1); // Mask to get last `rhs` bits of integer
+        let mask: u128 = u128::MAX - ((1 << (128 - rhs)) - 1); // Mask to get last `rhs` bits of integer (starting from LSB)
         for i in 0..T {
             let bits = (self.data[i] & mask) >> (128 - rhs); // Apply mask and shift the bits over to be the first bits of the integer
             self.data[i] = self.data[i] << rhs;
@@ -122,7 +122,7 @@ impl<const T: usize> ops::ShrAssign<u128> for BitSet<T> {
             rhs -= 128;
         }
 
-        let mask: u128 = (1 << rhs) - 1; // Mask to get first `rhs` bits of integer
+        let mask: u128 = (1 << rhs) - 1; // Mask to get first `rhs` bits of integer (starting from LSB)
         for i in (0..T).rev() {
             let bits = (self.data[i] & mask) << (128 - rhs); // Apply mask and shift the bits over to be the last bits of the integer
             self.data[i] = self.data[i] >> rhs;

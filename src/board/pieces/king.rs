@@ -32,8 +32,8 @@ impl<'a> Piece for KingPiece<'a> {
         moves
     }   
 
-    fn get_attack_lookup(&self) -> Option<&Vec<BitBoard>> {
-        None
+    fn can_lookup(&self) -> bool {
+        true
     }
 
     fn get_board(&self) -> &Board {
