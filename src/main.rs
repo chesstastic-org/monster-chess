@@ -1,15 +1,10 @@
-mod bitset;
 mod board;
-mod pieces;
+mod bitset;
 
-pub use bitset::*;
 pub use board::*;
-pub use pieces::*;
+pub use bitset::*;
 
 fn main() {
-    let board: BitBoard = BitBoard::new();
-    
-    println!("{:?}", (BitSet::from_data([ 1, 0 ]) - &BitSet::from_data([ 0, 1 ])));
 
     /*let board = Board {
         state: BoardState { 

@@ -57,7 +57,7 @@ impl<const T: usize> BitSet<T> {
     pub fn get_bits(&self) -> Vec<u128> {
         let mut bits: Vec<u128> = Vec::with_capacity(128 * T);
         for container in self.data {
-            for i in 0..127 {
+            for i in 0..128 {
                 bits.push((container >> i) & 1); // Get `i`th bit of `container` and check if it is toggled on (equal to 1)
             }
         }
