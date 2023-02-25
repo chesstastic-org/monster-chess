@@ -1,5 +1,10 @@
 use std::ops;
 
+/*
+    I've chosen to use this little utility because of its performance in benchmarks being the best, and because it makes it the easiest to specialize to the needs of this project (in terms of both optimizations and code structure.)
+    In this case, those needs being a way to have bigger integer sizes that are compatible with bit operations at high speeds.
+*/
+
 #[derive(Debug, Clone, Copy)]
 pub struct BitSet<const T : usize> {
     pub data: [ u128; T ]
@@ -20,10 +25,8 @@ impl<const T: usize> BitSet<T> {
         }
     }
 
-    pub fn new<const S: usize>(capacity: usize) -> BitSet<S> {
-        BitSet::<S> {
-            data: [ 0; S ]
-        }
+    pub fn new<const S: usize>() -> BitSet<S> {
+        BitSet::<S>::from_data([ 0; S ])
     }
 
     pub fn apply(self, rhs: &BitSet<T>, apply: impl Fn((&u128, &u128)) -> u128) -> Self {
@@ -34,6 +37,29 @@ impl<const T: usize> BitSet<T> {
 
     pub fn effect(&mut self, rhs: &BitSet<T>, apply: impl Fn((&u128, &u128)) -> u128) {
         self.data = self.data.iter().zip(&rhs.data).map(apply).collect::<Vec<_>>().try_into().unwrap()
+    }
+
+    /*
+        Not a well optimized method; avoid using in hot loops.
+    */
+    pub fn get_bits(&self) -> Vec<u128> {
+        let mut bits: Vec<u128> = Vec::with_capacity(128 * T);
+        for container in self.data {
+            for i in 0..127 {
+                bits.push((container >> i) & 1); // Get `i`th bit of `container` and check if it is toggled on (equal to 1)
+            }
+        }
+        bits
+    }
+}
+
+impl<const T: usize> ops::Not for BitSet<T> {
+    type Output = BitSet<T>;
+
+    fn not(self) -> Self::Output {
+        BitSet::<T> {
+            data: self.data.iter().map(|el| !el).collect::<Vec<_>>().try_into().unwrap()
+        }
     }
 }
 
@@ -79,10 +105,10 @@ impl<const T: usize> ops::BitXorAssign<&BitSet<T>> for BitSet<T> {
     }
 }
 
-impl<const T: usize> ops::Shl<&u128> for BitSet<T> {
+impl<const T: usize> ops::Shl<u128> for BitSet<T> {
     type Output = BitSet<T>;
 
-    fn shl(self, rhs: &u128) -> Self::Output {
+    fn shl(self, rhs: u128) -> Self::Output {
         let len = self.data.len();
         if len == 1 {
             return BitSet {
@@ -97,16 +123,15 @@ impl<const T: usize> ops::Shl<&u128> for BitSet<T> {
     }
 }
 
-impl<const T: usize> ops::ShlAssign<&u128> for BitSet<T> {
-    fn shl_assign(&mut self, rhs: &u128) {
+impl<const T: usize> ops::ShlAssign<u128> for BitSet<T> {
+    fn shl_assign(&mut self, mut rhs: u128) {
         let len = self.data.len();
         if len == 1 {
             self.data = [ self.data[0] << rhs; T ];
         }
 
-        let mut rhs = *rhs;
         while rhs > 128 {
-            *self <<= &128;
+            *self <<= 128;
             rhs -= 128;
         }
 
@@ -123,10 +148,10 @@ impl<const T: usize> ops::ShlAssign<&u128> for BitSet<T> {
     }
 }
 
-impl<const T: usize> ops::Shr<&u128> for BitSet<T> {
+impl<const T: usize> ops::Shr<u128> for BitSet<T> {
     type Output = BitSet<T>;
 
-    fn shr(self, rhs: &u128) -> Self::Output {
+    fn shr(self, rhs: u128) -> Self::Output {
         let len = self.data.len();
         if len == 1 {
             return BitSet {
@@ -141,16 +166,15 @@ impl<const T: usize> ops::Shr<&u128> for BitSet<T> {
     }
 }
 
-impl<const T: usize> ops::ShrAssign<&u128> for BitSet<T> {
-    fn shr_assign(&mut self, rhs: &u128) {
+impl<const T: usize> ops::ShrAssign<u128> for BitSet<T> {
+    fn shr_assign(&mut self, mut rhs: u128) {
         let len = self.data.len();
         if len == 1 {
             self.data = [ self.data[0] >> rhs; T ];
         }
 
-        let mut rhs = *rhs;
         while rhs > 128 {
-            *self >>= &128;
+            *self >>= 128;
             rhs -= 128;
         }
 

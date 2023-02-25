@@ -7,8 +7,24 @@ pub use board::*;
 pub use pieces::*;
 
 fn main() {
-    let test = BitSet::<2>::from_data([ u128::MAX; 2 ]);
-    for i in &(test >> &5).data {
-        println!("{:#0130b}", i);
-    }
+    let board = Board {
+        state: BoardState { 
+            blockers: BitBoard::new(), 
+            pieces: Vec::new(), 
+            teams: Vec::new(),
+            edges: Vec::new(),
+            rows: 8, 
+            cols: 8
+        },
+        pieces: Vec::new(),
+        attack_lookup: Vec::new()
+    };
+
+    let king = KingPiece {
+        board: &board,
+        piece_type: 5
+    };
+
+    let king_pos = BitBoard::from_element(4096);
+    let moves = king.generate_moves(king_pos);
 }
