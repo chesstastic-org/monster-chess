@@ -7,7 +7,11 @@ pub use board::*;
 pub use pieces::*;
 
 fn main() {
-    let board = Board {
+    let board: BitBoard = BitBoard::new();
+    
+    println!("{:?}", (BitSet::from_data([ 1, 0 ]) - &BitSet::from_data([ 0, 1 ])));
+
+    /*let board = Board {
         state: BoardState { 
             blockers: BitBoard::new(), 
             pieces: Vec::new(), 
@@ -26,5 +30,5 @@ fn main() {
     };
 
     let king_pos = BitBoard::from_element(4096);
-    let moves = king.generate_moves(king_pos);
+    let moves = king.generate_moves(king_pos);*/
 }
