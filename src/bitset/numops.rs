@@ -54,3 +54,20 @@ impl<const T: usize> SubAssign<&BitSet<T>> for BitSet<T> {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::{BitSet};
+
+    #[test]
+    fn add() {
+        assert_eq!(BitSet::from_data([ 2, 13 ]) + &BitSet::from_data([ 4, 19 ]), BitSet::from_data([ 6, 32 ]));
+        assert_eq!(BitSet::from_data([ 0, u128::MAX ]) + &BitSet::from_data([ 0, 1 ]), BitSet::from_data([ 1, 0 ]));
+    }
+
+    #[test]
+    fn sub() {
+        assert_eq!(BitSet::from_data([ 6, 32 ]) - &BitSet::from_data([ 4, 19 ]), BitSet::from_data([ 2, 13 ]));
+        assert_eq!(BitSet::from_data([ 1, 0 ]) - &BitSet::from_data([ 0, 1 ]), BitSet::from_data([ 0, u128::MAX ]));
+    }
+}
