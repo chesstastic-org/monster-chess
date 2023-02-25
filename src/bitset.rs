@@ -51,6 +51,20 @@ impl<const T: usize> BitSet<T> {
         }
         bits
     }
+
+    pub fn display(&self, cols: usize, rows: usize) -> String {
+        let mut chunks = Vec::<String>::with_capacity(rows);
+        for (ind, row) in self.get_bits().chunks(cols).enumerate() {
+            if ind == rows {
+                break;
+            }
+
+            let chunk = row.iter().map(|i| i.to_string()).collect::<Vec<_>>().join(" ");
+            chunks.push(chunk);
+        }
+        
+        chunks.join("\n")
+    }
 }
 
 impl<const T: usize> ops::Not for BitSet<T> {

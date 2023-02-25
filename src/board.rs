@@ -3,22 +3,6 @@ use crate::{BitSet, Piece};
 pub type BitBoard = BitSet::<1>;
 pub type PieceType = usize;
 
-impl BitBoard {
-    pub fn display(&self, cols: Cols, rows: Rows) -> String {
-        let mut chunks = Vec::<String>::with_capacity(rows as usize);
-        for (ind, row) in self.get_bits().chunks(cols as usize).enumerate() {
-            if ind == (rows as usize) {
-                break;
-            }
-
-            let chunk = row.iter().map(|i| i.to_string()).collect::<Vec<_>>().join(" ");
-            chunks.push(chunk);
-        }
-        
-        chunks.join("\n")
-    }
-}
-
 /*
     I doubt anyone would be practically creating boards of 340,282,366,920,938,463,463,374,607,431,768,211,456 x 340,282,366,920,938,463,463,374,607,431,768,211,456.
     However, storing these as u128s makes it much easier to interface the bitboards with (particularly, shifting bits with them.)
