@@ -1,4 +1,4 @@
-use crate::{BitSet, Piece};
+use crate::{BitSet, Piece, Edges};
 
 pub type BitBoard = BitSet::<1>;
 pub type PieceType = usize;
@@ -20,7 +20,7 @@ pub struct BoardState {
     /*
         Edges is a list of "boundary bitboards" for validating the movement of delta pieces (pieces that move in a fixed way everytime)
     */
-    pub edges: Vec<BitBoard>,
+    pub edges: Vec<Edges>,
     pub rows: Rows,
     pub cols: Cols
 } 
