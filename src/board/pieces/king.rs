@@ -1,7 +1,6 @@
 use crate::{Piece, BitBoard, PieceType, Board, Rows, Edges};
 
-pub struct KingPiece<'a> {
-    pub board: &'a Board,
+pub struct KingPiece {
     pub piece_type: PieceType
 }
 
@@ -21,10 +20,10 @@ fn down_one(from: BitBoard, rows: Rows, edges: &Edges) -> BitBoard {
     from << rows & &(!(edges.top))
 }
 
-impl<'a> Piece for KingPiece<'a> {
-    fn generate_moves(&self, mut from: BitBoard) -> BitBoard {
-        let rows = self.get_board().state.rows;
-        let edges = &self.get_board().state.edges[0];
+impl Piece for KingPiece {
+    fn generate_moves(&self, board: &Board, mut from: BitBoard) -> BitBoard {
+        let rows = board.state.rows;
+        let edges = &board.state.edges[0];
         let mut moves = left_one(from, edges) | &right_one(from, edges);
         from |= &moves;
         moves |= &up_one(from, rows, edges);
@@ -36,15 +35,11 @@ impl<'a> Piece for KingPiece<'a> {
         true
     }
 
-    fn get_board(&self) -> &Board {
-        &self.board
-    }
-
     fn get_piece_type(&self) -> PieceType {
         self.piece_type
     }
 
-    fn get_moves(&self, from: BitBoard) -> BitBoard {
-        self.generate_moves(from)
+    fn get_moves(&self, board: &Board, from: BitBoard) -> BitBoard {
+        *self.get_attack_lookup(board, from).unwrap_or(&self.generate_moves(board, from))
     }
 }

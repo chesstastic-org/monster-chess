@@ -62,7 +62,7 @@ impl<const T: usize> BitSet<T> {
         bits
     }
 
-    pub fn display(&self, cols: usize, rows: usize) -> String {
+    pub fn display(&self, rows: usize, cols: usize) -> String {
         let mut chunks = Vec::<String>::with_capacity(rows);
         for (ind, row) in self.get_bits().chunks(cols).enumerate() {
             if ind == rows {
