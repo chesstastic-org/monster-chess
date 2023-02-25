@@ -3,7 +3,7 @@
     In this case, those needs being a way to have bigger integer sizes that are compatible with bit operations at high speeds.
 */
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct BitSet<const T : usize> {
     pub data: [ u128; T ]
 }

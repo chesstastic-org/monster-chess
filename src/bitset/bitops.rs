@@ -134,3 +134,43 @@ impl<const T: usize> ops::ShrAssign<u128> for BitSet<T> {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::{BitSet};
+
+    #[test]
+    fn not() {
+        assert_eq!(!BitSet::from_data([ u128::MAX, u128::MAX ]), BitSet::from_data([ 0, 0 ]));
+        assert_eq!(!BitSet::from_data([ 0, 0 ]), BitSet::from_data([ u128::MAX, u128::MAX ]));
+        assert_eq!(!!BitSet::from_data([ 4945856, 748691 ]), BitSet::from_data([ 4945856, 748691 ]));
+    }
+
+    #[test]
+    fn and() {
+        assert_eq!(BitSet::from_data([ 1, 0 ]) & &BitSet::from_data([ 0, 1 ]), BitSet::from_data([ 0, 0 ]));
+        assert_eq!(BitSet::from_data([ 0, 1 ]) & &BitSet::from_data([ 0, 1 ]), BitSet::from_data([ 0, 1 ]));
+    }
+
+    #[test]
+    fn or() {
+        assert_eq!(BitSet::from_data([ 1, 0 ]) | &BitSet::from_data([ 0, 1 ]), BitSet::from_data([ 1, 1 ]));
+        assert_eq!(BitSet::from_data([ 0, 1 ]) | &BitSet::from_data([ 0, 1 ]), BitSet::from_data([ 0, 1 ]));
+    }
+
+    #[test]
+    fn xor() {
+        assert_eq!(BitSet::from_data([ 1, 0 ]) ^ &BitSet::from_data([ 0, 1 ]), BitSet::from_data([ 1, 1 ]));
+        assert_eq!(BitSet::from_data([ 0, 1 ]) ^ &BitSet::from_data([ 0, 1 ]), BitSet::from_data([ 0, 0 ]));
+    }
+
+    #[test]
+    fn shl() {
+        assert_eq!(BitSet::from_data([ 0, (u128::MAX >> 1) + 1 ]) << 1, BitSet::from_data([ 1, 0 ]));
+    }
+
+    #[test]
+    fn shr() {
+        assert_eq!(BitSet::from_data([ 1, 0 ]) >> 1, BitSet::from_data([ 0, (u128::MAX >> 1) + 1 ]));
+    }
+}
