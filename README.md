@@ -10,7 +10,7 @@
 
 If you are only aiming to support chess or chess960, you should use the [cozy-chess](https://github.com/analog-hors/cozy-chess/) library, which will have much better performance and better code quality then the `monster-chess` library.
 
-### Implementation
+## Implementation
 
 `monster-chess` uses a general implementation of [Bitboards](https://www.chessprogramming.org/Bitboards) to extend to larger board sizes, using a custom made `BitSet` data type.
 
