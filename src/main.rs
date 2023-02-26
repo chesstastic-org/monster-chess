@@ -15,8 +15,11 @@ fn main() {
             cols: 8
         },
         pieces: vec![
+            Box::new(KnightPiece {
+                piece_type: 0
+            }),
             Box::new(KingPiece {
-                piece_type: 5
+                piece_type: 1
             })
         ],
         attack_lookup: Vec::new()
@@ -24,7 +27,8 @@ fn main() {
 
     board.generate_lookups();
 
-    println!("{}", board.pieces[0].generate_moves(&board, BitBoard::from_element(4096)).display(8, 8));
+    let from = BitBoard::from_data([ 1 << 24 ]);
+    println!("{}", board.pieces[0].get_moves(&board, from).display(8, 8));
 
     /*let king_pos = BitBoard::from_element(4096);
     let moves = king.generate_moves(king_pos);
