@@ -8,7 +8,7 @@ pub trait Piece {
         match board.attack_lookup.get(self.get_piece_type()) {
             None => None,
             Some(lookup) => {
-                lookup.get(from.bitscan_forward() as usize)
+                lookup.get(from.bitscan_reverse() as usize)
             }
         }
     }

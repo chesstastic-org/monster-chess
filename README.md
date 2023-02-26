@@ -57,3 +57,10 @@ impl Piece for KingPiece {
     }
 }
 ```
+
+# License
+
+`monster-chess` s available under the
+[MIT license](https://opensource.org/licenses/MIT). See
+[LICENSE](https://github.com/chesstastic-org/monster-chess/blob/main/LICENSE) for the full
+license text.

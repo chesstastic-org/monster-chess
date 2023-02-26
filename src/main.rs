@@ -27,11 +27,8 @@ fn main() {
 
     board.generate_lookups();
 
-    let from = BitBoard::from_data([ 1 << 24 ]);
-    println!("{}", board.pieces[0].get_moves(&board, from).display(8, 8));
+    let king_pos = BitBoard::from_element(4096);
+    let moves = board.pieces[1].get_moves(&board, king_pos);
 
-    /*let king_pos = BitBoard::from_element(4096);
-    let moves = king.generate_moves(king_pos);
-
-    println!("{}", moves.display(8, 8));*/
+    println!("{}", moves.display(8, 8));
 }
