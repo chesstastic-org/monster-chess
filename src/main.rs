@@ -18,8 +18,17 @@ fn main() {
             Box::new(KnightPiece {
                 piece_type: 0
             }),
-            Box::new(KingPiece {
+            Box::new(BishopPiece {
                 piece_type: 1
+            }),
+            Box::new(RookPiece {
+                piece_type: 2
+            }),
+            Box::new(QueenPiece {
+                piece_type: 3
+            }),
+            Box::new(KingPiece {
+                piece_type: 4
             })
         ],
         attack_lookup: Vec::new()
@@ -27,8 +36,14 @@ fn main() {
 
     board.generate_lookups();
 
-    let king_pos = BitBoard::from_element(4096);
-    let moves = board.pieces[1].get_moves(&board, king_pos);
+    let king_pos = BitBoard::from_element(1 << 28);
+    
+    //let blocker = BitBoard::from_element(1 << 29);
+    //board.state.blockers |= &blocker;
 
+    let moves = board.pieces[3].get_moves(&board, king_pos);
+
+    println!("{}", king_pos.display(8, 8));
+    println!("-");
     println!("{}", moves.display(8, 8));
 }

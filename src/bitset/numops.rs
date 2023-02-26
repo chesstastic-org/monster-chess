@@ -1,5 +1,5 @@
 use crate::BitSet;
-use std::ops::{AddAssign, Add, Sub, SubAssign};
+use std::ops::{AddAssign, Add, Sub, SubAssign, Mul, MulAssign, DivAssign, Div};
 
 impl<const T: usize> Add<&BitSet<T>> for BitSet<T> {
     type Output = Self;
@@ -20,14 +20,13 @@ impl<const T: usize> AddAssign<&BitSet<T>> for BitSet<T> {
 
         let mut carry = *self & rhs;
         *self ^= rhs;
-        while !carry.is_empty() {
+        while carry.is_set() {
             let shifted_carry = carry << 1;
             carry = *self & &shifted_carry;
             *self ^= &shifted_carry;
         }
     }
 }
-
 
 impl<const T: usize> Sub<&BitSet<T>> for BitSet<T> {
     type Output = Self;
@@ -47,7 +46,7 @@ impl<const T: usize> SubAssign<&BitSet<T>> for BitSet<T> {
         }
 
         let mut rhs = rhs.clone();
-        while !rhs.is_empty() {
+        while rhs.is_set() {
             let borrow = !(*self) & &rhs;
             *self ^= &rhs;
             rhs = borrow << 1;

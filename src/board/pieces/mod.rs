@@ -1,9 +1,9 @@
 mod base;
 mod king;
 mod knight;
-mod rook;
+mod sliders;
 
 pub use base::*;
 pub use king::*;
 pub use knight::*;
-pub use rook::*;
+pub use sliders::*;

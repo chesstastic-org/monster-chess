@@ -74,6 +74,7 @@ impl<const T: usize> ops::ShlAssign<u128> for BitSet<T> {
     fn shl_assign(&mut self, mut rhs: u128) {
         if T == 1 {
             self.data = [ self.data[0] << rhs; T ];
+            return;
         }
 
         while rhs > 128 {
@@ -115,6 +116,7 @@ impl<const T: usize> ops::ShrAssign<u128> for BitSet<T> {
     fn shr_assign(&mut self, mut rhs: u128) {
         if T == 1 {
             self.data = [ self.data[0] >> rhs; T ];
+            return;
         }
 
         while rhs > 128 {

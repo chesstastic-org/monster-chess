@@ -47,11 +47,11 @@ impl Piece for KingPiece {
         true
     }
 
-    // get_moves will fetch the moves in the game
+    // get_moves will fetch the moves for move generation itself
     fn get_moves(&self, board: &Board, from: BitBoard) -> BitBoard {
         let lookup = self.get_attack_lookup(board, from);
         match lookup {
-            Some(lookup) => lookup[0],
+            Some(lookup) => lookup[from.bitscan_reverse() as usize][0],
             None => self.generate_moves(board, from)[0]
         }
     }

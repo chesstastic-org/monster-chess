@@ -42,7 +42,7 @@ impl Piece for KnightPiece {
     fn get_moves(&self, board: &Board, from: BitBoard) -> BitBoard {
         let lookup = self.get_attack_lookup(board, from);
         match lookup {
-            Some(lookup) => lookup[0],
+            Some(lookup) => lookup[from.bitscan_reverse() as usize][0],
             None => self.generate_moves(board, from)[0]
         }
     }

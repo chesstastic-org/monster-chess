@@ -3,7 +3,9 @@
     In this case, those needs being a way to have bigger integer sizes that are compatible with bit operations at high speeds.
 */
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+use std::fmt::Display;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Ord)]
 pub struct BitSet<const T : usize> {
     pub data: [ u128; T ]
 }
@@ -17,7 +19,7 @@ impl<const T: usize> BitSet<T> {
 
     pub fn from_element(el: u128) -> BitSet<T> {
         let mut arr = [ 0; T ];
-        arr[0] = el;
+        arr[T - 1] = el;
         BitSet {
             data: arr
         }
@@ -28,6 +30,14 @@ impl<const T: usize> BitSet<T> {
             self.data[0] == 0   
         } else {
             self.data.iter().all(|el| *el == 0)
+        }
+    }
+
+    pub fn is_set(&self) -> bool {
+        if T == 1 {
+            self.data[0] != 0   
+        } else {
+            self.data.iter().any(|el| *el != 0)
         }
     }
 
@@ -69,10 +79,16 @@ impl<const T: usize> BitSet<T> {
                 break;
             }
 
-            let chunk = row.iter().map(|i| i.to_string()).collect::<Vec<_>>().join(" ");
+            let chunk = row.iter().map(|i| if i == &0 { "⬛" } else { "⬜" }).collect::<Vec<_>>().join("");
             chunks.push(chunk);
         }
         
         chunks.join("\n")
     }
 }
+
+/*impl<const T: usize> Display for BitSet<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "({}, {})", self.longitude, self.latitude);
+    }
+}*/
