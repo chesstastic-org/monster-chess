@@ -1,4 +1,4 @@
-use crate::{Piece, BitBoard, PieceType, Board, Rows, Edges, Cols};
+use crate::{Piece, BitBoard, PieceType, Board, Rows, Edges, Cols, AttackDirections};
 
 pub struct KingPiece {
     pub piece_type: PieceType
@@ -21,14 +21,14 @@ fn down_one(from: BitBoard, cols: Cols, edges: &Edges) -> BitBoard {
 }
 
 impl Piece for KingPiece {
-    fn generate_moves(&self, board: &Board, mut from: BitBoard) -> BitBoard {
+    fn generate_moves(&self, board: &Board, mut from: BitBoard) -> AttackDirections {
         let cols = board.state.cols;
         let edges = &board.state.edges[0];
         let mut moves = left_one(from, edges) | &right_one(from, edges);
         from |= &moves;
         moves |= &up_one(from, cols, edges);
         moves |= &down_one(from, cols, edges);
-        moves
+        vec![ moves ]
     }   
 
     fn can_lookup(&self) -> bool {
@@ -40,6 +40,10 @@ impl Piece for KingPiece {
     }
 
     fn get_moves(&self, board: &Board, from: BitBoard) -> BitBoard {
-        *self.get_attack_lookup(board, from).unwrap_or(&self.generate_moves(board, from))
+        let lookup = self.get_attack_lookup(board, from);
+        match lookup {
+            Some(lookup) => lookup[0],
+            None => self.generate_moves(board, from)[0]
+        }
     }
 }

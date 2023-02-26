@@ -1,6 +1,6 @@
-use crate::{Piece, Rows, Cols, BitBoard, Board};
+use crate::{Piece, Rows, Cols, BitBoard, Board, AttackLookup};
 
-pub fn generate_lookups(board: &Board, piece: &Box<dyn Piece>, rows: Rows, cols: Cols) -> Vec<BitBoard> {
+pub fn generate_lookups(board: &Board, piece: &Box<dyn Piece>, rows: Rows, cols: Cols) -> AttackLookup {
     let mut lookups = Vec::with_capacity((rows * cols) as usize);
 
     for i in 0..(rows * cols) {

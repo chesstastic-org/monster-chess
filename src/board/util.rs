@@ -31,8 +31,19 @@ impl BoardState {
     }
 }
 
+pub type AttackDirections = Vec<BitBoard>;
+
+/*
+    AttackLookup is indexed by the index of the Most Significant 1-Bit.
+
+    It stores an `AttackDirections` (alias for `Vec<BitBoard>`).
+        For pieces that always move the same way (like Delta Pieces), only the first slot of this AttackDirections is used, because there's no directions.
+        For slider pieces, there are different indexes for specific ray directions of it.
+*/
+pub type AttackLookup = Vec<AttackDirections>;
+
 pub struct Board {
     pub state: BoardState,
     pub pieces: Vec<Box<dyn Piece>>,
-    pub attack_lookup: Vec<Vec<BitBoard>>
+    pub attack_lookup: Vec<AttackLookup>
 }

@@ -1,4 +1,4 @@
-use crate::{Piece, BitBoard, PieceType, Board, Edges, Cols};
+use crate::{Piece, BitBoard, PieceType, Board, Edges, Cols, AttackDirections};
 
 pub struct KnightPiece {
     pub piece_type: PieceType
@@ -14,7 +14,7 @@ fn south_west_west(b: BitBoard, cols: Cols, edges: &Edges, deep_edges: &Edges) -
 fn south_south_west(b: BitBoard, cols: Cols, edges: &Edges, deep_edges: &Edges) -> BitBoard  { (b >> (2 * cols + 1)) & &!edges.right & &!deep_edges.bottom  }
 
 impl Piece for KnightPiece {
-    fn generate_moves(&self, board: &Board, from: BitBoard) -> BitBoard {
+    fn generate_moves(&self, board: &Board, from: BitBoard) -> AttackDirections {
         let cols = board.state.cols;
         let edges = &board.state.edges[0];
         let deep_edges = &board.state.edges[1];
@@ -28,7 +28,7 @@ impl Piece for KnightPiece {
         moves |= &south_west_west(from, cols, edges, deep_edges);
         moves |= &south_south_west(from, cols, edges, deep_edges);
 
-        moves
+        vec![ moves ]
     }   
 
     fn can_lookup(&self) -> bool {
@@ -40,6 +40,10 @@ impl Piece for KnightPiece {
     }
 
     fn get_moves(&self, board: &Board, from: BitBoard) -> BitBoard {
-        *self.get_attack_lookup(board, from).unwrap_or(&self.generate_moves(board, from))
+        let lookup = self.get_attack_lookup(board, from);
+        match lookup {
+            Some(lookup) => lookup[0],
+            None => self.generate_moves(board, from)[0]
+        }
     }
 }
