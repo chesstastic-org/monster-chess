@@ -1,4 +1,4 @@
-use crate::{Piece, BitBoard, PieceType, Board, Rows, Edges};
+use crate::{Piece, BitBoard, PieceType, Board, Rows, Edges, Cols};
 
 pub struct KingPiece {
     pub piece_type: PieceType
