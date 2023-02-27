@@ -36,8 +36,8 @@ Here's an example of what the King piece would look like with `monster-chess`'s 
 
 ```rust
 impl Piece for KingPiece {
-    // generate_moves will generate moves for attack tables
-    fn generate_moves(&self, board: &Board, mut from: BitBoard) -> AttackDirections {
+    // generate_lookup_moves will generate moves for attack tables
+    fn generate_lookup_moves(&self, board: &Board, mut from: BitBoard) -> AttackDirections {
         let moves = ...;
         vec![ moves ]
     }   

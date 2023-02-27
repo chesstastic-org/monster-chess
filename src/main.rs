@@ -10,6 +10,7 @@ fn main() {
             blockers: BitBoard::new(), 
             pieces: Vec::new(), 
             teams: Vec::new(),
+            first_move: BitBoard::new(),
             edges: generate_edge_list(8, 8),
             rows: 8, 
             cols: 8
@@ -41,7 +42,7 @@ fn main() {
     //let blocker = BitBoard::from_element(1 << 29);
     //board.state.blockers |= &blocker;
 
-    let moves = board.pieces[3].get_moves(&board, king_pos);
+    let moves = board.pieces[2].get_moves(&board, king_pos);
 
     println!("{}", king_pos.display(8, 8));
     println!("-");

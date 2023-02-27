@@ -5,7 +5,7 @@ pub fn generate_lookups(board: &Board, piece: &Box<dyn Piece>, rows: Rows, cols:
 
     for i in 0..(rows * cols) {
         let from = !(BitBoard::max() << 1) << i;
-        lookups.insert(i as usize, piece.generate_moves(board, from));
+        lookups.insert(i as usize, piece.generate_lookup_moves(board, from));
     }
 
     lookups

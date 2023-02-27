@@ -15,6 +15,7 @@ pub struct BoardState {
         Blockers is a BitBoard of all pieces, because keeping this bitboard ready makes it much easier to calculate movement for slider pieces.
     */
     pub blockers: BitBoard,
+    pub first_move: BitBoard,
     pub pieces: Vec<BitBoard>,
     pub teams: Vec<BitBoard>,
     /*

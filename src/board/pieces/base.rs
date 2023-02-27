@@ -9,5 +9,5 @@ pub trait Piece {
     }
 
     fn get_moves(&self, board: &Board, from: BitBoard) -> BitBoard;
-    fn generate_moves(&self, board: &Board, from: BitBoard) -> AttackDirections;
+    fn generate_lookup_moves(&self, board: &Board, from: BitBoard) -> AttackDirections;
 }

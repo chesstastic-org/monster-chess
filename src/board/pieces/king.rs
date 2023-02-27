@@ -4,27 +4,27 @@ pub struct KingPiece {
     pub piece_type: PieceType
 }
 
-fn left_one(from: BitBoard, edges: &Edges) -> BitBoard {
-    (from << 1) & &(!(edges.right))
+fn right_one(from: BitBoard, edges: &Edges) -> BitBoard {
+    from.right(1) & &!edges.right
 }
 
-fn right_one(from: BitBoard, edges: &Edges) -> BitBoard {
-    (from >> 1) & &(!(edges.left))
+fn left_one(from: BitBoard, edges: &Edges) -> BitBoard {
+    from.left(1) & &!edges.left
 }
 
 fn up_one(from: BitBoard, cols: Cols, edges: &Edges) -> BitBoard {
-    from >> cols & &(!(edges.bottom))
+    from.up(1, cols) & &!edges.bottom
 }
 
 fn down_one(from: BitBoard, cols: Cols, edges: &Edges) -> BitBoard {
-    from << cols & &(!(edges.top))
+    from.down(1, cols) & &!edges.top
 }
 
 impl Piece for KingPiece {
-    fn generate_moves(&self, board: &Board, mut from: BitBoard) -> AttackDirections {
+    fn generate_lookup_moves(&self, board: &Board, mut from: BitBoard) -> AttackDirections {
         let cols = board.state.cols;
         let edges = &board.state.edges[0];
-        let mut moves = left_one(from, edges) | &right_one(from, edges);
+        let mut moves = right_one(from, edges) | &left_one(from, edges);
         from |= &moves;
         moves |= &up_one(from, cols, edges);
         moves |= &down_one(from, cols, edges);
@@ -43,7 +43,7 @@ impl Piece for KingPiece {
         let lookup = self.get_attack_lookup(board, from);
         match lookup {
             Some(lookup) => lookup[from.bitscan_reverse() as usize][0],
-            None => self.generate_moves(board, from)[0]
+            None => self.generate_lookup_moves(board, from)[0]
         }
     }
 }

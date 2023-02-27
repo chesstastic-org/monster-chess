@@ -5,18 +5,18 @@ pub struct QueenPiece {
 }
 
 impl Piece for QueenPiece {
-    fn generate_moves(&self, board: &Board, from: BitBoard) -> AttackDirections {
+    fn generate_lookup_moves(&self, board: &Board, from: BitBoard) -> AttackDirections {
         let edges = &board.state.edges[0];
         let cols = board.state.cols;
         vec![
-            get_moves_ray(from, |b| { b >> 1 }, |b| b.is_empty() || !(b & &edges.left).is_empty()),
-            get_moves_ray(from, |b| { b << 1 }, |b| b.is_empty() || !(b & &edges.right).is_empty()),
-            get_moves_ray(from, |b| { b >> cols }, |b| b.is_empty() || !(b & &edges.top).is_empty()),
-            get_moves_ray(from, |b| { b << cols }, |b| b.is_empty() || !(b & &edges.bottom).is_empty()),
-            get_moves_ray(from, |b| { b >> (cols + 1) }, |b| b.is_empty() || !(b & &(edges.left | &edges.top)).is_empty()),
-            get_moves_ray(from, |b| { b << (cols + 1) }, |b| b.is_empty() || !(b & &(edges.right | &edges.bottom)).is_empty()),
-            get_moves_ray(from, |b| { b >> (cols - 1) }, |b| b.is_empty() || !(b & &(edges.right | &edges.top)).is_empty()),
-            get_moves_ray(from, |b| { b << (cols - 1) }, |b| b.is_empty() || !(b & &(edges.left | &edges.bottom)).is_empty()),
+            get_moves_ray(from, |b| { b.left(1) }, |b| b.is_empty() || (b & &edges.left).is_set()),
+            get_moves_ray(from, |b| { b.right(1) }, |b| b.is_empty() || (b & &edges.right).is_set()),
+            get_moves_ray(from, |b| { b.up(1, cols) }, |b| b.is_empty() || (b & &edges.top).is_set()),
+            get_moves_ray(from, |b| { b.down(1, cols) }, |b| b.is_empty() || (b & &edges.bottom).is_set()),
+            get_moves_ray(from, |b| { b.left(1).up(1, cols) }, |b| b.is_empty() || (b & &(edges.left | &edges.top)).is_set()),
+            get_moves_ray(from, |b| { b.left(1).down(1, cols) }, |b| b.is_empty() || (b & &(edges.left | &edges.bottom)).is_set()),
+            get_moves_ray(from, |b| { b.right(1).up(1, cols) }, |b| b.is_empty() || (b & &(edges.right | &edges.top)).is_set()),
+            get_moves_ray(from, |b| { b.right(1).down(1, cols) }, |b| b.is_empty() || (b & &(edges.right | &edges.bottom)).is_set())
         ]
     }   
 
