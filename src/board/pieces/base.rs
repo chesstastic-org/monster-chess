@@ -1,10 +1,4 @@
-use crate::{BitBoard, Board, PieceType, AttackDirections, AttackLookup};
-
-pub struct Action {
-    from: BitBoard,
-    to: BitBoard,
-    capture: bool
-}
+use crate::{BitBoard, Board, PieceType, AttackDirections, AttackLookup, Action};
 
 pub trait Piece {
     fn get_piece_type(&self) -> PieceType;
@@ -40,13 +34,13 @@ pub trait Piece {
                 }
             }
 
-            board.state.teams[color] ^= &action.from;
             board.state.teams[captured_color] ^= &action.to;
+            board.state.teams[color] ^= &action.from;
             board.state.teams[color] |= &action.to;
 
+            board.state.pieces[captured_piece_type] ^= &action.to;
             board.state.pieces[piece_type] ^= &action.from;
             board.state.pieces[piece_type] |= &action.to;
-            board.state.pieces[captured_piece_type] ^= &action.to;
 
             board.state.blockers ^= &action.from;
             // We actually don't need to swap the blockers. A blocker will still exist on `to`, just not on `from`.
