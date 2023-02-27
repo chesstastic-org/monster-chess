@@ -15,6 +15,7 @@ impl Board {
     pub fn generate_lookups(&mut self) {
         for (ind, piece) in self.pieces.iter().enumerate() {
             if !piece.can_lookup() {
+                self.attack_lookup.insert(ind, vec![]);
                 continue;
             }
 
