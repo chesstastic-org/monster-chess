@@ -11,6 +11,7 @@ fn main() {
 
     let mut board = Board {
         state: BoardState { 
+            history: Vec::new(),
             blockers: BitBoard::new(), 
             pieces: Vec::new(), 
             teams: Vec::new(),

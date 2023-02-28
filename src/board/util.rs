@@ -1,4 +1,4 @@
-use crate::{BitSet, Piece, Edges};
+use crate::{BitSet, Piece, Edges, HistoryMove};
 
 pub type BitBoard = BitSet::<1>;
 pub type PieceType = usize;
@@ -23,7 +23,9 @@ pub struct BoardState {
     */
     pub edges: Vec<Edges>,
     pub rows: Rows,
-    pub cols: Cols
+    pub cols: Cols,
+
+    pub history: Vec<HistoryMove>
 } 
 
 impl BoardState {

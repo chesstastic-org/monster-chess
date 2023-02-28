@@ -1,4 +1,4 @@
-use crate::{BitBoard, Board, PieceType, AttackDirections, AttackLookup, Action};
+use crate::{BitBoard, Board, PieceType, AttackDirections, AttackLookup, Action, HistoryMove, IndexedPreviousBoard, PreviousBoard, NoHistoryMoves};
 
 pub trait Piece {
     fn get_piece_type(&self) -> PieceType;
@@ -34,6 +34,21 @@ pub trait Piece {
                 }
             }
 
+            let history_move: HistoryMove = HistoryMove {
+                action: *action,
+                teams: vec![
+                    IndexedPreviousBoard(color, board.state.teams[color]),
+                    IndexedPreviousBoard(captured_color, board.state.teams[captured_color])
+                ],
+                pieces: vec![
+                    IndexedPreviousBoard(piece_type, board.state.teams[piece_type]),
+                    IndexedPreviousBoard(captured_piece_type, board.state.teams[captured_piece_type])
+                ],
+                blockers: PreviousBoard(board.state.blockers),
+                first_move: PreviousBoard(board.state.first_move)
+            };
+            board.state.history.push(history_move);
+
             board.state.teams[captured_color] ^= &action.to;
             board.state.teams[color] ^= &action.from;
             board.state.teams[color] |= &action.to;
@@ -52,6 +67,19 @@ pub trait Piece {
             };
             let piece_type = self.get_piece_type();
 
+            let history_move: HistoryMove = HistoryMove {
+                action: *action,
+                teams: vec![
+                    IndexedPreviousBoard(color, board.state.teams[color])
+                ],
+                pieces: vec![
+                    IndexedPreviousBoard(piece_type, board.state.teams[piece_type])
+                ],
+                blockers: PreviousBoard(board.state.blockers),
+                first_move: PreviousBoard(board.state.first_move)
+            };
+            board.state.history.push(history_move);
+
             board.state.teams[color] ^= &action.from;
             board.state.teams[color] |= &action.to;
 
@@ -60,6 +88,29 @@ pub trait Piece {
 
             board.state.blockers ^= &action.from;
             board.state.blockers |= &action.to;
+        }
+    }
+
+    fn undo_move(&self, board: &mut Board) -> Result<(), NoHistoryMoves> {
+        let history_move = board.state.history.pop();
+        match history_move {
+            Some(history_move) => {
+                for IndexedPreviousBoard(index, bitboard) in history_move.teams {
+                    board.state.teams[index] = bitboard;
+                }
+
+                for IndexedPreviousBoard(index, bitboard) in history_move.pieces {
+                    board.state.pieces[index] = bitboard;
+                }
+
+                board.state.blockers = history_move.blockers.0;
+                board.state.first_move = history_move.first_move.0;
+
+                Ok(())
+            }
+            None => {
+                Err(NoHistoryMoves)
+            }
         }
     }
 }

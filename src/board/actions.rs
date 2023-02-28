@@ -1,5 +1,7 @@
 use crate::BitBoard;
 
+pub struct NoHistoryMoves;
+
 #[derive(Copy, Clone, Debug)]
 pub struct Action {
     pub from: BitBoard,
@@ -11,13 +13,10 @@ pub struct Action {
 pub struct PreviousBoard(pub BitBoard);
 
 #[derive(Copy, Clone, Debug)]
-pub struct IndexedPreviousBoard { 
-    pub index: usize,
-    pub previous_board: BitBoard
-}
+pub struct IndexedPreviousBoard(pub usize, pub BitBoard);
 
 #[derive(Clone, Debug)]
-pub struct UndoMove {
+pub struct HistoryMove {
     pub action: Action,
     pub pieces: Vec<IndexedPreviousBoard>,
     pub teams: Vec<IndexedPreviousBoard>,
