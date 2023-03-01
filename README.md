@@ -99,7 +99,7 @@ Because `monster-chess` is aiming to support all chess variants, a general modif
     - If the `!` marker follows a piece (eg. `p!`), that piece has moved at least once already. This is a general way to handle things like first pawn moves and castling rights.
     - Like typical FEN, if a piece is uppercase it will be assumed as team zero (white), and if it's lowercase it will be assumed as team one (black.) However, you can specify an `{T}` marker after a given piece to specify its team.
 
-For instance, `p!{3}` is a pawn that has moved once before on the fourth time. (We're using zero as the first index, much like arrays do in programming.)
+For instance, `p!{3}` is a pawn that has moved once before on the fourth team. (We're using zero as the first index, much like arrays do in programming.)
 
 The active team to move can be represented by either `w` (team 0) and `b` (team 1), or by the team number to move itself.
 
