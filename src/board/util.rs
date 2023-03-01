@@ -94,7 +94,10 @@ impl Board {
     }
 
     pub fn new(pieces: Vec<Box<dyn Piece>>, teams: u128, (rows, cols): (Rows, Cols), fen: &str) -> Board {
-        let mut board = Board::empty(pieces, teams, (rows, cols));
+        let mut board = Board::empty(
+            pieces.iter().map(|el| el.duplicate()).collect::<Vec<_>>(), 
+            teams, (rows, cols)
+        );
 
         let mut board_ind = 0;
         for row in fen.split("/") {
@@ -105,9 +108,12 @@ impl Board {
 
                 if char.is_numeric() {
                     board_ind += char.to_digit(10).unwrap();
-                } else {
-                    board_ind += 1;
+                    i += 1;
+                    continue;
                 }
+
+                let lower_char = char.to_ascii_lowercase();
+                let piece_type = pieces.iter().position(|piece| piece.get_piece_symbol() == lower_char).unwrap();
 
                 let mut first_move = true;
 
@@ -127,6 +133,16 @@ impl Board {
                     }
                 }
 
+                let piece_board = BitBoard::from_msb(board_ind);
+
+                board.state.teams[team as usize] |= &piece_board;
+                board.state.pieces[piece_type] |= &piece_board;
+                board.state.blockers |= &piece_board;
+                if first_move {
+                    board.state.first_move |= &piece_board;
+                }
+                
+                board_ind += 1;
                 i += 1;
             }
         }

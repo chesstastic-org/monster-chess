@@ -21,8 +21,13 @@ fn down_one(from: BitBoard, cols: Cols, edges: &Edges) -> BitBoard {
 }
 
 impl Piece for KingPiece {
-    fn get_piece_symbol(&self) -> &str {
-        "k"
+    fn duplicate(&self) -> Box<dyn Piece> {
+        Box::new(Self { piece_type: self.piece_type })
+    }
+
+
+    fn get_piece_symbol(&self) -> char {
+        'k'
     }
 
     fn generate_lookup_moves(&self, board: &Board, mut from: BitBoard) -> AttackDirections {

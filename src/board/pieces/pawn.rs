@@ -5,12 +5,16 @@ pub struct PawnPiece {
 }
 
 impl Piece for PawnPiece {
+    fn duplicate(&self) -> Box<dyn Piece> {
+        Box::new(Self { piece_type: self.piece_type })
+    }
+
     fn can_lookup(&self) -> bool {
         false
     }
 
-    fn get_piece_symbol(&self) -> &str {
-        "p"
+    fn get_piece_symbol(&self) -> char {
+        'p'
     }
 
     fn get_piece_type(&self) -> PieceType {

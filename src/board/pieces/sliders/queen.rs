@@ -5,8 +5,13 @@ pub struct QueenPiece {
 }
 
 impl Piece for QueenPiece {
-    fn get_piece_symbol(&self) -> &str {
-        "q"
+    fn duplicate(&self) -> Box<dyn Piece> {
+        Box::new(Self { piece_type: self.piece_type })
+    }
+
+
+    fn get_piece_symbol(&self) -> char {
+        'q'
     }
 
     fn generate_lookup_moves(&self, board: &Board, from: BitBoard) -> AttackDirections {

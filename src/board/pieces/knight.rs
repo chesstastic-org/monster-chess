@@ -37,8 +37,13 @@ fn down_left2(b: BitBoard, cols: Cols, edges: &Edges, deep_edges: &Edges) -> Bit
 }
 
 impl Piece for KnightPiece {
-    fn get_piece_symbol(&self) -> &str {
-        "n"
+    fn duplicate(&self) -> Box<dyn Piece> {
+        Box::new(Self { piece_type: self.piece_type })
+    }
+
+
+    fn get_piece_symbol(&self) -> char {
+        'n'
     }
 
     fn generate_lookup_moves(&self, board: &Board, from: BitBoard) -> AttackDirections {

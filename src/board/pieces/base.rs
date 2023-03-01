@@ -1,8 +1,10 @@
 use crate::{BitBoard, Board, PieceType, AttackDirections, AttackLookup, Action, HistoryMove, IndexedPreviousBoard, PreviousBoard, NoHistoryMoves};
 
 pub trait Piece {
+    fn duplicate(&self) -> Box<dyn Piece>;
+
     fn get_piece_type(&self) -> PieceType;
-    fn get_piece_symbol(&self) -> &str;
+    fn get_piece_symbol(&self) -> char;
 
     fn can_lookup(&self) -> bool;
     fn get_attack_lookup<'a>(&self, board: &'a Board, from: BitBoard) -> Option<&'a AttackLookup> {
@@ -59,6 +61,9 @@ pub trait Piece {
             board.state.pieces[piece_type] |= &action.to;
 
             board.state.blockers ^= &action.from;
+
+            board.state.first_move ^= &action.from;
+            board.state.first_move ^= &action.to;
             // We actually don't need to swap the blockers. A blocker will still exist on `to`, just not on `from`.
         } else {
             let color: usize = if (action.from & &board.state.teams[0]).is_set() {
@@ -89,6 +94,8 @@ pub trait Piece {
 
             board.state.blockers ^= &action.from;
             board.state.blockers |= &action.to;
+            
+            board.state.first_move ^= &action.from;
         }
     }
 

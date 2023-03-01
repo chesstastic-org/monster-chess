@@ -5,8 +5,13 @@ pub struct BishopPiece {
 }
 
 impl Piece for BishopPiece {
-    fn get_piece_symbol(&self) -> &str {
-        "b"
+    fn duplicate(&self) -> Box<dyn Piece> {
+        Box::new(Self { piece_type: self.piece_type })
+    }
+
+
+    fn get_piece_symbol(&self) -> char {
+        'b'
     }
 
     fn generate_lookup_moves(&self, board: &Board, from: BitBoard) -> AttackDirections {
