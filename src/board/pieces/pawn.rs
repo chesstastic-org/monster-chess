@@ -9,6 +9,10 @@ impl Piece for PawnPiece {
         false
     }
 
+    fn get_piece_symbol(&self) -> &str {
+        "p"
+    }
+
     fn get_piece_type(&self) -> PieceType {
         self.piece_type
     }

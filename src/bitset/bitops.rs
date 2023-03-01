@@ -53,10 +53,10 @@ impl<const T: usize> ops::BitXorAssign<&BitSet<T>> for BitSet<T> {
     }
 }
 
-impl<const T: usize> ops::Shl<u128> for BitSet<T> {
+impl<const T: usize> ops::Shl<u32> for BitSet<T> {
     type Output = BitSet<T>;
 
-    fn shl(self, rhs: u128) -> Self::Output {
+    fn shl(self, rhs: u32) -> Self::Output {
         if T == 1 {
             return BitSet {
                 data: [ self.data[0] << rhs; T ]
@@ -70,8 +70,8 @@ impl<const T: usize> ops::Shl<u128> for BitSet<T> {
     }
 }
 
-impl<const T: usize> ops::ShlAssign<u128> for BitSet<T> {
-    fn shl_assign(&mut self, mut rhs: u128) {
+impl<const T: usize> ops::ShlAssign<u32> for BitSet<T> {
+    fn shl_assign(&mut self, mut rhs: u32) {
         if T == 1 {
             self.data = [ self.data[0] << rhs; T ];
             return;
@@ -95,10 +95,10 @@ impl<const T: usize> ops::ShlAssign<u128> for BitSet<T> {
     }
 }
 
-impl<const T: usize> ops::Shr<u128> for BitSet<T> {
+impl<const T: usize> ops::Shr<u32> for BitSet<T> {
     type Output = BitSet<T>;
 
-    fn shr(self, rhs: u128) -> Self::Output {
+    fn shr(self, rhs: u32) -> Self::Output {
         if T == 1 {
             return BitSet {
                 data: [ self.data[0] >> rhs; T ]
@@ -112,8 +112,8 @@ impl<const T: usize> ops::Shr<u128> for BitSet<T> {
     }
 }
 
-impl<const T: usize> ops::ShrAssign<u128> for BitSet<T> {
-    fn shr_assign(&mut self, mut rhs: u128) {
+impl<const T: usize> ops::ShrAssign<u32> for BitSet<T> {
+    fn shr_assign(&mut self, mut rhs: u32) {
         if T == 1 {
             self.data = [ self.data[0] >> rhs; T ];
             return;

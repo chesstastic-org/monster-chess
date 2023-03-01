@@ -5,6 +5,10 @@ pub struct RookPiece {
 }
 
 impl Piece for RookPiece {
+    fn get_piece_symbol(&self) -> &str {
+        "r"
+    }
+    
     fn generate_lookup_moves(&self, board: &Board, from: BitBoard) -> AttackDirections {
         let edges = &board.state.edges[0];
         let cols = board.state.cols;

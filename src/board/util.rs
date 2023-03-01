@@ -1,4 +1,4 @@
-use crate::{BitSet, Piece, Edges, HistoryMove};
+use crate::{BitSet, Piece, Edges, HistoryMove, generate_edge_list};
 
 pub type BitBoard = BitSet::<1>;
 pub type PieceType = usize;
@@ -49,4 +49,88 @@ pub struct Board {
     pub state: BoardState,
     pub pieces: Vec<Box<dyn Piece>>,
     pub attack_lookup: Vec<AttackLookup>
+}
+
+/*
+    This is a special generalized FEN format.
+
+    We assume two modes of this:
+        2-Teams Mode, where capitalized means white team and lowercase means block.
+        3+ Teams Mode, where the team of a piece is specialized via {} around the piece
+            Eg. P{2} is a Pawn of Team 2
+
+    "!" must be placed after a piece to show that it is not its first move
+        P! would be a pawn that has moved before
+
+    Note: "!" must be before "{"
+
+    For the normal chess game itself, a special constructor will be provided to create an 8x8 chess board.
+
+    The rest of this should follow the same FEN format that the rest of chess does.
+*/
+
+impl Board {
+    pub fn empty(pieces: Vec<Box<dyn Piece>>, teams: u128, (rows, cols): (Rows, Cols)) -> Board {
+        let pieces_state = &pieces.iter().map(|_| BitBoard::new()).collect::<Vec<_>>().clone();
+
+        let mut board = Board {
+            attack_lookup: vec![],
+            pieces,
+            state: BoardState {
+                blockers: BitBoard::new(),
+                first_move: BitBoard::new(),
+                pieces: pieces_state.clone(),
+                teams: (0..teams).map(|_| BitBoard::new()).collect::<Vec<_>>(),
+                edges: generate_edge_list(rows, cols),
+                cols,
+                rows,
+                history: vec![]
+            }
+        };
+
+        board.generate_lookups();
+
+        board
+    }
+
+    pub fn new(pieces: Vec<Box<dyn Piece>>, teams: u128, (rows, cols): (Rows, Cols), fen: &str) -> Board {
+        let mut board = Board::empty(pieces, teams, (rows, cols));
+
+        let mut board_ind = 0;
+        for row in fen.split("/") {
+            let chars = row.chars().collect::<Vec<_>>();   
+            let mut i = 0;
+            while i < chars.len() {
+                let char = chars[i];
+
+                if char.is_numeric() {
+                    board_ind += char.to_digit(10).unwrap();
+                } else {
+                    board_ind += 1;
+                }
+
+                let mut first_move = true;
+
+                if let Some(next_char) = chars.get(i + 1) {
+                    if next_char == &'!' {
+                        first_move = false;
+                        i += 1;
+                    }
+                }
+
+                let mut team: u32 = if char.is_ascii_uppercase() { 0 } else { 1 };
+
+                if let Some(next_char) = chars.get(i + 1) {
+                    if next_char == &'{' {
+                        team = chars.get(i + 2).unwrap().to_digit(10).unwrap() - 1;
+                        i += 3;
+                    }
+                }
+
+                i += 1;
+            }
+        }
+
+        board
+    }
 }

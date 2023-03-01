@@ -25,6 +25,10 @@ impl<const T: usize> BitSet<T> {
         }
     }
 
+    pub fn from_msb(bit: u32) -> BitSet<T> {
+        !(BitSet::<T>::max() << 1) << bit
+    }
+
     pub fn is_empty(&self) -> bool {
         if T == 1 {
             self.data[0] == 0   

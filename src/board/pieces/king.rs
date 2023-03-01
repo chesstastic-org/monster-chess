@@ -21,6 +21,10 @@ fn down_one(from: BitBoard, cols: Cols, edges: &Edges) -> BitBoard {
 }
 
 impl Piece for KingPiece {
+    fn get_piece_symbol(&self) -> &str {
+        "k"
+    }
+
     fn generate_lookup_moves(&self, board: &Board, mut from: BitBoard) -> AttackDirections {
         let cols = board.state.cols;
         let edges = &board.state.edges[0];

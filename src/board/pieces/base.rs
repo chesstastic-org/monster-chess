@@ -2,6 +2,7 @@ use crate::{BitBoard, Board, PieceType, AttackDirections, AttackLookup, Action, 
 
 pub trait Piece {
     fn get_piece_type(&self) -> PieceType;
+    fn get_piece_symbol(&self) -> &str;
 
     fn can_lookup(&self) -> bool;
     fn get_attack_lookup<'a>(&self, board: &'a Board, from: BitBoard) -> Option<&'a AttackLookup> {
