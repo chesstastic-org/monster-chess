@@ -17,13 +17,16 @@ pub trait Piece {
     }
 
     fn make_move(&self, board: &mut Board, action: &Action) {
-        if action.capture {
-            let color: usize = if (action.from & &board.state.teams[0]).is_set() {
+        let from = BitBoard::from_msb(action.from);
+        let to = BitBoard::from_msb(action.to);
+
+        if board.state.blockers.has_bit(action.to) {
+            let color: usize = if (from & &board.state.teams[0]).is_set() {
                 0
             } else {
                 1
             };
-            let captured_color: usize = if (action.to & &board.state.teams[0]).is_set() {
+            let captured_color: usize = if (to & &board.state.teams[0]).is_set() {
                 0
             } else {
                 1
@@ -31,12 +34,12 @@ pub trait Piece {
             let piece_type = self.get_piece_type();
             let mut captured_piece_type: usize = 0; 
             for i in 0..(board.pieces.len()) {
-                if (board.state.pieces[i] & &action.to).is_set() {
+                if (board.state.pieces[i] & &to).is_set() {
                     captured_piece_type = i;
                     break;
                 }
             }
-
+        
             let history_move: HistoryMove = HistoryMove {
                 action: *action,
                 teams: vec![
@@ -51,28 +54,28 @@ pub trait Piece {
                 first_move: PreviousBoard(board.state.first_move)
             };
             board.state.history.push(history_move);
-
-            board.state.teams[captured_color] ^= &action.to;
-            board.state.teams[color] ^= &action.from;
-            board.state.teams[color] |= &action.to;
-
-            board.state.pieces[captured_piece_type] ^= &action.to;
-            board.state.pieces[piece_type] ^= &action.from;
-            board.state.pieces[piece_type] |= &action.to;
-
-            board.state.blockers ^= &action.from;
-
-            board.state.first_move ^= &action.from;
-            board.state.first_move ^= &action.to;
+        
+            board.state.teams[captured_color] ^= &to;
+            board.state.teams[color] ^= &from;
+            board.state.teams[color] |= &to;
+        
+            board.state.pieces[captured_piece_type] ^= &to;
+            board.state.pieces[piece_type] ^= &from;
+            board.state.pieces[piece_type] |= &to;
+        
+            board.state.blockers ^= &from;
+        
+            board.state.first_move ^= &from;
+            board.state.first_move ^= &to;
             // We actually don't need to swap the blockers. A blocker will still exist on `to`, just not on `from`.
         } else {
-            let color: usize = if (action.from & &board.state.teams[0]).is_set() {
+            let color: usize = if (from & &board.state.teams[0]).is_set() {
                 0
             } else {
                 1
             };
             let piece_type = self.get_piece_type();
-
+        
             let history_move: HistoryMove = HistoryMove {
                 action: *action,
                 teams: vec![
@@ -85,17 +88,17 @@ pub trait Piece {
                 first_move: PreviousBoard(board.state.first_move)
             };
             board.state.history.push(history_move);
-
-            board.state.teams[color] ^= &action.from;
-            board.state.teams[color] |= &action.to;
-
-            board.state.pieces[piece_type] ^= &action.from;
-            board.state.pieces[piece_type] |= &action.to;
-
-            board.state.blockers ^= &action.from;
-            board.state.blockers |= &action.to;
+        
+            board.state.teams[color] ^= &from;
+            board.state.teams[color] |= &to;
+        
+            board.state.pieces[piece_type] ^= &from;
+            board.state.pieces[piece_type] |= &to;
+        
+            board.state.blockers ^= &from;
+            board.state.blockers |= &to;
             
-            board.state.first_move ^= &action.from;
+            board.state.first_move ^= &from;
         }
     }
 
@@ -118,6 +121,29 @@ pub trait Piece {
             }
             None => {
                 Err(NoHistoryMoves)
+            }
+        }
+    }
+
+    fn add_actions(&self, board: &mut Board, from: u32, actions: &mut Vec<Action>) {
+        let from_board = BitBoard::from_msb(from);
+        let bit_actions = self.get_moves(board, from_board);
+
+        if bit_actions.is_empty() {
+            return;
+        }
+        
+        let rows = board.state.rows;
+        let cols = board.state.cols;
+
+        let first_bit = bit_actions.bitscan_reverse();
+        for bit in first_bit..((rows * cols) as u32) {
+            if bit_actions.has_bit(bit) {
+                actions.push(Action {
+                    from,
+                    to: bit,
+                    info: 0
+                })
             }
         }
     }

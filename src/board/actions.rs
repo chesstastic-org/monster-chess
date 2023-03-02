@@ -4,9 +4,9 @@ pub struct NoHistoryMoves;
 
 #[derive(Copy, Clone, Debug)]
 pub struct Action {
-    pub from: BitBoard,
-    pub to: BitBoard,
-    pub capture: bool
+    pub from: u32,
+    pub to: u32,
+    pub info: u32
 }
 
 #[derive(Copy, Clone, Debug)]

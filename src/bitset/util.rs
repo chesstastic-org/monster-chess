@@ -29,6 +29,10 @@ impl<const T: usize> BitSet<T> {
         !(BitSet::<T>::max() << 1) << bit
     }
 
+    pub fn has_bit(&self, bit: u32) -> bool {
+        (*self & &(BitSet::<T>::from_element(1) << bit)).is_set()
+    }
+
     pub fn is_empty(&self) -> bool {
         if T == 1 {
             self.data[0] == 0   
@@ -61,6 +65,22 @@ impl<const T: usize> BitSet<T> {
 
     pub fn effect(&mut self, rhs: &BitSet<T>, apply: impl Fn((&u128, &u128)) -> u128) {
         self.data = self.data.iter().zip(&rhs.data).map(apply).collect::<Vec<_>>().try_into().unwrap()
+    }
+
+    pub fn count_zeros(&self) -> u32 {
+        if T == 1 {
+            self.data[0].count_zeros()
+        } else {
+            self.data.iter().map(|el| el.count_zeros()).sum()
+        }
+    }
+
+    pub fn count_ones(&self) -> u32 {
+        if T == 1 {
+            self.data[0].count_ones()
+        } else {
+            self.data.iter().map(|el| el.count_ones()).sum()
+        }
     }
 
     /*
