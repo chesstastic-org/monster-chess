@@ -1,4 +1,4 @@
-use crate::{BitSet, Piece, Edges, HistoryMove, generate_edge_list};
+use crate::{BitSet, Piece, Edges, HistoryMove, generate_edge_list, Action};
 
 pub type BitBoard = BitSet::<1>;
 pub type PieceType = usize;
@@ -148,5 +148,21 @@ impl Board {
         }
 
         board
+    }
+
+    pub fn generate_moves(&self, team: u32) -> Vec<Action> {
+        let board_len = self.state.rows * self.state.cols;
+        let mut actions: Vec<Action> = Vec::with_capacity(board_len as usize);
+
+        for (ind, board) in self.state.pieces.iter().enumerate() {
+            let board = *board & &self.state.teams[team as usize];
+            let piece = &self.pieces[ind];
+            
+            for bit in board.iter_one_bits(board_len as u32) {
+                piece.add_actions(&mut actions, self, bit, team);
+            }
+        }
+
+        actions
     }
 }

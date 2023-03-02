@@ -15,10 +15,14 @@ Types of games that we're aiming to be compatible with:
 - [FRC Chess](https://en.wikipedia.org/wiki/Fischer_random_chess)
 - [Shogi](https://en.wikipedia.org/wiki/Shogi)
 - [Maharajah and the Sepoys](https://en.wikipedia.org/wiki/Maharajah_and_the_Sepoys)
+- [Ataxx](https://en.wikipedia.org/wiki/Ataxx)
+
+Types of games we *may* aim to be comaptible with:
+- [Go](https://en.wikipedia.org/wiki/Go_(game))
 
 Types of games we're not aiming to be compatible with:
-- [Go](https://en.wikipedia.org/wiki/Go_(game))
 - [5D Chess with Multiversal Time Travel](https://store.steampowered.com/app/1349230/5D_Chess_With_Multiverse_Time_Travel/)
+- [Minecraft](https://en.wikipedia.org/wiki/Minecraft)
 
 If you're wondering if a given game or chess variant is compatible with chess, imagine starting with the base game of chess, and see if you can do any of the following to get to your variant.
 
@@ -79,7 +83,7 @@ impl Piece for KingPiece {
     }
 
     // get_moves will fetch the moves for move generation itself
-    fn get_moves(&self, board: &Board, from: BitBoard) -> BitBoard {
+    fn get_moves(&self, board: &Board, from: BitBoard, team: u32) -> BitBoard {
         let lookup = self.get_attack_lookup(board, from);
         match lookup {
             Some(lookup) => lookup[from.bitscan_reverse() as usize][0],

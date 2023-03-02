@@ -96,6 +96,17 @@ impl<const T: usize> BitSet<T> {
         bits
     }
 
+    pub fn iter_one_bits(&self, end: u32) -> Vec<u32> {
+        let first_bit = self.bitscan_reverse();
+        let mut bits: Vec<u32> = Vec::with_capacity((end - first_bit) as usize);
+        for bit in first_bit..end {
+            if self.has_bit(bit) {
+                bits.push(bit);
+            }
+        }
+        bits
+    }
+
     pub fn display(&self, rows: usize, cols: usize) -> String {
         let mut chunks = Vec::<String>::with_capacity(rows);
         for (ind, row) in self.get_bits().chunks(cols).enumerate() {

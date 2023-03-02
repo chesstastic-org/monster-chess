@@ -35,6 +35,12 @@ fn main() {
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
     );
 
+    /*let from = board.state.pieces[1] & &BitBoard::from_msb(1);
+    let e = vec![ board.pieces[1].get_moves(&board, from, 1) & &!board.state.teams[1] ]
+    .iter().map(|el| el.display(8, 8)).fold("".to_string(), |a, b| a + "\n-\n" + &b);*/
+
+    println!("{:?}", board.generate_moves(1).len());
+
     //println!("{}", board.state.first_move.display(8, 8));
 
     /*let king_pos = BitBoard::from_element(1 << 28);

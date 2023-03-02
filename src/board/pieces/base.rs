@@ -11,7 +11,7 @@ pub trait Piece {
         board.attack_lookup.get(self.get_piece_type())
     }
 
-    fn get_moves(&self, board: &Board, from: BitBoard) -> BitBoard;
+    fn get_moves(&self, board: &Board, from: BitBoard, team: u32) -> BitBoard;
     fn generate_lookup_moves(&self, board: &Board, from: BitBoard) -> AttackDirections {
         Vec::new()
     }
@@ -125,9 +125,9 @@ pub trait Piece {
         }
     }
 
-    fn add_actions(&self, board: &mut Board, from: u32, actions: &mut Vec<Action>) {
+    fn add_actions(&self, actions: &mut Vec<Action>, board: &Board, from: u32, team: u32) {
         let from_board = BitBoard::from_msb(from);
-        let bit_actions = self.get_moves(board, from_board);
+        let bit_actions = self.get_moves(board, from_board, team) & &!board.state.teams[team as usize];
 
         if bit_actions.is_empty() {
             return;
@@ -136,15 +136,12 @@ pub trait Piece {
         let rows = board.state.rows;
         let cols = board.state.cols;
 
-        let first_bit = bit_actions.bitscan_reverse();
-        for bit in first_bit..((rows * cols) as u32) {
-            if bit_actions.has_bit(bit) {
-                actions.push(Action {
-                    from,
-                    to: bit,
-                    info: 0
-                })
-            }
+        for bit in bit_actions.iter_one_bits((rows * cols) as u32) {
+            actions.push(Action {
+                from,
+                to: bit,
+                info: 0
+            });
         }
     }
 }

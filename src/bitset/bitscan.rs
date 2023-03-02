@@ -8,7 +8,7 @@ impl<const T: usize> BitSet<T> {
         debug_assert!(self.is_set(), "Bitscan Forward only works for non-empty bitsets.");
 
         if T == 1 {
-            self.data[0].leading_zeros()
+            127 - self.data[0].leading_zeros()
         } else {
             let mut zeros: u32 = 0;
             for i in 0..T {
@@ -20,7 +20,7 @@ impl<const T: usize> BitSet<T> {
 
                 zeros += 128;
             }
-            zeros
+            ((128 * T) - 1) as u32 - zeros
         }
     }
 
