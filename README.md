@@ -107,6 +107,29 @@ Then, the last UCI moves, specified by a `,` can be shown. For instance: `e2e4, 
 
 Finally, the halfmove clock and fullmove clocks are the same as traditional FEN notation.
 
+
+## TODOs
+
+### Indirection
+
+As of right now, we store `Piece` as a `Box<dyn Piece>`, which introduces a layer of indirection. However, since we can guarantee the size of `Piece`, and we just want `Piece`'s functionality, we can optimize by writing our own vtable that removes the indirection.
+
+_(Example provided by the very kind quicknir#3667 on the Rust Programming Language Community Server.)_
+```rust
+struct foo {
+    first_method: fn(i32, i32) -> i32,
+}
+
+fn first_method_impl_one(x: i32, y: i32) -> i32 { x + y }
+
+static impl_one: foo = foo{first_method: first_method_impl_one};
+
+fn main() {
+   let mut v = vec![];
+   v.push(&impl_one);
+}
+```
+
 ## License
 
 `monster-chess` available under the

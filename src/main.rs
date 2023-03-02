@@ -9,18 +9,8 @@ pub use bitset::*;
 fn main() {
     env::set_var("RUST_BACKTRACE", "1");
 
-    let mut board = Board {
-        state: BoardState { 
-            history: Vec::new(),
-            blockers: BitBoard::new(), 
-            pieces: Vec::new(), 
-            teams: Vec::new(),
-            first_move: BitBoard::new(),
-            edges: generate_edge_list(8, 8),
-            rows: 8, 
-            cols: 8
-        },
-        pieces: vec![
+    let mut board = Board::new(
+        vec![
             Box::new(PawnPiece {
                 piece_type: 0
             }),
@@ -38,14 +28,16 @@ fn main() {
             }),
             Box::new(KingPiece {
                 piece_type: 5
-            })
+            }),
         ],
-        attack_lookup: Vec::new()
-    };
+        2,
+        (8, 8),
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
+    );
 
-    board.generate_lookups();
+    //println!("{}", board.state.first_move.display(8, 8));
 
-    let king_pos = BitBoard::from_element(1 << 28);
+    /*let king_pos = BitBoard::from_element(1 << 28);
 
     board.state.first_move |= &king_pos;
     
@@ -56,5 +48,5 @@ fn main() {
 
     println!("{}", king_pos.display(8, 8));
     println!("-");
-    println!("{}", moves.display(8, 8));
+    println!("{}", moves.display(8, 8));*/
 }
