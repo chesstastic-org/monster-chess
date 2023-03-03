@@ -1,4 +1,4 @@
-use crate::{BitSet, Piece, Edges, HistoryMove, generate_edge_list, Action};
+use crate::{BitSet, Piece, Edges, HistoryMove, generate_edge_list, Action, Game};
 
 pub type BitBoard = BitSet::<1>;
 pub type PieceType = usize;
@@ -47,7 +47,7 @@ pub type AttackLookup = Vec<AttackDirections>;
 
 pub struct Board {
     pub state: BoardState,
-    pub pieces: Vec<Box<dyn Piece>>,
+    pub game: Game,
     pub attack_lookup: Vec<AttackLookup>
 }
 
@@ -70,12 +70,12 @@ pub struct Board {
 */
 
 impl Board {
-    pub fn empty(pieces: Vec<Box<dyn Piece>>, teams: u128, (rows, cols): (Rows, Cols)) -> Board {
-        let pieces_state = &pieces.iter().map(|_| BitBoard::new()).collect::<Vec<_>>().clone();
+    pub fn empty(game: Game, teams: u128, (rows, cols): (Rows, Cols)) -> Board {
+        let pieces_state = game.pieces.iter().map(|_| BitBoard::new()).collect::<Vec<_>>().clone();
 
         let mut board = Board {
             attack_lookup: vec![],
-            pieces,
+            game,
             state: BoardState {
                 blockers: BitBoard::new(),
                 first_move: BitBoard::new(),
@@ -93,9 +93,11 @@ impl Board {
         board
     }
 
-    pub fn new(pieces: Vec<Box<dyn Piece>>, teams: u128, (rows, cols): (Rows, Cols), fen: &str) -> Board {
+    pub fn new(game: Game, teams: u128, (rows, cols): (Rows, Cols), fen: &str) -> Board {
+        let pieces = game.pieces.iter().map(|el| el.duplicate()).collect::<Vec<_>>();
+
         let mut board = Board::empty(
-            pieces.iter().map(|el| el.duplicate()).collect::<Vec<_>>(), 
+            game, 
             teams, (rows, cols)
         );
 
@@ -150,13 +152,29 @@ impl Board {
         board
     }
 
+    pub fn get_attack_mask(&self, team: u32) -> BitBoard {
+        let board_len = self.state.rows * self.state.cols;
+        let mut bitboard = BitBoard::new();
+
+        for (ind, board) in self.state.pieces.iter().enumerate() {
+            let board = *board & &self.state.teams[team as usize];
+            let piece = &self.game.pieces[ind];
+            
+            for bit in board.iter_one_bits(board_len as u32) {
+                bitboard |= &piece.get_moves(self, BitBoard::from_lsb(bit), team);
+            }
+        }
+
+        bitboard
+    }
+
     pub fn generate_moves(&self, team: u32) -> Vec<Action> {
         let board_len = self.state.rows * self.state.cols;
         let mut actions: Vec<Action> = Vec::with_capacity(board_len as usize);
 
         for (ind, board) in self.state.pieces.iter().enumerate() {
             let board = *board & &self.state.teams[team as usize];
-            let piece = &self.pieces[ind];
+            let piece = &self.game.pieces[ind];
             
             for bit in board.iter_one_bits(board_len as u32) {
                 piece.add_actions(&mut actions, self, bit, team);

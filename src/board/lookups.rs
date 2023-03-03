@@ -13,7 +13,7 @@ pub fn generate_lookups(board: &Board, piece: &Box<dyn Piece>, rows: Rows, cols:
 
 impl Board {
     pub fn generate_lookups(&mut self) {
-        for (ind, piece) in self.pieces.iter().enumerate() {
+        for (ind, piece) in self.game.pieces.iter().enumerate() {
             if !piece.can_lookup() {
                 self.attack_lookup.insert(ind, vec![]);
                 continue;

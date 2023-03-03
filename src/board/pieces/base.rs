@@ -33,7 +33,7 @@ pub trait Piece {
             };
             let piece_type = self.get_piece_type();
             let mut captured_piece_type: usize = 0; 
-            for i in 0..(board.pieces.len()) {
+            for i in 0..(board.game.pieces.len()) {
                 if (board.state.pieces[i] & &to).is_set() {
                     captured_piece_type = i;
                     break;

@@ -111,6 +111,24 @@ Then, the last UCI moves, specified by a `,` can be shown. For instance: `e2e4, 
 
 Finally, the halfmove clock and fullmove clocks are the same as traditional FEN notation.
 
+### Games
+
+`monster-chess` finally provides a struct called `Game`, which is used to describe the rules of your chess-adjacent game. It would be declared as follows:
+
+```rust
+pub struct Game {
+    pub pieces: Vec<Box<dyn Piece>>,
+    pub move_restrictions: Box<dyn MoveRestrictions>, // TODO
+    pub win_conditions: Box<dyn WinConditions> // TODO
+}
+```
+
+The games that `monster-chess` certainly plans to support out of the box are as follows:
+- [Chess](https://en.wikipedia.org/wiki/Chess)
+- [FRC Chess](https://en.wikipedia.org/wiki/Fischer_random_chess)
+
+In addition, it's likely that we also support the following out of the box:
+- [Ataxx](https://en.wikipedia.org/wiki/Ataxx)
 
 ## TODOs
 
