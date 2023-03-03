@@ -39,7 +39,7 @@ fn main() {
     let e = vec![ board.pieces[1].get_moves(&board, from, 1) & &!board.state.teams[1] ]
     .iter().map(|el| el.display(8, 8)).fold("".to_string(), |a, b| a + "\n-\n" + &b);*/
 
-    println!("{:?}", board.generate_moves(1).len());
+    println!("{:#0130b}", board.state.pieces[0].data[0]);
 
     //println!("{}", board.state.first_move.display(8, 8));
 

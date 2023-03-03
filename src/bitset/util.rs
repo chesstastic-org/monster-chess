@@ -25,8 +25,12 @@ impl<const T: usize> BitSet<T> {
         }
     }
 
+    pub fn from_lsb(bit: u32) -> BitSet<T> {
+        BitSet::<T>::from_element(1) << bit
+    }
+
     pub fn from_msb(bit: u32) -> BitSet<T> {
-        !(BitSet::<T>::max() << 1) << bit
+        !(BitSet::<T>::max() >> 1) >> bit
     }
 
     pub fn has_bit(&self, bit: u32) -> bool {

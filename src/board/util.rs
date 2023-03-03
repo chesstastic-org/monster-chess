@@ -133,7 +133,7 @@ impl Board {
                     }
                 }
 
-                let piece_board = BitBoard::from_msb(board_ind);
+                let piece_board = BitBoard::from_lsb(board_ind);
 
                 board.state.teams[team as usize] |= &piece_board;
                 board.state.pieces[piece_type] |= &piece_board;

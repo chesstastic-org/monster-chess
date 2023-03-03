@@ -17,8 +17,8 @@ pub trait Piece {
     }
 
     fn make_move(&self, board: &mut Board, action: &Action) {
-        let from = BitBoard::from_msb(action.from);
-        let to = BitBoard::from_msb(action.to);
+        let from = BitBoard::from_lsb(action.from);
+        let to = BitBoard::from_lsb(action.to);
 
         if board.state.blockers.has_bit(action.to) {
             let color: usize = if (from & &board.state.teams[0]).is_set() {
@@ -126,7 +126,7 @@ pub trait Piece {
     }
 
     fn add_actions(&self, actions: &mut Vec<Action>, board: &Board, from: u32, team: u32) {
-        let from_board = BitBoard::from_msb(from);
+        let from_board = BitBoard::from_lsb(from);
         let bit_actions = self.get_moves(board, from_board, team) & &!board.state.teams[team as usize];
 
         if bit_actions.is_empty() {
