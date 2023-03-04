@@ -1,7 +1,5 @@
-/*
-    I've chosen to use this little utility because of its performance in benchmarks being the best, and because it makes it the easiest to specialize to the needs of this project (in terms of both optimizations and code structure.)
-    In this case, those needs being a way to have bigger integer sizes that are compatible with bit operations at high speeds.
-*/
+/// I've chosen to use this little utility because of its performance in benchmarks being the best, and because it makes it the easiest to specialize to the needs of this project (in terms of both optimizations and code structure.)
+/// In this case, those needs being a way to have bigger integer sizes that are compatible with bit operations at high speeds.
 
 use std::fmt::Display;
 
@@ -87,9 +85,7 @@ impl<const T: usize> BitSet<T> {
         }
     }
 
-    /*
-        Not a well optimized method; avoid using in hot loops.
-    */
+    /// Not a well optimized method; avoid using in hot loops.
     pub fn get_bits(&self) -> Vec<u128> {
         let mut bits: Vec<u128> = Vec::with_capacity(128 * T);
         for container in self.data {

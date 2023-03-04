@@ -118,10 +118,12 @@ Finally, the halfmove clock and fullmove clocks are the same as traditional FEN 
 ```rust
 pub struct Game {
     pub pieces: Vec<Box<dyn Piece>>,
-    pub move_restrictions: Box<dyn MoveRestrictions>, // TODO
+    pub move_restrictions: Box<dyn MoveRestrictions>,
     pub win_conditions: Box<dyn WinConditions> // TODO
 }
 ```
+
+The way `monster-chess` handles restricting moves (like walking into check being illegal in chess) is through psuedolegal move generation. When writing a chess engine, you'll typically only look at a fraction of the moves of any given position, because you'll end up pruning a substantial amount of them. Checking for legality will be faster the more moves you prune at a given position.
 
 The games that `monster-chess` certainly plans to support out of the box are as follows:
 - [Chess](https://en.wikipedia.org/wiki/Chess)

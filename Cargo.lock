@@ -307,6 +307,7 @@ version = "0.1.0"
 dependencies = [
  "bitvec",
  "criterion",
+ "lazy_static",
  "num-bigint",
  "rug",
  "smallvec",

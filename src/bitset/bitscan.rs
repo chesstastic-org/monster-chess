@@ -1,9 +1,7 @@
 use crate::BitSet;
 
 impl<const T: usize> BitSet<T> {
-    /*
-        A forward bitscan, which finds the least significant 1-bit.
-    */
+    /// A forward bitscan, which finds the least significant 1-bit.
     pub fn bitscan_forward(&self) -> u32 {
         debug_assert!(self.is_set(), "Bitscan Forward only works for non-empty bitsets.");
 
@@ -24,9 +22,7 @@ impl<const T: usize> BitSet<T> {
         }
     }
 
-    /*
-        A reverse bitscan, which finds the most significant 1-bit.
-    */
+    /// A reverse bitscan, which finds the most significant 1-bit.
     pub fn bitscan_reverse(&self) -> u32 {
         debug_assert!(self.is_set(), "Bitscan Reverse only works for non-empty bitsets.");
 

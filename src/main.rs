@@ -1,47 +1,37 @@
 mod board;
 mod bitset;
+mod games;
 
 use std::env;
 
 pub use board::*;
 pub use bitset::*;
+pub use games::*;
 
 fn main() {
     env::set_var("RUST_BACKTRACE", "1");
 
     let mut board = Board::new(
-        Game {
-            pieces: vec![
-                Box::new(PawnPiece {
-                    piece_type: 0
-                }),
-                Box::new(KnightPiece {
-                    piece_type: 1
-                }),
-                Box::new(BishopPiece {
-                    piece_type: 2
-                }),
-                Box::new(RookPiece {
-                    piece_type: 3
-                }),
-                Box::new(QueenPiece {
-                    piece_type: 4
-                }),
-                Box::new(KingPiece {
-                    piece_type: 5
-                })
-            ]
-        },
+        Chess::create(),
         2,
         (8, 8),
-        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
+        "k7/8/K7/8/8/8/8/1Q6"
     );
+
+    board.state.moving_team = 0;
 
     /*let from = board.state.pieces[1] & &BitBoard::from_msb(1);
     let e = vec![ board.pieces[1].get_moves(&board, from, 1) & &!board.state.teams[1] ]
     .iter().map(|el| el.display(8, 8)).fold("".to_string(), |a, b| a + "\n-\n" + &b);*/
 
-    println!("{}", board.get_attack_mask(1).display(8, 8));
+    let actions = board.generate_legal_moves(1);
+    
+    //println!("{}", actions.len());
+
+    //let action = actions[0];
+
+    //board.game.pieces[0].duplicate().make_move(&mut board, &action);
+    //println!("{}", board.state.first_move.display(8, 8));
 
     //println!("{}", board.state.first_move.display(8, 8));
 
