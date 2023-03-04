@@ -12,7 +12,7 @@ When we say that we're compatible with a given game, that doesn't mean we'll nec
 
 Types of games that we're aiming to be compatible with:
 - [Chess](https://en.wikipedia.org/wiki/Chess)
-- [FRC Chess](https://en.wikipedia.org/wiki/Fischer_random_chess)
+- [Fischer Random Chess](https://en.wikipedia.org/wiki/Fischer_random_chess)
 - [Shogi](https://en.wikipedia.org/wiki/Shogi)
 - [Maharajah and the Sepoys](https://en.wikipedia.org/wiki/Maharajah_and_the_Sepoys)
 - [Ataxx](https://en.wikipedia.org/wiki/Ataxx)
@@ -127,9 +127,9 @@ The way `monster-chess` handles restricting moves (like walking into check being
 
 The games that `monster-chess` certainly plans to support out of the box are as follows:
 - [Chess](https://en.wikipedia.org/wiki/Chess)
-- [FRC Chess](https://en.wikipedia.org/wiki/Fischer_random_chess)
+- [Fischer Random Chess](https://en.wikipedia.org/wiki/Fischer_random_chess)
 
-In addition, it's likely that we also support the following out of the box:
+In addition, it's likely that we will also support the following out of the box:
 - [Ataxx](https://en.wikipedia.org/wiki/Ataxx)
 
 ### Boards
