@@ -132,6 +132,20 @@ The games that `monster-chess` certainly plans to support out of the box are as 
 In addition, it's likely that we also support the following out of the box:
 - [Ataxx](https://en.wikipedia.org/wiki/Ataxx)
 
+### Boards
+
+Once you have a `Game`, initializing a board becomes very easy. The example below should showcase this without any further explanation.
+
+```rust
+    let mut board = Board::new(
+        Chess::create(),
+        2,
+        (8, 8),
+        "k7/8/K7/8/8/8/8/1Q6"
+    );
+
+```
+
 ## TODOs
 
 ### Indirection
