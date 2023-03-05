@@ -1,5 +1,5 @@
 use crate::BitSet;
-use std::ops::{AddAssign, Add, Sub, SubAssign, Mul, MulAssign, DivAssign, Div};
+use std::ops::{AddAssign, Add, Sub, SubAssign};
 
 impl<const T: usize> Add<&BitSet<T>> for BitSet<T> {
     type Output = Self;

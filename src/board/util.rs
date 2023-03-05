@@ -9,8 +9,8 @@ pub type Rows = u128;
 pub type Cols = u128;
 
 pub struct BoardState {
-    /// Blockers is a BitBoard of all pieces, because keeping this bitboard ready makes it much easier to calculate movement for slider pieces.
-    pub blockers: BitBoard,
+    /// All Pieces is a BitBoard of all pieces, because keeping this bitboard ready makes it much easier to calculate movement for slider pieces.
+    pub all_pieces: BitBoard,
     pub first_move: BitBoard,
     pub pieces: Vec<BitBoard>,
     pub teams: Vec<BitBoard>,
@@ -56,7 +56,7 @@ impl Board {
             attack_lookup: vec![],
             game,
             state: BoardState {
-                blockers: BitBoard::new(),
+                all_pieces: BitBoard::new(),
                 first_move: BitBoard::new(),
                 pieces: pieces_state.clone(),
                 teams: (0..teams).map(|_| BitBoard::new()).collect::<Vec<_>>(),
@@ -119,7 +119,7 @@ impl Board {
 
                 board.state.teams[team as usize] |= &piece_board;
                 board.state.pieces[piece_type] |= &piece_board;
-                board.state.blockers |= &piece_board;
+                board.state.all_pieces |= &piece_board;
                 if first_move {
                     board.state.first_move |= &piece_board;
                 }
@@ -148,8 +148,8 @@ impl Board {
         bitboard
     }
 
-    pub fn is_attacked(&self, team: u32, from: BitBoard) -> bool {
-        (self.get_move_mask(team) & &from).is_set()
+    pub fn is_attacking(&self, team: u32, target: BitBoard) -> bool {
+        (self.get_move_mask(team) & &target).is_set()
     }
 
     pub fn generate_moves(&self, team: u32) -> Vec<Action> {

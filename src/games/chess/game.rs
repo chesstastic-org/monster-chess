@@ -12,7 +12,7 @@ impl MoveRestrictions for ChessMoveRestrictions {
         let piece_trait = board.game.pieces[action.piece_type].duplicate();
         let moving_team = board.state.moving_team;
         piece_trait.make_move(board, action);
-        let in_check = board.is_attacked(moving_team, from_board);
+        let in_check = board.is_attacking(moving_team, from_board);
         piece_trait.undo_move(board).unwrap();
         in_check
     }

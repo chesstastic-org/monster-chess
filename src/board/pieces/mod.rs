@@ -1,5 +1,7 @@
 use crate::{BitBoard, Board, PieceType, AttackDirections, AttackLookup, Action, HistoryMove, IndexedPreviousBoard, PreviousBoard, NoHistoryMoves};
 
+const NORMAL_MOVE: usize = 0;
+
 pub trait Piece {
     fn duplicate(&self) -> Box<dyn Piece>;
 
@@ -16,89 +18,98 @@ pub trait Piece {
         Vec::new()
     }
 
+    fn make_capture_move(&self, board: &mut Board, action: &Action, from: BitBoard, to: BitBoard) {
+        let color: usize = if (from & &board.state.teams[0]).is_set() {
+            0
+        } else {
+            1
+        };
+        let captured_color: usize = if (to & &board.state.teams[0]).is_set() {
+            0
+        } else {
+            1
+        };
+        let piece_type = self.get_piece_type();
+        let mut captured_piece_type: usize = 0; 
+        for i in 0..(board.game.pieces.len()) {
+            if (board.state.pieces[i] & &to).is_set() {
+                captured_piece_type = i;
+                break;
+            }
+        }
+    
+        let history_move = HistoryMove {
+            action: *action,
+            teams: vec![
+                IndexedPreviousBoard(color, board.state.teams[color]),
+                IndexedPreviousBoard(captured_color, board.state.teams[captured_color])
+            ],
+            pieces: vec![
+                IndexedPreviousBoard(piece_type, board.state.pieces[piece_type]),
+                IndexedPreviousBoard(captured_piece_type, board.state.pieces[captured_piece_type])
+            ],
+            all_pieces: PreviousBoard(board.state.all_pieces),
+            first_move: PreviousBoard(board.state.first_move)
+        };
+        board.state.history.push(history_move);
+    
+        board.state.teams[captured_color] ^= &to;
+        board.state.teams[color] ^= &from;
+        board.state.teams[color] |= &to;
+    
+        board.state.pieces[captured_piece_type] ^= &to;
+        board.state.pieces[piece_type] ^= &from;
+        board.state.pieces[piece_type] |= &to;
+    
+        board.state.all_pieces ^= &from;
+    
+        board.state.first_move ^= &from;
+        board.state.first_move ^= &to;
+        // We actually don't need to swap the blockers. A blocker will still exist on `to`, just not on `from`.
+    }
+
+    fn make_normal_move(&self, board: &mut Board, action: &Action, from: BitBoard, to: BitBoard) {
+        let color: usize = if (from & &board.state.teams[0]).is_set() {
+            0
+        } else {
+            1
+        };
+        let piece_type = self.get_piece_type();
+    
+        let history_move = HistoryMove {
+            action: *action,
+            teams: vec![
+                IndexedPreviousBoard(color, board.state.teams[color])
+            ],
+            pieces: vec![
+                IndexedPreviousBoard(piece_type, board.state.pieces[piece_type])
+            ],
+            all_pieces: PreviousBoard(board.state.all_pieces),
+            first_move: PreviousBoard(board.state.first_move)
+        };
+        board.state.history.push(history_move);
+    
+        board.state.teams[color] ^= &from;
+        board.state.teams[color] |= &to;
+    
+        board.state.pieces[piece_type] ^= &from;
+        board.state.pieces[piece_type] |= &to;
+    
+        board.state.all_pieces ^= &from;
+        board.state.all_pieces |= &to;
+        
+        board.state.first_move ^= &from;
+    }
+
     fn make_move(&self, board: &mut Board, action: &Action) {
         let from = BitBoard::from_lsb(action.from);
         let to = BitBoard::from_lsb(action.to);
 
-        if board.state.blockers.has_bit(action.to) {
-            let color: usize = if (from & &board.state.teams[0]).is_set() {
-                0
-            } else {
-                1
-            };
-            let captured_color: usize = if (to & &board.state.teams[0]).is_set() {
-                0
-            } else {
-                1
-            };
-            let piece_type = self.get_piece_type();
-            let mut captured_piece_type: usize = 0; 
-            for i in 0..(board.game.pieces.len()) {
-                if (board.state.pieces[i] & &to).is_set() {
-                    captured_piece_type = i;
-                    break;
-                }
-            }
-        
-            let history_move: HistoryMove = HistoryMove {
-                action: *action,
-                teams: vec![
-                    IndexedPreviousBoard(color, board.state.teams[color]),
-                    IndexedPreviousBoard(captured_color, board.state.teams[captured_color])
-                ],
-                pieces: vec![
-                    IndexedPreviousBoard(piece_type, board.state.teams[piece_type]),
-                    IndexedPreviousBoard(captured_piece_type, board.state.teams[captured_piece_type])
-                ],
-                blockers: PreviousBoard(board.state.blockers),
-                first_move: PreviousBoard(board.state.first_move)
-            };
-            board.state.history.push(history_move);
-        
-            board.state.teams[captured_color] ^= &to;
-            board.state.teams[color] ^= &from;
-            board.state.teams[color] |= &to;
-        
-            board.state.pieces[captured_piece_type] ^= &to;
-            board.state.pieces[piece_type] ^= &from;
-            board.state.pieces[piece_type] |= &to;
-        
-            board.state.blockers ^= &from;
-        
-            board.state.first_move ^= &from;
-            board.state.first_move ^= &to;
-            // We actually don't need to swap the blockers. A blocker will still exist on `to`, just not on `from`.
+        if board.state.all_pieces.has_bit(action.to) {
+            self.make_capture_move(board, action, from, to);
+
         } else {
-            let color: usize = if (from & &board.state.teams[0]).is_set() {
-                0
-            } else {
-                1
-            };
-            let piece_type = self.get_piece_type();
-        
-            let history_move: HistoryMove = HistoryMove {
-                action: *action,
-                teams: vec![
-                    IndexedPreviousBoard(color, board.state.teams[color])
-                ],
-                pieces: vec![
-                    IndexedPreviousBoard(piece_type, board.state.teams[piece_type])
-                ],
-                blockers: PreviousBoard(board.state.blockers),
-                first_move: PreviousBoard(board.state.first_move)
-            };
-            board.state.history.push(history_move);
-        
-            board.state.teams[color] ^= &from;
-            board.state.teams[color] |= &to;
-        
-            board.state.pieces[piece_type] ^= &from;
-            board.state.pieces[piece_type] |= &to;
-        
-            board.state.blockers ^= &from;
-            board.state.blockers |= &to;
-            
-            board.state.first_move ^= &from;
+            self.make_normal_move(board, action, from, to);
         }
 
         board.state.moving_team = board.get_next_team(board.state.moving_team);
@@ -116,7 +127,7 @@ pub trait Piece {
                     board.state.pieces[index] = bitboard;
                 }
 
-                board.state.blockers = history_move.blockers.0;
+                board.state.all_pieces = history_move.all_pieces.0;
                 board.state.first_move = history_move.first_move.0;
 
                 Ok(())
@@ -143,7 +154,7 @@ pub trait Piece {
             actions.push(Action {
                 from,
                 to: bit,
-                info: 0,
+                info: NORMAL_MOVE,
                 piece_type
             });
         }

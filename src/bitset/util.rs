@@ -31,6 +31,10 @@ impl<const T: usize> BitSet<T> {
         !(BitSet::<T>::max() >> 1) >> bit
     }
 
+    pub fn starting_at_lsb(bit: u32, length: u32) -> BitSet<T> {
+        (BitSet::<T>::from_lsb(length) - &BitSet::<T>::from_element(1)) << bit
+    }
+
     pub fn has_bit(&self, bit: u32) -> bool {
         (*self & &(BitSet::<T>::from_element(1) << bit)).is_set()
     }

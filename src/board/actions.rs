@@ -28,6 +28,6 @@ pub struct HistoryMove {
     pub action: Action,
     pub pieces: Vec<IndexedPreviousBoard>,
     pub teams: Vec<IndexedPreviousBoard>,
-    pub blockers: PreviousBoard,
+    pub all_pieces: PreviousBoard,
     pub first_move: PreviousBoard
 }
