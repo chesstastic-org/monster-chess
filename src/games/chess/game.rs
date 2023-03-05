@@ -1,9 +1,9 @@
-use crate::{Game, BitBoard, KingPiece, QueenPiece, RookPiece, BishopPiece, KnightPiece, PawnPiece, MoveRestrictions};
+use crate::{BitBoard, MoveRestrictions, Action, Board};
 
 pub struct ChessMoveRestrictions;
 
 impl MoveRestrictions for ChessMoveRestrictions {
-    fn is_legal(&self, board: &mut crate::Board, action: &crate::Action) -> bool {
+    fn is_legal(&self, board: &mut Board, action: &Action) -> bool {
         let from_board = BitBoard::from_lsb(action.from);
         if (from_board & &board.state.pieces[5]).is_set() {
             return false;
