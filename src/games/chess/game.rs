@@ -1,5 +1,3 @@
-use lazy_static::lazy_static;
-
 use crate::{Game, BitBoard, KingPiece, QueenPiece, RookPiece, BishopPiece, KnightPiece, PawnPiece, MoveRestrictions};
 
 pub struct ChessMoveRestrictions;
