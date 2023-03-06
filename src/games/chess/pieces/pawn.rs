@@ -52,13 +52,13 @@ impl Piece for PawnPiece {
         let mut moves = BitBoard::new();
         let cols = board.state.cols;
 
-        let single_moves = up(&from, 1, cols, team) ^ &board.state.all_pieces;
+        let single_moves = up(&from, 1, cols, team) & &!board.state.all_pieces;
         let first_move = (from & &board.state.first_move).is_set();
 
         moves |= &single_moves;
 
         if first_move {
-            let double_moves = up(&single_moves, 1, cols, team) ^ &board.state.all_pieces;
+            let double_moves = up(&single_moves, 1, cols, team) & &!board.state.all_pieces;
             moves |= &double_moves;
         }
 
@@ -243,7 +243,7 @@ impl Piece for PawnPiece {
 
         let from_board = BitBoard::from_lsb(from);
         let bit_actions =
-            self.get_moves(board, from_board, team) ^ &board.state.teams[team as usize];
+            self.get_moves(board, from_board, team) & &!board.state.teams[team as usize];
 
         if bit_actions.is_empty() {
             return;
