@@ -4,8 +4,9 @@ use crate::{
 };
 
 const NORMAL_PAWN_MOVE: usize = 0;
+const EN_PASSANT_MOVE: usize = 1;
 fn promotion_move(piece_type: PieceType) -> usize {
-    piece_type + 1
+    piece_type + 2
 }
 
 pub struct PawnPiece {
@@ -43,20 +44,36 @@ impl Piece for PawnPiece {
         let mut moves = BitBoard::new();
         let cols = board.state.cols;
 
-        let single_moves = up(&from, 1, cols, team) & &!board.state.all_pieces;
+        let single_moves = up(&from, 1, cols, team) ^ &board.state.all_pieces;
         let first_move = (from & &board.state.first_move).is_set();
 
         moves |= &single_moves;
 
         if first_move {
-            let double_moves = up(&single_moves, 1, cols, team) & &!board.state.all_pieces;
+            let double_moves = up(&single_moves, 1, cols, team) ^ &board.state.all_pieces;
             moves |= &double_moves;
         }
 
         let up_one = from.up(1, cols);
         let mut captures = up_one.right(1);
         captures |= &up_one.left(1);
-        captures &= &board.state.all_pieces;
+
+        let mut capture_requirements = board.state.all_pieces;
+        if let Some(last_move) = board.state.history.last() {
+            let conditions = last_move.action.piece_type == 0
+                && (last_move.action.to.abs_diff(last_move.action.from) == (2 * (cols as u32)));
+            
+            if conditions {
+                capture_requirements |= &up(
+                    &BitBoard::from_lsb(last_move.action.from),
+                    1,
+                    cols,
+                    board.get_next_team(team)
+                );
+            }
+        }
+
+        captures &= &capture_requirements;
 
         moves |= &captures;
 
@@ -103,10 +120,10 @@ impl Piece for PawnPiece {
 
         board.state.pieces[captured_piece_type] ^= &to;
         board.state.pieces[piece_type] ^= &from;
-        if action.info < 1 {
+        if action.info < 2 {
             board.state.pieces[piece_type] |= &to;
         } else {
-            let promotion_piece_type = action.info - 1;
+            let promotion_piece_type = action.info - 2;
             history_move.pieces.push(IndexedPreviousBoard(
                 piece_type,
                 board.state.teams[promotion_piece_type],
@@ -171,7 +188,7 @@ impl Piece for PawnPiece {
 
         let from_board = BitBoard::from_lsb(from);
         let bit_actions =
-            self.get_moves(board, from_board, team) & &!board.state.teams[team as usize];
+            self.get_moves(board, from_board, team) ^ &board.state.teams[team as usize];
 
         if bit_actions.is_empty() {
             return;
@@ -193,11 +210,22 @@ impl Piece for PawnPiece {
                     });
                 }
             } else {
+                let mut en_passant = false;
+                if let Some(last_move) = board.state.history.last() {
+                    let conditions = last_move.action.piece_type == 0
+                        && (last_move.action.to.abs_diff(last_move.action.from) == (2 * (cols as u32)))
+                        && (last_move.action.to.abs_diff(bit) == (cols as u32));
+
+                    if conditions {
+                        en_passant = true;
+                    }
+                }
+
                 actions.push(Action {
                     from,
                     to: bit,
-                    info: NORMAL_PAWN_MOVE,
-                    piece_type,
+                    info: if en_passant { EN_PASSANT_MOVE } else { NORMAL_PAWN_MOVE },
+                    piece_type
                 });
             }
         }

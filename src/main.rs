@@ -16,7 +16,7 @@ fn main() {
     board.state.moving_team = 0;
 
     /*let from = board.state.pieces[1] & &BitBoard::from_msb(1);
-    let e = vec![ board.pieces[1].get_moves(&board, from, 1) & &!board.state.teams[1] ]
+    let e = vec![ board.pieces[1].get_moves(&board, from, 1) ^ &board.state.teams[1] ]
     .iter().map(|el| el.display(8, 8)).fold("".to_string(), |a, b| a + "\n-\n" + &b);*/
 
     let actions = board.generate_legal_moves(1);

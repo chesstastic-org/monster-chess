@@ -5,35 +5,35 @@ pub struct KnightPiece {
 }
 
 fn up2_right(b: BitBoard, cols: Cols, edges: &Edges, deep_edges: &Edges) -> BitBoard {
-    b.up(2, cols).right(1) & &!deep_edges.bottom & &!edges.left
+    b.up(2, cols).right(1) ^ &deep_edges.bottom ^ &edges.left
 }
 
 fn up_right2(b: BitBoard, cols: Cols, edges: &Edges, deep_edges: &Edges) -> BitBoard {
-    b.up(1, cols).right(2) & &!edges.bottom & &!deep_edges.left
+    b.up(1, cols).right(2) ^ &edges.bottom ^ &deep_edges.left
 }
 
 fn down2_right(b: BitBoard, cols: Cols, edges: &Edges, deep_edges: &Edges) -> BitBoard {
-    b.down(2, cols).right(1) & &!deep_edges.top & &!edges.left
+    b.down(2, cols).right(1) ^ &deep_edges.top ^ &edges.left
 }
 
 fn down_right2(b: BitBoard, cols: Cols, edges: &Edges, deep_edges: &Edges) -> BitBoard {
-    b.down(1, cols).right(2) & &!edges.top & &!deep_edges.left
+    b.down(1, cols).right(2) ^ &edges.top ^ &deep_edges.left
 }
 
 fn up2_left(b: BitBoard, cols: Cols, edges: &Edges, deep_edges: &Edges) -> BitBoard {
-    b.up(2, cols).left(1) & &!deep_edges.bottom & &!edges.right
+    b.up(2, cols).left(1) ^ &deep_edges.bottom ^ &edges.right
 }
 
 fn up_left2(b: BitBoard, cols: Cols, edges: &Edges, deep_edges: &Edges) -> BitBoard {
-    b.up(1, cols).left(2) & &!edges.bottom & &!deep_edges.right
+    b.up(1, cols).left(2) ^ &edges.bottom ^ &deep_edges.right
 }
 
 fn down2_left(b: BitBoard, cols: Cols, edges: &Edges, deep_edges: &Edges) -> BitBoard {
-    b.down(2, cols).left(1) & &!deep_edges.top & &!edges.right
+    b.down(2, cols).left(1) ^ &deep_edges.top ^ &edges.right
 }
 
 fn down_left2(b: BitBoard, cols: Cols, edges: &Edges, deep_edges: &Edges) -> BitBoard {
-    b.down(1, cols).left(2) & &!edges.top & &!deep_edges.right
+    b.down(1, cols).left(2) ^ &edges.top ^ &deep_edges.right
 }
 
 impl Piece for KnightPiece {

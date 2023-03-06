@@ -13,19 +13,19 @@ pub struct KingPiece {
 }
 
 fn right_one(from: BitBoard, edges: &Edges) -> BitBoard {
-    from.right(1) & &!edges.right
+    from.right(1) ^ &edges.right
 }
 
 fn left_one(from: BitBoard, edges: &Edges) -> BitBoard {
-    from.left(1) & &!edges.left
+    from.left(1) ^ &edges.left
 }
 
 fn up_one(from: BitBoard, cols: Cols, edges: &Edges) -> BitBoard {
-    from.up(1, cols) & &!edges.bottom
+    from.up(1, cols) ^ &edges.bottom
 }
 
 fn down_one(from: BitBoard, cols: Cols, edges: &Edges) -> BitBoard {
-    from.down(1, cols) & &!edges.top
+    from.down(1, cols) ^ &edges.top
 }
 
 enum Direction {
@@ -211,7 +211,7 @@ impl Piece for KingPiece {
         let piece_type = self.get_piece_type();
         let from_board = BitBoard::from_lsb(from);
         let bit_actions =
-            self.get_moves(board, from_board, team) & &!board.state.teams[team as usize];
+            self.get_moves(board, from_board, team) ^ &board.state.teams[team as usize];
 
         if bit_actions.is_empty() {
             return;
