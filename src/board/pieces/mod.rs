@@ -70,8 +70,8 @@ pub trait Piece {
 
         board.state.all_pieces ^= &from;
 
-        board.state.first_move ^= &from;
-        board.state.first_move ^= &to;
+        board.state.first_move &= &!from;
+        board.state.first_move &= &!to;
         // We actually don't need to swap the blockers. A blocker will still exist on `to`, just not on `from`.
     }
 
@@ -104,7 +104,7 @@ pub trait Piece {
         board.state.all_pieces ^= &from;
         board.state.all_pieces |= &to;
 
-        board.state.first_move ^= &from;
+        board.state.first_move &= &!from;
     }
 
     fn make_move(&self, board: &mut Board, action: &Action) {

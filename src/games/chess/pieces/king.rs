@@ -104,8 +104,8 @@ impl KingPiece {
             }
         }
 
-        board.state.first_move ^= &from;
-        board.state.first_move ^= &to;
+        board.state.first_move &= &!from;
+        board.state.first_move &= &!to;
     }
 }
 
@@ -198,8 +198,8 @@ impl Piece for KingPiece {
 
         board.state.all_pieces ^= &from;
 
-        board.state.first_move ^= &from;
-        board.state.first_move ^= &to;
+        board.state.first_move &= &!from;
+        board.state.first_move &= &!to;
         // We actually don't need to swap the blockers. A blocker will still exist on `to`, just not on `from`.
     }
 

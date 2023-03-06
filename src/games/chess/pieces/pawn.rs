@@ -21,6 +21,14 @@ pub fn up(bitboard: &BitBoard, shift: u32, cols: Cols, team: u32) -> BitBoard {
     }
 }
 
+pub fn down(bitboard: &BitBoard, shift: u32, cols: Cols, team: u32) -> BitBoard {
+    match team {
+        0 => bitboard.down(shift, cols),
+        1 => bitboard.up(shift, cols),
+        _ => bitboard.down(shift, cols),
+    }
+}
+
 impl Piece for PawnPiece {
     fn duplicate(&self) -> Box<dyn Piece> {
         Box::new(Self {
@@ -133,14 +141,61 @@ impl Piece for PawnPiece {
 
         board.state.all_pieces ^= &from;
 
-        board.state.first_move ^= &from;
-        board.state.first_move ^= &to;
+        board.state.first_move &= &!from;
+        board.state.first_move &= &!to;
         // We actually don't need to swap the blockers. A blocker will still exist on `to`, just not on `from`.
 
         board.state.history.push(history_move);
     }
 
     fn make_normal_move(&self, board: &mut Board, action: &Action, from: BitBoard, to: BitBoard) {
+        if action.info == EN_PASSANT_MOVE {
+            let cols = board.state.cols;
+
+            let color: usize = if (from & &board.state.teams[0]).is_set() {
+                0
+            } else {
+                1
+            };
+            let piece_type = self.get_piece_type();
+            let en_passant_target = down(&to, 1, cols, color as u32);
+
+            
+            let en_passant_target_color: usize = if (en_passant_target & &board.state.teams[0]).is_set() {
+                0
+            } else {
+                1
+            };
+    
+            let history_move = HistoryMove {
+                action: *action,
+                teams: vec![
+                    IndexedPreviousBoard(color, board.state.teams[color]),
+                    IndexedPreviousBoard(en_passant_target_color, board.state.teams[en_passant_target_color])
+                ],
+                pieces: vec![IndexedPreviousBoard(
+                    piece_type,
+                    board.state.pieces[piece_type],
+                )],
+                all_pieces: PreviousBoard(board.state.all_pieces),
+                first_move: PreviousBoard(board.state.first_move)
+            };
+    
+            board.state.teams[color] ^= &from;
+            board.state.teams[color] |= &en_passant_target;
+            board.state.teams[en_passant_target_color] ^= &en_passant_target;
+    
+            board.state.pieces[piece_type] ^= &from;
+
+            board.state.all_pieces ^= &from;
+
+            board.state.first_move &= &!from;
+            board.state.first_move &= &!en_passant_target;
+    
+            board.state.history.push(history_move);            
+            return;
+        }
+
         let color: usize = if (from & &board.state.teams[0]).is_set() {
             0
         } else {
@@ -177,7 +232,7 @@ impl Piece for PawnPiece {
         board.state.all_pieces ^= &from;
         board.state.all_pieces |= &to;
 
-        board.state.first_move ^= &from;
+        board.state.first_move &= &!from;
 
         board.state.history.push(history_move);
     }
