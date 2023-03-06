@@ -1,6 +1,6 @@
 use crate::{
     Action, AttackDirections, BitBoard, Board, Cols, Edges, HistoryMove, IndexedPreviousBoard,
-    Piece, PieceType, PreviousBoard,
+    Piece, PieceType, PreviousBoard, PieceSymbol,
 };
 
 const NORMAL_KING_MOVE: usize = 0;
@@ -116,8 +116,8 @@ impl Piece for KingPiece {
         })
     }
 
-    fn get_piece_symbol(&self) -> char {
-        'k'
+    fn get_piece_symbol(&self) -> PieceSymbol {
+        PieceSymbol::Char('k')
     }
 
     fn generate_lookup_moves(&self, board: &Board, mut from: BitBoard) -> AttackDirections {

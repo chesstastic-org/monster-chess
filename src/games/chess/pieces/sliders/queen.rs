@@ -1,4 +1,4 @@
-use crate::{get_moves_ray, get_ray_attacks, AttackDirections, BitBoard, Board, Piece, PieceType};
+use crate::{get_moves_ray, get_ray_attacks, AttackDirections, BitBoard, Board, Piece, PieceType, PieceSymbol};
 
 pub struct QueenPiece {
     pub piece_type: PieceType,
@@ -11,8 +11,8 @@ impl Piece for QueenPiece {
         })
     }
 
-    fn get_piece_symbol(&self) -> char {
-        'q'
+    fn get_piece_symbol(&self) -> PieceSymbol {
+        PieceSymbol::Char('q')
     }
 
     fn generate_lookup_moves(&self, board: &Board, from: BitBoard) -> AttackDirections {

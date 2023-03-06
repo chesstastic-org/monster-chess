@@ -1,4 +1,4 @@
-use crate::{AttackDirections, BitBoard, Board, Cols, Edges, Piece, PieceType};
+use crate::{AttackDirections, BitBoard, Board, Cols, Edges, Piece, PieceType, PieceSymbol};
 
 pub struct KnightPiece {
     pub piece_type: PieceType,
@@ -43,8 +43,8 @@ impl Piece for KnightPiece {
         })
     }
 
-    fn get_piece_symbol(&self) -> char {
-        'n'
+    fn get_piece_symbol(&self) -> PieceSymbol {
+        PieceSymbol::Char('n')
     }
 
     fn generate_lookup_moves(&self, board: &Board, from: BitBoard) -> AttackDirections {

@@ -1,6 +1,6 @@
 use crate::{
     Action, BitBoard, Board, Cols, HistoryMove, IndexedPreviousBoard, Piece, PieceType,
-    PreviousBoard,
+    PreviousBoard, PieceSymbol,
 };
 
 const NORMAL_PAWN_MOVE: usize = 0;
@@ -40,8 +40,8 @@ impl Piece for PawnPiece {
         false
     }
 
-    fn get_piece_symbol(&self) -> char {
-        'p'
+    fn get_piece_symbol(&self) -> PieceSymbol {
+        PieceSymbol::Char('p')
     }
 
     fn get_piece_type(&self) -> PieceType {

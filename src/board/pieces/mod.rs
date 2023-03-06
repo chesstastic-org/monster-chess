@@ -3,13 +3,18 @@ use crate::{
     PieceType, PreviousBoard, UndoMoveError,
 };
 
+pub enum PieceSymbol {
+    Char(char),
+    TeamSymbol(Vec<char>)
+}
+
 const NORMAL_MOVE: usize = 0;
 
 pub trait Piece {
     fn duplicate(&self) -> Box<dyn Piece>;
 
     fn get_piece_type(&self) -> PieceType;
-    fn get_piece_symbol(&self) -> char;
+    fn get_piece_symbol(&self) -> PieceSymbol;
 
     fn can_lookup(&self) -> bool;
 
