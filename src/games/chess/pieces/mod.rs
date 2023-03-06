@@ -5,5 +5,5 @@ mod sliders;
 
 pub use king::*;
 pub use knight::*;
-pub use sliders::*;
 pub use pawn::*;
+pub use sliders::*;

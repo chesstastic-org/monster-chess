@@ -1,6 +1,6 @@
-use crate::{BitSet, Piece, Edges, HistoryMove, generate_edge_list, Action, Game};
+use crate::{generate_edge_list, Action, BitSet, Edges, Game, HistoryMove};
 
-pub type BitBoard = BitSet::<1>;
+pub type BitBoard = BitSet<1>;
 pub type PieceType = usize;
 
 /// I doubt anyone would be practically creating boards of 340,282,366,920,938,463,463,374,607,431,768,211,456 x 340,282,366,920,938,463,463,374,607,431,768,211,456.
@@ -22,8 +22,8 @@ pub struct BoardState {
     pub rows: Rows,
     pub cols: Cols,
 
-    pub history: Vec<HistoryMove>
-} 
+    pub history: Vec<HistoryMove>,
+}
 
 impl BoardState {
     pub fn get_piece_team_board(&self, piece: usize, team: usize) -> BitBoard {
@@ -33,9 +33,8 @@ impl BoardState {
 
 pub type AttackDirections = Vec<BitBoard>;
 
-
 /// AttackLookup is indexed by the index of the Most Significant 1-Bit.
-/// 
+///
 /// It stores an `AttackDirections` (alias for `Vec<BitBoard>`).
 ///     For pieces that always move the same way (like Delta Pieces), only the first slot of this AttackDirections is used, because there's no directions.
 ///     For slider pieces, there are different indexes for specific ray directions of it.
@@ -45,12 +44,17 @@ pub type AttackLookup = Vec<AttackDirections>;
 pub struct Board {
     pub state: BoardState,
     pub game: Game,
-    pub attack_lookup: Vec<AttackLookup>
+    pub attack_lookup: Vec<AttackLookup>,
 }
 
 impl Board {
     pub fn empty(game: Game, teams: u128, (rows, cols): (Rows, Cols)) -> Board {
-        let pieces_state = game.pieces.iter().map(|_| BitBoard::new()).collect::<Vec<_>>().clone();
+        let pieces_state = game
+            .pieces
+            .iter()
+            .map(|_| BitBoard::new())
+            .collect::<Vec<_>>()
+            .clone();
 
         let mut board = Board {
             attack_lookup: vec![],
@@ -64,8 +68,8 @@ impl Board {
                 cols,
                 rows,
                 history: vec![],
-                moving_team: 0
-            }
+                moving_team: 0,
+            },
         };
 
         board.generate_lookups();
@@ -74,16 +78,17 @@ impl Board {
     }
 
     pub fn new(game: Game, teams: u128, (rows, cols): (Rows, Cols), fen: &str) -> Board {
-        let pieces = game.pieces.iter().map(|el| el.duplicate()).collect::<Vec<_>>();
+        let pieces = game
+            .pieces
+            .iter()
+            .map(|el| el.duplicate())
+            .collect::<Vec<_>>();
 
-        let mut board = Board::empty(
-            game, 
-            teams, (rows, cols)
-        );
+        let mut board = Board::empty(game, teams, (rows, cols));
 
         let mut board_ind = 0;
         for row in fen.split("/") {
-            let chars = row.chars().collect::<Vec<_>>();   
+            let chars = row.chars().collect::<Vec<_>>();
             let mut i = 0;
             while i < chars.len() {
                 let char = chars[i];
@@ -95,7 +100,10 @@ impl Board {
                 }
 
                 let lower_char = char.to_ascii_lowercase();
-                let piece_type = pieces.iter().position(|piece| piece.get_piece_symbol() == lower_char).unwrap();
+                let piece_type = pieces
+                    .iter()
+                    .position(|piece| piece.get_piece_symbol() == lower_char)
+                    .unwrap();
 
                 let mut first_move = true;
 
@@ -123,7 +131,7 @@ impl Board {
                 if first_move {
                     board.state.first_move |= &piece_board;
                 }
-                
+
                 board_ind += 1;
                 i += 1;
             }
@@ -139,7 +147,7 @@ impl Board {
         for (ind, board) in self.state.pieces.iter().enumerate() {
             let board = *board & &self.state.teams[team as usize];
             let piece = &self.game.pieces[ind];
-            
+
             for bit in board.iter_one_bits(board_len as u32) {
                 bitboard |= &piece.get_moves(self, BitBoard::from_lsb(bit), team);
             }
@@ -159,7 +167,7 @@ impl Board {
         for (ind, board) in self.state.pieces.iter().enumerate() {
             let board = *board & &self.state.teams[team as usize];
             let piece = &self.game.pieces[ind];
-            
+
             for bit in board.iter_one_bits(board_len as u32) {
                 piece.add_actions(&mut actions, self, bit, team);
             }
@@ -174,7 +182,11 @@ impl Board {
     pub fn generate_legal_moves(&mut self, team: u32) -> Vec<Action> {
         let moves = self.generate_moves(team);
         let game_restrictions = self.game.move_restrictions.duplicate();
-        moves.iter().map(|el| el.clone()).filter(|el| game_restrictions.is_legal(self, el)).collect::<Vec<_>>()
+        moves
+            .iter()
+            .map(|el| el.clone())
+            .filter(|el| game_restrictions.is_legal(self, el))
+            .collect::<Vec<_>>()
     }
 
     pub fn get_next_team(&self, mut team: u32) -> u32 {
@@ -190,7 +202,7 @@ impl Board {
     pub fn get_previous_team(&self, mut team: u32) -> u32 {
         team -= 1;
 
-        if team < 0 {
+        if team == u32::MAX {
             (self.state.teams.len() - 1) as u32
         } else {
             team

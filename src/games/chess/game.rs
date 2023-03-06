@@ -1,4 +1,4 @@
-use crate::{BitBoard, MoveRestrictions, Action, Board};
+use crate::{Action, BitBoard, Board, MoveRestrictions, Game, PawnPiece, KnightPiece, BishopPiece, RookPiece, QueenPiece, KingPiece};
 
 pub struct ChessMoveRestrictions;
 
@@ -7,7 +7,7 @@ impl MoveRestrictions for ChessMoveRestrictions {
         let from_board = BitBoard::from_lsb(action.from);
         if (from_board & &board.state.pieces[5]).is_set() {
             return false;
-        } 
+        }
 
         let piece_trait = board.game.pieces[action.piece_type].duplicate();
         let moving_team = board.state.moving_team;
@@ -22,32 +22,20 @@ impl MoveRestrictions for ChessMoveRestrictions {
     }
 }
 
-pub mod Chess {
-    use crate::{Game, BitBoard, KingPiece, QueenPiece, RookPiece, BishopPiece, KnightPiece, PawnPiece, MoveRestrictions, ChessMoveRestrictions};
+pub struct Chess;
 
+impl Chess {
     pub fn create() -> Game {
         Game {
             pieces: vec![
-                Box::new(PawnPiece {
-                    piece_type: 0
-                }),
-                Box::new(KnightPiece {
-                    piece_type: 1
-                }),
-                Box::new(BishopPiece {
-                    piece_type: 2
-                }),
-                Box::new(RookPiece {
-                    piece_type: 3
-                }),
-                Box::new(QueenPiece {
-                    piece_type: 4
-                }),
-                Box::new(KingPiece {
-                    piece_type: 5
-                }),
+                Box::new(PawnPiece { piece_type: 0 }),
+                Box::new(KnightPiece { piece_type: 1 }),
+                Box::new(BishopPiece { piece_type: 2 }),
+                Box::new(RookPiece { piece_type: 3 }),
+                Box::new(QueenPiece { piece_type: 4 }),
+                Box::new(KingPiece { piece_type: 5 }),
             ],
-            move_restrictions: Box::new(ChessMoveRestrictions)
+            move_restrictions: Box::new(ChessMoveRestrictions),
         }
     }
 }

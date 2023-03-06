@@ -1,13 +1,13 @@
-mod util;
-mod edges;
-mod pieces;
-mod lookups;
 mod actions;
+mod edges;
 mod game;
+mod lookups;
+mod pieces;
+mod util;
 
-pub use util::*;
-pub use edges::*;
-pub use pieces::*;
-pub use lookups::*;
 pub use actions::*;
+pub use edges::*;
 pub use game::*;
+pub use lookups::*;
+pub use pieces::*;
+pub use util::*;

@@ -1,4 +1,4 @@
-use crate::{BitBoard, Rows, Cols};
+use crate::{BitBoard, Cols, Rows};
 
 pub type EdgeBuffer = u128;
 
@@ -7,7 +7,7 @@ pub struct Edges {
     pub bottom: BitBoard,
     pub right: BitBoard,
     pub left: BitBoard,
-    pub all: BitBoard
+    pub all: BitBoard,
 }
 
 pub fn generate_edges(buffer: EdgeBuffer, rows: Rows, cols: Cols) -> Edges {
@@ -28,7 +28,7 @@ pub fn generate_edges(buffer: EdgeBuffer, rows: Rows, cols: Cols) -> Edges {
         bottom,
         right,
         left,
-        all: edges
+        all: edges,
     }
 }
 

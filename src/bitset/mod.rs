@@ -1,13 +1,13 @@
-mod bitscan;
 mod bitops;
+mod bitscan;
 mod numops;
 mod ord;
-mod util;
 mod shifts;
+mod util;
 
-pub use bitscan::*;
 pub use bitops::*;
+pub use bitscan::*;
 pub use numops::*;
-pub use util::*;
 pub use ord::*;
 pub use shifts::*;
+pub use util::*;

@@ -1,7 +1,9 @@
 use crate::{BitBoard, PieceType};
 
 #[derive(Debug)]
-pub struct NoHistoryMoves;
+pub enum UndoMoveError {
+    NoHistoryMoves,
+}
 
 pub type ActionInfo = usize;
 
@@ -14,7 +16,7 @@ pub struct Action {
     /// Moves can store extra information both for optimizing `make_move` or for specifying additional variants of a move.
     ///
     /// Eg. Pawn Promotion uses `info` to represent which piece is promoted to.
-    pub info: ActionInfo
+    pub info: ActionInfo,
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -29,5 +31,5 @@ pub struct HistoryMove {
     pub pieces: Vec<IndexedPreviousBoard>,
     pub teams: Vec<IndexedPreviousBoard>,
     pub all_pieces: PreviousBoard,
-    pub first_move: PreviousBoard
+    pub first_move: PreviousBoard,
 }

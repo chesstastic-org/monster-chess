@@ -1,5 +1,5 @@
-mod pieces;
 mod game;
+mod pieces;
 
-pub use pieces::*;
 pub use game::*;
+pub use pieces::*;

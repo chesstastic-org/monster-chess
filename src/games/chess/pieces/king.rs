@@ -1,4 +1,7 @@
-use crate::{Piece, BitBoard, PieceType, Board, Rows, Edges, Cols, AttackDirections, Action, HistoryMove, PreviousBoard, IndexedPreviousBoard};
+use crate::{
+    Action, AttackDirections, BitBoard, Board, Cols, Edges, HistoryMove, IndexedPreviousBoard,
+    Piece, PieceType, PreviousBoard,
+};
 
 const NORMAL_KING_MOVE: usize = 0;
 const CASTLING_MOVE: usize = 1;
@@ -6,7 +9,7 @@ const CASTLING_MOVE: usize = 1;
 const ROOK_PIECE_TYPE: usize = 3;
 
 pub struct KingPiece {
-    pub piece_type: PieceType
+    pub piece_type: PieceType,
 }
 
 fn right_one(from: BitBoard, edges: &Edges) -> BitBoard {
@@ -27,7 +30,7 @@ fn down_one(from: BitBoard, cols: Cols, edges: &Edges) -> BitBoard {
 
 enum Direction {
     LEFT,
-    RIGHT
+    RIGHT,
 }
 
 impl KingPiece {
@@ -56,29 +59,25 @@ impl KingPiece {
             1
         };
         let piece_type = self.get_piece_type();
-    
+
         let history_move = HistoryMove {
             action: *action,
-            teams: vec![
-                IndexedPreviousBoard(color, board.state.teams[color])
-            ],
+            teams: vec![IndexedPreviousBoard(color, board.state.teams[color])],
             pieces: vec![
                 IndexedPreviousBoard(piece_type, board.state.pieces[piece_type]),
-                IndexedPreviousBoard(piece_type, board.state.pieces[ROOK_PIECE_TYPE])
+                IndexedPreviousBoard(piece_type, board.state.pieces[ROOK_PIECE_TYPE]),
             ],
             all_pieces: PreviousBoard(board.state.all_pieces),
-            first_move: PreviousBoard(board.state.first_move)
+            first_move: PreviousBoard(board.state.first_move),
         };
         board.state.history.push(history_move);
-    
+
         board.state.teams[color] ^= &from;
         board.state.teams[color] ^= &to;
-    
+
         board.state.pieces[piece_type] ^= &from;
         board.state.pieces[ROOK_PIECE_TYPE] ^= &to;
 
-        
-    
         board.state.all_pieces ^= &from;
         board.state.all_pieces ^= &to;
 
@@ -104,7 +103,7 @@ impl KingPiece {
                 board.state.all_pieces |= &castle_right_rook;
             }
         }
-        
+
         board.state.first_move ^= &from;
         board.state.first_move ^= &to;
     }
@@ -112,9 +111,10 @@ impl KingPiece {
 
 impl Piece for KingPiece {
     fn duplicate(&self) -> Box<dyn Piece> {
-        Box::new(Self { piece_type: self.piece_type })
+        Box::new(Self {
+            piece_type: self.piece_type,
+        })
     }
-
 
     fn get_piece_symbol(&self) -> char {
         'k'
@@ -127,8 +127,8 @@ impl Piece for KingPiece {
         from |= &moves;
         moves |= &up_one(from, cols, edges);
         moves |= &down_one(from, cols, edges);
-        vec![ moves ]
-    }   
+        vec![moves]
+    }
 
     fn can_lookup(&self) -> bool {
         true
@@ -138,11 +138,12 @@ impl Piece for KingPiece {
         self.piece_type
     }
 
+    #[allow(unused_variables)] 
     fn get_moves(&self, board: &Board, from: BitBoard, team: u32) -> BitBoard {
         let lookup = self.get_attack_lookup(board, from);
         match lookup {
             Some(lookup) => lookup[from.bitscan_reverse() as usize][0],
-            None => self.generate_lookup_moves(board, from)[0]
+            None => self.generate_lookup_moves(board, from)[0],
         }
     }
 
@@ -164,39 +165,39 @@ impl Piece for KingPiece {
             1
         };
         let piece_type = self.get_piece_type();
-        let mut captured_piece_type: usize = 0; 
+        let mut captured_piece_type: usize = 0;
         for i in 0..(board.game.pieces.len()) {
             if (board.state.pieces[i] & &to).is_set() {
                 captured_piece_type = i;
                 break;
             }
         }
-    
+
         let history_move = HistoryMove {
             action: *action,
             teams: vec![
                 IndexedPreviousBoard(color, board.state.teams[color]),
-                IndexedPreviousBoard(captured_color, board.state.teams[captured_color])
+                IndexedPreviousBoard(captured_color, board.state.teams[captured_color]),
             ],
             pieces: vec![
                 IndexedPreviousBoard(piece_type, board.state.pieces[piece_type]),
-                IndexedPreviousBoard(captured_piece_type, board.state.pieces[captured_piece_type])
+                IndexedPreviousBoard(captured_piece_type, board.state.pieces[captured_piece_type]),
             ],
             all_pieces: PreviousBoard(board.state.all_pieces),
-            first_move: PreviousBoard(board.state.first_move)
+            first_move: PreviousBoard(board.state.first_move),
         };
         board.state.history.push(history_move);
-    
+
         board.state.teams[captured_color] ^= &to;
         board.state.teams[color] ^= &from;
         board.state.teams[color] |= &to;
-    
+
         board.state.pieces[captured_piece_type] ^= &to;
         board.state.pieces[piece_type] ^= &from;
         board.state.pieces[piece_type] |= &to;
-    
+
         board.state.all_pieces ^= &from;
-    
+
         board.state.first_move ^= &from;
         board.state.first_move ^= &to;
         // We actually don't need to swap the blockers. A blocker will still exist on `to`, just not on `from`.
@@ -209,7 +210,8 @@ impl Piece for KingPiece {
 
         let piece_type = self.get_piece_type();
         let from_board = BitBoard::from_lsb(from);
-        let bit_actions = self.get_moves(board, from_board, team) & &!board.state.teams[team as usize];
+        let bit_actions =
+            self.get_moves(board, from_board, team) & &!board.state.teams[team as usize];
 
         if bit_actions.is_empty() {
             return;
@@ -220,11 +222,11 @@ impl Piece for KingPiece {
                 from,
                 to: bit,
                 info: NORMAL_KING_MOVE,
-                piece_type
+                piece_type,
             });
         }
 
-        /* 
+        /*
             Castling (Fischer Random)
 
             For convenience's sake, I'm only going to support castling on the bottom row
@@ -240,17 +242,14 @@ impl Piece for KingPiece {
             return;
         }
 
-        let rooks = board.state.pieces[ROOK_PIECE_TYPE] 
-            & team_board
-            & first_move
-            & bottom_row;
+        let rooks = board.state.pieces[ROOK_PIECE_TYPE] & team_board & first_move & bottom_row;
 
-        /* 
+        /*
             FRC Castling brings us to the same positions that traditional chess castling would.
             To extend for bigger board sizes, we'll have to create two castling spots for left and right.
             We'll define these positions in terms of `left_center`.
 
-            `left_center` is the centermost point on the bottom row. 
+            `left_center` is the centermost point on the bottom row.
             If there are two center points, `left_center` is the center point on the left.
         */
 
@@ -271,7 +270,7 @@ impl Piece for KingPiece {
         for rook in rooks.iter_one_bits(board_len) {
             let rook_board = BitBoard::from_lsb(rook);
 
-            /* 
+            /*
                 For any given row, the leftmost point is lowest, and the rightmost point is highest.
                 Therefore, for castling, if `from > rook_pos`, it's to the right of it, and vice-versa.
             */
@@ -284,12 +283,12 @@ impl Piece for KingPiece {
 
             let castling_spots = match dir {
                 Direction::LEFT => castle_left,
-                Direction::RIGHT => castle_right
+                Direction::RIGHT => castle_right,
             };
 
             let in_between = match dir {
                 Direction::LEFT => BitBoard::starting_at_lsb(from, rook - from + 1),
-                Direction::RIGHT => BitBoard::starting_at_lsb(rook, from - rook + 1)
+                Direction::RIGHT => BitBoard::starting_at_lsb(rook, from - rook + 1),
             };
 
             let all_spots = (castling_spots & &in_between) ^ &(from_board & &rook_board);
@@ -311,7 +310,7 @@ impl Piece for KingPiece {
                 from,
                 to: rook,
                 info: NORMAL_KING_MOVE,
-                piece_type
+                piece_type,
             });
         }
     }

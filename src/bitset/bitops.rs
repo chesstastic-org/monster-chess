@@ -6,7 +6,13 @@ impl<const T: usize> ops::Not for BitSet<T> {
 
     fn not(self) -> Self::Output {
         BitSet::<T> {
-            data: self.data.iter().map(|el| !el).collect::<Vec<_>>().try_into().unwrap()
+            data: self
+                .data
+                .iter()
+                .map(|el| !el)
+                .collect::<Vec<_>>()
+                .try_into()
+                .unwrap(),
         }
     }
 }
@@ -59,10 +65,10 @@ impl<const T: usize> ops::Shl<u32> for BitSet<T> {
     fn shl(self, rhs: u32) -> Self::Output {
         if T == 1 {
             return BitSet {
-                data: [ self.data[0] << rhs; T ]
+                data: [self.data[0] << rhs; T],
             };
         }
-        
+
         let mut bitset = self.clone();
         bitset <<= rhs;
 
@@ -73,7 +79,7 @@ impl<const T: usize> ops::Shl<u32> for BitSet<T> {
 impl<const T: usize> ops::ShlAssign<u32> for BitSet<T> {
     fn shl_assign(&mut self, mut rhs: u32) {
         if T == 1 {
-            self.data = [ self.data[0] << rhs; T ];
+            self.data = [self.data[0] << rhs; T];
             return;
         }
 
@@ -101,10 +107,10 @@ impl<const T: usize> ops::Shr<u32> for BitSet<T> {
     fn shr(self, rhs: u32) -> Self::Output {
         if T == 1 {
             return BitSet {
-                data: [ self.data[0] >> rhs; T ]
+                data: [self.data[0] >> rhs; T],
             };
         }
-        
+
         let mut bitset = self.clone();
         bitset >>= rhs;
 
@@ -115,7 +121,7 @@ impl<const T: usize> ops::Shr<u32> for BitSet<T> {
 impl<const T: usize> ops::ShrAssign<u32> for BitSet<T> {
     fn shr_assign(&mut self, mut rhs: u32) {
         if T == 1 {
-            self.data = [ self.data[0] >> rhs; T ];
+            self.data = [self.data[0] >> rhs; T];
             return;
         }
 
@@ -139,40 +145,73 @@ impl<const T: usize> ops::ShrAssign<u32> for BitSet<T> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{BitSet};
+    use crate::BitSet;
 
     #[test]
     fn not() {
-        assert_eq!(!BitSet::from_data([ u128::MAX, u128::MAX ]), BitSet::from_data([ 0, 0 ]));
-        assert_eq!(!BitSet::from_data([ 0, 0 ]), BitSet::from_data([ u128::MAX, u128::MAX ]));
-        assert_eq!(!!BitSet::from_data([ 4945856, 748691 ]), BitSet::from_data([ 4945856, 748691 ]));
+        assert_eq!(
+            !BitSet::from_data([u128::MAX, u128::MAX]),
+            BitSet::from_data([0, 0])
+        );
+        assert_eq!(
+            !BitSet::from_data([0, 0]),
+            BitSet::from_data([u128::MAX, u128::MAX])
+        );
+        assert_eq!(
+            !!BitSet::from_data([4945856, 748691]),
+            BitSet::from_data([4945856, 748691])
+        );
     }
 
     #[test]
     fn and() {
-        assert_eq!(BitSet::from_data([ 1, 0 ]) & &BitSet::from_data([ 0, 1 ]), BitSet::from_data([ 0, 0 ]));
-        assert_eq!(BitSet::from_data([ 0, 1 ]) & &BitSet::from_data([ 0, 1 ]), BitSet::from_data([ 0, 1 ]));
+        assert_eq!(
+            BitSet::from_data([1, 0]) & &BitSet::from_data([0, 1]),
+            BitSet::from_data([0, 0])
+        );
+        assert_eq!(
+            BitSet::from_data([0, 1]) & &BitSet::from_data([0, 1]),
+            BitSet::from_data([0, 1])
+        );
     }
 
     #[test]
     fn or() {
-        assert_eq!(BitSet::from_data([ 1, 0 ]) | &BitSet::from_data([ 0, 1 ]), BitSet::from_data([ 1, 1 ]));
-        assert_eq!(BitSet::from_data([ 0, 1 ]) | &BitSet::from_data([ 0, 1 ]), BitSet::from_data([ 0, 1 ]));
+        assert_eq!(
+            BitSet::from_data([1, 0]) | &BitSet::from_data([0, 1]),
+            BitSet::from_data([1, 1])
+        );
+        assert_eq!(
+            BitSet::from_data([0, 1]) | &BitSet::from_data([0, 1]),
+            BitSet::from_data([0, 1])
+        );
     }
 
     #[test]
     fn xor() {
-        assert_eq!(BitSet::from_data([ 1, 0 ]) ^ &BitSet::from_data([ 0, 1 ]), BitSet::from_data([ 1, 1 ]));
-        assert_eq!(BitSet::from_data([ 0, 1 ]) ^ &BitSet::from_data([ 0, 1 ]), BitSet::from_data([ 0, 0 ]));
+        assert_eq!(
+            BitSet::from_data([1, 0]) ^ &BitSet::from_data([0, 1]),
+            BitSet::from_data([1, 1])
+        );
+        assert_eq!(
+            BitSet::from_data([0, 1]) ^ &BitSet::from_data([0, 1]),
+            BitSet::from_data([0, 0])
+        );
     }
 
     #[test]
     fn shl() {
-        assert_eq!(BitSet::from_data([ 0, (u128::MAX >> 1) + 1 ]) << 1, BitSet::from_data([ 1, 0 ]));
+        assert_eq!(
+            BitSet::from_data([0, (u128::MAX >> 1) + 1]) << 1,
+            BitSet::from_data([1, 0])
+        );
     }
 
     #[test]
     fn shr() {
-        assert_eq!(BitSet::from_data([ 1, 0 ]) >> 1, BitSet::from_data([ 0, (u128::MAX >> 1) + 1 ]));
+        assert_eq!(
+            BitSet::from_data([1, 0]) >> 1,
+            BitSet::from_data([0, (u128::MAX >> 1) + 1])
+        );
     }
 }

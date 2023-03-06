@@ -1,22 +1,17 @@
-mod board;
 mod bitset;
+mod board;
 mod games;
 
 use std::env;
 
-pub use board::*;
 pub use bitset::*;
+pub use board::*;
 pub use games::*;
 
 fn main() {
     env::set_var("RUST_BACKTRACE", "1");
 
-    let mut board = Board::new(
-        Chess::create(),
-        2,
-        (8, 8),
-        "k7/8/K7/8/8/8/8/1Q6"
-    );
+    let mut board = Board::new(Chess::create(), 2, (8, 8), "k7/8/K7/8/8/8/8/1Q6");
 
     board.state.moving_team = 0;
 
@@ -25,7 +20,7 @@ fn main() {
     .iter().map(|el| el.display(8, 8)).fold("".to_string(), |a, b| a + "\n-\n" + &b);*/
 
     let actions = board.generate_legal_moves(1);
-    
+
     //println!("{}", actions.len());
 
     //let action = actions[0];
@@ -38,7 +33,7 @@ fn main() {
     /*let king_pos = BitBoard::from_element(1 << 28);
 
     board.state.first_move |= &king_pos;
-    
+
     let blocker = BitBoard::from_element(1 << 45);
     board.state.blockers |= &blocker;
 

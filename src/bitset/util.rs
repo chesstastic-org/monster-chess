@@ -1,26 +1,20 @@
 /// I've chosen to use this little utility because of its performance in benchmarks being the best, and because it makes it the easiest to specialize to the needs of this project (in terms of both optimizations and code structure.)
 /// In this case, those needs being a way to have bigger integer sizes that are compatible with bit operations at high speeds.
 
-use std::fmt::Display;
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Ord)]
-pub struct BitSet<const T : usize> {
-    pub data: [ u128; T ]
+pub struct BitSet<const T: usize> {
+    pub data: [u128; T],
 }
 
 impl<const T: usize> BitSet<T> {
-    pub fn from_data(data: [ u128; T ]) -> BitSet<T> {
-        BitSet {
-            data
-        }
+    pub fn from_data(data: [u128; T]) -> BitSet<T> {
+        BitSet { data }
     }
 
     pub fn from_element(el: u128) -> BitSet<T> {
-        let mut arr = [ 0; T ];
+        let mut arr = [0; T];
         arr[T - 1] = el;
-        BitSet {
-            data: arr
-        }
+        BitSet { data: arr }
     }
 
     pub fn from_lsb(bit: u32) -> BitSet<T> {
@@ -41,7 +35,7 @@ impl<const T: usize> BitSet<T> {
 
     pub fn is_empty(&self) -> bool {
         if T == 1 {
-            self.data[0] == 0   
+            self.data[0] == 0
         } else {
             self.data.iter().all(|el| *el == 0)
         }
@@ -49,28 +43,42 @@ impl<const T: usize> BitSet<T> {
 
     pub fn is_set(&self) -> bool {
         if T == 1 {
-            self.data[0] != 0   
+            self.data[0] != 0
         } else {
             self.data.iter().any(|el| *el != 0)
         }
     }
 
     pub fn max() -> BitSet<T> {
-        BitSet::<T>::from_data([ u128::MAX; T ])
+        BitSet::<T>::from_data([u128::MAX; T])
     }
 
     pub fn new() -> BitSet<T> {
-        BitSet::<T>::from_data([ 0; T ])
+        BitSet::<T>::from_data([0; T])
     }
 
     pub fn apply(self, rhs: &BitSet<T>, apply: impl Fn((&u128, &u128)) -> u128) -> Self {
         BitSet {
-            data: self.data.iter().zip(&rhs.data).map(apply).collect::<Vec<_>>().try_into().unwrap()
+            data: self
+                .data
+                .iter()
+                .zip(&rhs.data)
+                .map(apply)
+                .collect::<Vec<_>>()
+                .try_into()
+                .unwrap(),
         }
     }
 
     pub fn effect(&mut self, rhs: &BitSet<T>, apply: impl Fn((&u128, &u128)) -> u128) {
-        self.data = self.data.iter().zip(&rhs.data).map(apply).collect::<Vec<_>>().try_into().unwrap()
+        self.data = self
+            .data
+            .iter()
+            .zip(&rhs.data)
+            .map(apply)
+            .collect::<Vec<_>>()
+            .try_into()
+            .unwrap()
     }
 
     pub fn count_zeros(&self) -> u32 {
@@ -118,10 +126,14 @@ impl<const T: usize> BitSet<T> {
                 break;
             }
 
-            let chunk = row.iter().map(|i| if i == &0 { "⬛" } else { "⬜" }).collect::<Vec<_>>().join("");
+            let chunk = row
+                .iter()
+                .map(|i| if i == &0 { "⬛" } else { "⬜" })
+                .collect::<Vec<_>>()
+                .join("");
             chunks.push(chunk);
         }
-        
+
         chunks.join("\n")
     }
 }

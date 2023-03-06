@@ -1,4 +1,4 @@
-use crate::{Piece, Board, Action};
+use crate::{Action, Board, Piece};
 
 pub trait MoveRestrictions {
     fn is_legal(&self, board: &mut Board, action: &Action) -> bool;
@@ -7,5 +7,5 @@ pub trait MoveRestrictions {
 
 pub struct Game {
     pub pieces: Vec<Box<dyn Piece>>,
-    pub move_restrictions: Box<dyn MoveRestrictions>
+    pub move_restrictions: Box<dyn MoveRestrictions>,
 }
