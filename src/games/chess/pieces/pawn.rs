@@ -69,7 +69,7 @@ impl Piece for PawnPiece {
         let mut capture_requirements = board.state.all_pieces;
         if let Some(last_move) = board.state.history.last() {
             let conditions = last_move.action.piece_type == 0
-                && (last_move.action.to.abs_diff(last_move.action.from) == (2 * (cols as u32)));
+                && (last_move.action.to.abs_diff(last_move.action.from) == (2 * (cols)));
             
             if conditions {
                 capture_requirements |= &up(
@@ -268,8 +268,8 @@ impl Piece for PawnPiece {
                 let mut en_passant = false;
                 if let Some(last_move) = board.state.history.last() {
                     let conditions = last_move.action.piece_type == 0
-                        && (last_move.action.to.abs_diff(last_move.action.from) == (2 * (cols as u32)))
-                        && (last_move.action.to.abs_diff(bit) == (cols as u32));
+                        && (last_move.action.to.abs_diff(last_move.action.from) == (2 * (cols)))
+                        && (last_move.action.to.abs_diff(bit) == (cols));
 
                     if conditions {
                         en_passant = true;

@@ -3,10 +3,10 @@ use crate::{generate_edge_list, Action, BitSet, Edges, Game, HistoryMove};
 pub type BitBoard = BitSet<1>;
 pub type PieceType = usize;
 
-/// I doubt anyone would be practically creating boards of 340,282,366,920,938,463,463,374,607,431,768,211,456 x 340,282,366,920,938,463,463,374,607,431,768,211,456.
-/// However, storing these as u128s makes it much easier to interface the bitboards with (particularly, shifting bits with them.)
-pub type Rows = u128;
-pub type Cols = u128;
+/// I doubt anyone would be practically creating boards of 4,294,967,296 x 4,294,967,296.
+/// However, storing these as u32s makes it much easier to interface the bitboards with (particularly, shifting bits with them.)
+pub type Rows = u32;
+pub type Cols = u32;
 
 pub struct BoardState {
     /// All Pieces is a BitBoard of all pieces, because keeping this bitboard ready makes it much easier to calculate movement for slider pieces.
@@ -169,6 +169,7 @@ impl Board {
             let piece = &self.game.pieces[ind];
 
             for bit in board.iter_one_bits(board_len as u32) {
+                println!("Baaa");
                 piece.add_actions(&mut actions, self, bit, team);
             }
         }

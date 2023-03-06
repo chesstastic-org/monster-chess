@@ -109,7 +109,12 @@ impl<const T: usize> BitSet<T> {
     }
 
     pub fn iter_one_bits(&self, end: u32) -> Vec<u32> {
-        let first_bit = self.bitscan_reverse();
+        if !self.is_set() {
+            return Vec::new();
+        }
+
+        let first_bit = self.bitscan_forward();
+
         let mut bits: Vec<u32> = Vec::with_capacity((end - first_bit) as usize);
         for bit in first_bit..end {
             if self.has_bit(bit) {

@@ -35,7 +35,7 @@ enum Direction {
 
 impl KingPiece {
     fn make_castling_move(&self, board: &mut Board, action: &Action, from: BitBoard, to: BitBoard) {
-        let cols = board.state.cols as u32;
+        let cols = board.state.cols;
         let left_center = BitBoard::from_lsb(if cols % 2 == 0 {
             (cols / 2) - 1
         } else {
@@ -204,8 +204,8 @@ impl Piece for KingPiece {
     }
 
     fn add_actions(&self, actions: &mut Vec<Action>, board: &Board, from: u32, team: u32) {
-        let rows = board.state.rows as u32;
-        let cols = board.state.cols as u32;
+        let rows = board.state.rows;
+        let cols = board.state.cols;
         let board_len = rows * cols;
 
         let piece_type = self.get_piece_type();

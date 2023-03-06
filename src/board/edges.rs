@@ -1,6 +1,6 @@
 use crate::{BitBoard, Cols, Rows};
 
-pub type EdgeBuffer = u128;
+pub type EdgeBuffer = u32;
 
 pub struct Edges {
     pub top: BitBoard,
@@ -16,7 +16,7 @@ pub fn generate_edges(buffer: EdgeBuffer, rows: Rows, cols: Cols) -> Edges {
 
     let mut left = BitBoard::max() & &(!(BitBoard::max() << (buffer as u32)));
     for _ in 1..rows {
-        left |= &(left << (cols as u32));
+        left |= &(left << (cols));
     }
 
     let right = left << (cols - buffer) as u32;
