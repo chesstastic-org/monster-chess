@@ -28,7 +28,7 @@ impl Board {
                     .iter()
                     .position(|piece| match piece.get_piece_symbol() {
                         PieceSymbol::Char(char) => char == lower_char,
-                        PieceSymbol::TeamSymbol(chars) => chars.contains(&char)
+                        PieceSymbol::TeamSymbol(teams) => teams.contains(&char)
                     })
                     .unwrap();
     
@@ -111,8 +111,8 @@ impl Board {
                         char.to_ascii_lowercase().to_string()
                     }
                 },
-                PieceSymbol::TeamSymbol(chars) => {
-                    chars[team].to_string()
+                PieceSymbol::TeamSymbol(teams) => {
+                    teams[team].to_string()
                 }
             };
             if self.game.fen_options.state.first_moves && !first_move {
