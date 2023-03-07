@@ -12,7 +12,7 @@ impl<const T: usize> BitSet<T> {
             self.data[0].trailing_zeros()
         } else {
             let mut zeros: u32 = 0;
-            for i in 0..T {
+            for i in (0..T).rev() {
                 let data = self.data[i];
                 if data != 0 {
                     zeros += data.trailing_zeros();
@@ -21,7 +21,7 @@ impl<const T: usize> BitSet<T> {
 
                 zeros += 128;
             }
-            ((128 * T) - 1) as u32 - zeros
+            zeros
         }
     }
 
@@ -36,7 +36,7 @@ impl<const T: usize> BitSet<T> {
             127 - self.data[0].leading_zeros()
         } else {
             let mut zeros: u32 = 0;
-            for i in (0..T).rev() {
+            for i in 0..T {
                 let data = self.data[i];
                 if data != 0 {
                     zeros += data.leading_zeros();
@@ -45,7 +45,7 @@ impl<const T: usize> BitSet<T> {
 
                 zeros += 128;
             }
-            127 - zeros
+            (((T as u32) * 128) - 1) - zeros
         }
     }
 }
@@ -57,18 +57,16 @@ mod tests {
     #[test]
     fn bitscan_forward() {
         assert_eq!(BitSet::from_data([0, 1]).bitscan_forward(), 0);
-        assert_eq!(
-            BitSet::from_data([(u128::MAX >> 1) + 1, 0]).bitscan_forward(),
-            255
-        );
+        assert_eq!(BitSet::from_data([1, 1]).bitscan_forward(), 0);
+        assert_eq!(BitSet::from_data([3, 3]).bitscan_forward(), 0);
+        assert_eq!(BitSet::from_data([1, 0]).bitscan_forward(), 128);
     }
 
     #[test]
     fn bitscan_reverse() {
-        assert_eq!(BitSet::from_data([0, 1]).bitscan_reverse(), 255);
-        assert_eq!(
-            BitSet::from_data([(u128::MAX >> 1) + 1, 0]).bitscan_reverse(),
-            0
-        );
+        assert_eq!(BitSet::from_data([0, 1]).bitscan_reverse(), 0);
+        assert_eq!(BitSet::from_data([1, 1]).bitscan_reverse(), 128);
+        assert_eq!(BitSet::from_data([3, 3]).bitscan_reverse(), 129);
+        assert_eq!(BitSet::from_data([1, 0]).bitscan_reverse(), 128);
     }
 }

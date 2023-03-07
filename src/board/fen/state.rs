@@ -74,16 +74,34 @@ impl Board {
     pub fn to_fen_state(&self) -> String {
         let board_len = self.state.cols * self.state.rows;
         let mut fen_state = "".to_string();
-        for i in 0..board_len {
+        let mut empty_spaces = 0;
+        for i in 0..(board_len + 1) {
+            if i == board_len {
+                if empty_spaces > 0 {
+                    fen_state.push_str(&empty_spaces.to_string());
+                }
+                continue;
+            }
+
             if i > 0 && i % self.state.cols == 0 {
+                if empty_spaces > 0 {
+                    fen_state.push_str(&empty_spaces.to_string());
+                }
                 fen_state.push_str("/");
+                empty_spaces = 0;
             }
 
             let bitboard = BitBoard::from_lsb(i);
 
             if (self.state.all_pieces & &bitboard).is_empty() {
+                empty_spaces += 1;
                 continue;
             }
+
+            if empty_spaces > 0 {
+                fen_state.push_str(&empty_spaces.to_string());
+            }
+            empty_spaces = 0;
 
             let mut team = 0;
             for ind in 0..self.state.teams.len() {
@@ -92,10 +110,11 @@ impl Board {
                 }
             }
 
-            let mut piece_type = 0;
-            for ind in 0..self.state.teams.len() {
+            let mut piece_type = usize::MAX;
+            for ind in 0..self.state.pieces.len() {
                 if (self.state.pieces[ind] & &bitboard).is_set() {
                     piece_type = ind;
+                    break;
                 }
             }
 
@@ -118,6 +137,8 @@ impl Board {
             if self.game.fen_options.state.first_moves && !first_move {
                 piece_str.push_str("!");
             }
+
+            fen_state.push_str(&piece_str);
         }
 
         fen_state

@@ -49,13 +49,13 @@ impl<const T: usize> ops::BitXor<&BitSet<T>> for BitSet<T> {
     type Output = BitSet<T>;
 
     fn bitxor(self, rhs: &BitSet<T>) -> Self::Output {
-        self.apply(rhs, |el| el.0 & &!el.1)
+        self.apply(rhs, |el| el.0 ^ el.1)
     }
 }
 
 impl<const T: usize> ops::BitXorAssign<&BitSet<T>> for BitSet<T> {
     fn bitxor_assign(&mut self, rhs: &BitSet<T>) {
-        self.effect(rhs, |el| el.0 & &!el.1)
+        self.effect(rhs, |el| el.0 ^ el.1)
     }
 }
 
@@ -190,11 +190,11 @@ mod tests {
     #[test]
     fn xor() {
         assert_eq!(
-            BitSet::from_data([1, 0]) & &!BitSet::from_data([0, 1]),
+            BitSet::from_data([1, 0]) ^ &BitSet::from_data([0, 1]),
             BitSet::from_data([1, 1])
         );
         assert_eq!(
-            BitSet::from_data([0, 1]) & &!BitSet::from_data([0, 1]),
+            BitSet::from_data([0, 1]) ^ &BitSet::from_data([0, 1]),
             BitSet::from_data([0, 0])
         );
     }

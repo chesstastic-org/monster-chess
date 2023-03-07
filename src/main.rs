@@ -22,6 +22,7 @@ fn main() {
     let actions = board.generate_legal_moves(1);
 
     println!("{:?}", actions);
+    println!("{}", board.to_fen_state());
 
     //let action = actions[0];
 
