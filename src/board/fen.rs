@@ -1,7 +1,7 @@
 use crate::{BitBoard, PieceSymbol, Board, Game, Cols, Rows};
 
 impl Board {
-    pub fn new(game: Game, teams: u128, (rows, cols): (Rows, Cols), fen: &str) -> Board {
+    pub fn from_fen_state(game: Game, teams: u128, (rows, cols): (Rows, Cols), fen: &str) -> Board {
         let pieces = game
             .pieces
             .iter()
@@ -28,14 +28,14 @@ impl Board {
                     .iter()
                     .position(|piece| match piece.get_piece_symbol() {
                         PieceSymbol::Char(char) => char == lower_char,
-                        PieceSymbol::TeamSymbol(chars) => chars.contains(&lower_char)
+                        PieceSymbol::TeamSymbol(chars) => chars.contains(&char)
                     })
                     .unwrap();
     
                 let mut team: u32 = if char.is_ascii_uppercase() { 0 } else { 1 };
     
                 if let PieceSymbol::TeamSymbol(chars) = board.game.pieces[piece_type].get_piece_symbol() {
-                    team = chars.iter().position(|el| el == &lower_char).unwrap() as u32;
+                    team = chars.iter().position(|el| el == &char).unwrap() as u32;
                 }
     
                 let mut first_move = true;
@@ -69,5 +69,57 @@ impl Board {
         }
     
         board
+    }
+
+    pub fn to_fen_state(&self) -> String {
+        let board_len = self.state.cols * self.state.rows;
+        let mut fen_state = "".to_string();
+        for i in 0..board_len {
+            if i > 0 && i % self.state.cols == 0 {
+                fen_state.push_str("/");
+            }
+
+            let bitboard = BitBoard::from_lsb(i);
+
+            if (self.state.all_pieces & &bitboard).is_empty() {
+                continue;
+            }
+
+            let mut team = 0;
+            for ind in 0..self.state.teams.len() {
+                if (self.state.teams[ind] & &bitboard).is_set() {
+                    team = ind;
+                }
+            }
+
+            let mut piece_type = 0;
+            for ind in 0..self.state.teams.len() {
+                if (self.state.pieces[ind] & &bitboard).is_set() {
+                    piece_type = ind;
+                }
+            }
+
+            let first_move = (self.state.first_move & &bitboard).is_set();
+
+            let mut piece_str = match self.game.pieces[piece_type].get_piece_symbol() {
+                PieceSymbol::Char(char) => {
+                    if self.state.teams.len() > 2 {
+                        format!("{}{{{}}}", char.to_ascii_lowercase(), team)
+                    } else if team == 0 {
+                        char.to_ascii_uppercase().to_string()
+                    } else {
+                        char.to_ascii_lowercase().to_string()
+                    }
+                },
+                PieceSymbol::TeamSymbol(chars) => {
+                    chars[team].to_string()
+                }
+            };
+            if self.game.fen_options.state.first_moves && !first_move {
+                piece_str.push_str("!");
+            }
+        }
+
+        fen_state
     }
 }

@@ -1,4 +1,4 @@
-use crate::{Action, BitBoard, Board, MoveRestrictions, Game, PawnPiece, KnightPiece, BishopPiece, RookPiece, QueenPiece, KingPiece, FenOptions, FenTeams};
+use crate::{Action, BitBoard, Board, MoveRestrictions, Game, PawnPiece, KnightPiece, BishopPiece, RookPiece, QueenPiece, KingPiece, FenOptions, FenStateTeams, FenState};
 
 pub struct ChessMoveRestrictions;
 
@@ -37,8 +37,10 @@ impl Chess {
             ],
             move_restrictions: Box::new(ChessMoveRestrictions),
             fen_options: FenOptions {
-                first_moves: true,
-                teams: FenTeams::TeamNames(vec![ 'w', 'b' ])
+                state: FenState {
+                    first_moves: true,
+                    teams: FenStateTeams::TeamNames(vec![ 'w', 'b' ])
+                }
             }
         }
     }

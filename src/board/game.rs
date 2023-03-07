@@ -31,14 +31,18 @@ pub trait FenArgument {
     fn decode(&self, board: &mut Board, arg: &str) -> Result<(), FenDecodeError>;
 }
 
-pub enum FenTeams {
+pub enum FenStateTeams {
     Number,
     TeamNames(Vec<char>)
 }
 
-pub struct FenOptions {
+pub struct FenState {
     pub first_moves: bool,
-    pub teams: FenTeams
+    pub teams: FenStateTeams
+}
+
+pub struct FenOptions {
+    pub state: FenState
 }
 
 pub struct Game {
