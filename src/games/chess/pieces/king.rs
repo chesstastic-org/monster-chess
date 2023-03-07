@@ -1,6 +1,6 @@
 use crate::{
     Action, AttackDirections, BitBoard, Board, Cols, Edges, HistoryMove, IndexedPreviousBoard,
-    Piece, PieceType, PreviousBoard, PieceSymbol,
+    Piece, PieceSymbol, PieceType, PreviousBoard,
 };
 
 const NORMAL_KING_MOVE: usize = 0;
@@ -138,7 +138,7 @@ impl Piece for KingPiece {
         self.piece_type
     }
 
-    #[allow(unused_variables)] 
+    #[allow(unused_variables)]
     fn get_moves(&self, board: &Board, from: BitBoard, team: u32) -> BitBoard {
         let lookup = self.get_attack_lookup(board, from);
         match lookup {

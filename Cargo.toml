@@ -2,3 +2,6 @@
 name = "lotisa-bits"
 version = "0.1.0"
 edition = "2021"
+
+[dependencies]
+shell-words = "1.1.0"

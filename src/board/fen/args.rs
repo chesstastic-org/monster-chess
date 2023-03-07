@@ -1,23 +1,28 @@
 use crate::Board;
 
+#[derive(Clone)]
 pub enum FenTeamArgument {
     Number,
-    Teams(Vec<char>)
+    Teams(Vec<char>),
 }
 
 impl FenArgument for FenTeamArgument {
     fn encode(&self, board: &Board) -> String {
         match self {
             FenTeamArgument::Number => format!("{}", board.state.moving_team),
-            FenTeamArgument::Teams(teams) => teams[board.state.moving_team as usize].to_string()
+            FenTeamArgument::Teams(teams) => teams[board.state.moving_team as usize].to_string(),
         }
     }
 
     fn decode(&self, board: &mut Board, arg: &str) -> Result<(), FenDecodeError> {
         match self {
             FenTeamArgument::Number => {
-                board.state.moving_team = arg.parse::<u32>()
-                    .map_err(|_| FenDecodeError::InvalidArgument(format!("{} is not a valid numerical team value", arg)))?;
+                board.state.moving_team = arg.parse::<u32>().map_err(|_| {
+                    FenDecodeError::InvalidArgument(format!(
+                        "{} is not a valid numerical team value",
+                        arg
+                    ))
+                })?;
             }
             FenTeamArgument::Teams(teams) => {
                 let team = teams.iter().position(|el| el.to_string() == arg);
@@ -26,7 +31,10 @@ impl FenArgument for FenTeamArgument {
                         board.state.moving_team = team as u32;
                     }
                     None => {
-                        return Err(FenDecodeError::InvalidArgument(format!("{} is not a valid team argument", arg)));
+                        return Err(FenDecodeError::InvalidArgument(format!(
+                            "{} is not a valid team argument",
+                            arg
+                        )));
                     }
                 }
             }
@@ -34,10 +42,15 @@ impl FenArgument for FenTeamArgument {
 
         Ok(())
     }
+
+    fn duplicate(&self) -> Box<dyn FenArgument> {
+        Box::new(self.clone())
+    }
 }
 
+#[derive(Debug, Clone)]
 pub enum FenDecodeError {
-    InvalidArgument(String)
+    InvalidArgument(String),
 }
 
 pub trait FenArgument {
@@ -46,4 +59,6 @@ pub trait FenArgument {
 
     /// `decode` takes in a board and an existing argument, and will modify the board to meet the argument (eg. changing the team to reflect the given arg team of `w`)
     fn decode(&self, board: &mut Board, arg: &str) -> Result<(), FenDecodeError>;
+
+    fn duplicate(&self) -> Box<dyn FenArgument>;
 }

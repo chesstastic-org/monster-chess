@@ -1,4 +1,4 @@
-use crate::{AttackDirections, BitBoard, Board, Cols, Edges, Piece, PieceType, PieceSymbol};
+use crate::{AttackDirections, BitBoard, Board, Cols, Edges, Piece, PieceSymbol, PieceType};
 
 pub struct KnightPiece {
     pub piece_type: PieceType,
@@ -72,7 +72,7 @@ impl Piece for KnightPiece {
         self.piece_type
     }
 
-    #[allow(unused_variables)] 
+    #[allow(unused_variables)]
     fn get_moves(&self, board: &Board, from: BitBoard, team: u32) -> BitBoard {
         let lookup = self.get_attack_lookup(board, from);
         match lookup {

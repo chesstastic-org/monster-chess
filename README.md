@@ -95,6 +95,8 @@ impl Piece for KingPiece {
 
 ### FEN Representation
 
+#### Board State
+
 Because `monster-chess` is aiming to support all chess variants, a general modification of FEN is used for this (with a specific version of FEN for the base game of chess itself.) This version of FEN for the board state itself is the same as the typical chess FEN, with the following additions:
 
 - The FEN variant can support more or less than 8 rows and 8 columns.
@@ -106,6 +108,35 @@ Because `monster-chess` is aiming to support all chess variants, a general modif
     - If a game supports first move notation, then if the `!` marker follows a piece (eg. `p!`), that piece has moved at least once already. This is a general way to handle things like first pawn moves and castling rights.
 
 For instance, `p!{3}` is a pawn that has moved once before on the fourth team. (We're using zero as the first index, much like arrays do in programming.)
+
+There's only one option for FEN States, and that's `first_move`. In most games, first moves don't have any impact on the game state, or the FEN representation has other, more concise ways to represent first moves (eg. in chess, pawn first moves are detected based on if pawns are on the 2nd or 6th ranks.)
+
+#### Fen Arguments
+
+FEN Notation for games like chess also have additional information provided that isn't in the board state representation itself. For instance, the en passant square, or castling rights, or the side to move. `monster-chess` does not support these natively as part of the `Board` implementation. Instead, individual games have to manage the additional arguments for their respective FEN notations themselves, by implementing the `FenArgument` trait.
+
+`FenArgument` provides two main methods, `encode`, and `decode`.
+
+```rust
+pub trait FenArgument {
+    /// `encode` takes in a board, and outputs what this FEN argument's encoded result would be (eg. for a team argument, it could be `"b"`)
+    fn encode(&self, board: &Board) -> String;
+
+    /// `decode` takes in a board and an existing argument, and will modify the board to meet the argument (eg. changing the team to reflect the given arg team of `w`)
+    fn decode(&self, board: &mut Board, arg: &str) -> Result<(), FenDecodeError>;
+}
+```
+
+`monster-chess` provides an implementation of one argument for you, which is `FenTeamArgument`, defined like this:
+
+```rust
+pub enum FenTeamArgument {
+    Number,
+    Teams(Vec<char>),
+}
+```
+
+If your game needs an argument to represent which side has to move (which it almost certainly does), using `FenTeamArgument` is necessary, unless you decide to define your own argument representing which side has to move.
 
 ### Games
 

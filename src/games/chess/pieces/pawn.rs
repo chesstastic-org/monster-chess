@@ -1,6 +1,6 @@
 use crate::{
-    Action, BitBoard, Board, Cols, HistoryMove, IndexedPreviousBoard, Piece, PieceType,
-    PreviousBoard, PieceSymbol,
+    Action, BitBoard, Board, Cols, HistoryMove, IndexedPreviousBoard, Piece, PieceSymbol,
+    PieceType, PreviousBoard,
 };
 
 const NORMAL_PAWN_MOVE: usize = 0;
@@ -70,13 +70,13 @@ impl Piece for PawnPiece {
         if let Some(last_move) = board.state.history.last() {
             let conditions = last_move.action.piece_type == 0
                 && (last_move.action.to.abs_diff(last_move.action.from) == (2 * (cols)));
-            
+
             if conditions {
                 capture_requirements |= &up(
                     &BitBoard::from_lsb(last_move.action.from),
                     1,
                     cols,
-                    board.get_next_team(team)
+                    board.get_next_team(team),
                 );
             }
         }
@@ -160,39 +160,42 @@ impl Piece for PawnPiece {
             let piece_type = self.get_piece_type();
             let en_passant_target = down(&to, 1, cols, color as u32);
 
-            
-            let en_passant_target_color: usize = if (en_passant_target & &board.state.teams[0]).is_set() {
-                0
-            } else {
-                1
-            };
-    
+            let en_passant_target_color: usize =
+                if (en_passant_target & &board.state.teams[0]).is_set() {
+                    0
+                } else {
+                    1
+                };
+
             let history_move = HistoryMove {
                 action: *action,
                 teams: vec![
                     IndexedPreviousBoard(color, board.state.teams[color]),
-                    IndexedPreviousBoard(en_passant_target_color, board.state.teams[en_passant_target_color])
+                    IndexedPreviousBoard(
+                        en_passant_target_color,
+                        board.state.teams[en_passant_target_color],
+                    ),
                 ],
                 pieces: vec![IndexedPreviousBoard(
                     piece_type,
                     board.state.pieces[piece_type],
                 )],
                 all_pieces: PreviousBoard(board.state.all_pieces),
-                first_move: PreviousBoard(board.state.first_move)
+                first_move: PreviousBoard(board.state.first_move),
             };
-    
+
             board.state.teams[color] ^= &from;
             board.state.teams[color] |= &en_passant_target;
             board.state.teams[en_passant_target_color] ^= &en_passant_target;
-    
+
             board.state.pieces[piece_type] ^= &from;
 
             board.state.all_pieces ^= &from;
 
             board.state.first_move &= &!from;
             board.state.first_move &= &!en_passant_target;
-    
-            board.state.history.push(history_move);            
+
+            board.state.history.push(history_move);
             return;
         }
 
@@ -279,8 +282,12 @@ impl Piece for PawnPiece {
                 actions.push(Action {
                     from,
                     to: bit,
-                    info: if en_passant { EN_PASSANT_MOVE } else { NORMAL_PAWN_MOVE },
-                    piece_type
+                    info: if en_passant {
+                        EN_PASSANT_MOVE
+                    } else {
+                        NORMAL_PAWN_MOVE
+                    },
+                    piece_type,
                 });
             }
         }

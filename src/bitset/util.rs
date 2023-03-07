@@ -66,7 +66,7 @@ impl<const T: usize> BitSet<T> {
                 .map(apply)
                 .collect::<Vec<_>>()
                 .try_into()
-                .unwrap(),
+                .expect(&format!("Could not convert BitSet data vector into an array when applying operation with `apply`."))
         }
     }
 
@@ -78,7 +78,7 @@ impl<const T: usize> BitSet<T> {
             .map(apply)
             .collect::<Vec<_>>()
             .try_into()
-            .unwrap()
+            .expect(&format!("Could not convert BitSet data vector into an array when applying operation with `effect`."));
     }
 
     pub fn count_zeros(&self) -> u32 {

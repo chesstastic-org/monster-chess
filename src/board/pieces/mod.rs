@@ -5,7 +5,7 @@ use crate::{
 
 pub enum PieceSymbol {
     Char(char),
-    TeamSymbol(Vec<char>)
+    TeamSymbol(Vec<char>),
 }
 
 const NORMAL_MOVE: usize = 0;

@@ -12,7 +12,9 @@ impl<const T: usize> ops::Not for BitSet<T> {
                 .map(|el| !el)
                 .collect::<Vec<_>>()
                 .try_into()
-                .unwrap(),
+                .expect(&format!(
+                    "Could not convert BitSet data vector into an array during unary operation."
+                )),
         }
     }
 }

@@ -1,4 +1,7 @@
-use crate::{get_moves_ray, get_ray_attacks, AttackDirections, BitBoard, Board, Piece, PieceType, PieceSymbol};
+use crate::{
+    get_moves_ray, get_ray_attacks, AttackDirections, BitBoard, Board, Piece, PieceSymbol,
+    PieceType,
+};
 
 pub struct QueenPiece {
     pub piece_type: PieceType,
@@ -70,9 +73,11 @@ impl Piece for QueenPiece {
         self.piece_type
     }
 
-    #[allow(unused_variables)] 
+    #[allow(unused_variables)]
     fn get_moves(&self, board: &Board, from: BitBoard, team: u32) -> BitBoard {
-        let lookup = self.get_attack_lookup(board, from).unwrap();
+        let lookup = self
+            .get_attack_lookup(board, from)
+            .expect("Could not find the queen attack lookup.");
         let mut attacks = BitBoard::new();
 
         for dir in 0..8 {
