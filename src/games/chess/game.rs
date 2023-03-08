@@ -96,9 +96,10 @@ impl FenArgument for ChessEnPassant {
         }
 
         let previous_team = board.get_previous_team(board.state.moving_team);
-        let pos = arg.parse::<u32>().map_err(|_| {
+        let pos = board.decode_position(arg.to_string()).map_err(|err| {
             FenDecodeError::InvalidArgument(format!(
-                "'{arg}' is not a valid en passant position (must be an integer.)"
+                "'{arg}' is not a valid en passant position ({})",
+                err
             ))
         })?;
 
@@ -106,9 +107,9 @@ impl FenArgument for ChessEnPassant {
 
         let pawn = BitBoard::from_lsb(pos);
         let from = match previous_team {
-            0 => pawn.up(2, cols),
-            1 => pawn.down(2, cols),
-            _ => pawn.up(2, cols)
+            0 => pawn.down(2, cols),
+            1 => pawn.up(2, cols),
+            _ => pawn.down(2, cols)
         };
 
         board.state.history.push(HistoryMove {
@@ -139,7 +140,7 @@ impl FenArgument for ChessEnPassant {
             return "-".to_string();
         }
 
-        return last_move.action.to.to_string();
+        return board.encode_position(last_move.action.to);
     }
 
     fn duplicate(&self) -> Box<dyn FenArgument> {
