@@ -126,16 +126,29 @@ pub trait Piece {
         if board.state.current_turn >= board.game.turns {
             board.state.current_turn = 0;
             board.state.sub_moves += 1;
-            board.state.moving_team = board.get_next_team(board.state.moving_team);
-        }
 
-        if board.state.moving_team == 0 {
-            board.state.full_moves = 1;
+            if board.state.moving_team == 0 {
+                board.state.full_moves += 1;
+            }
+            board.state.moving_team = board.get_next_team(board.state.moving_team);
         }
     }
 
     fn undo_move(&self, board: &mut Board) -> Result<(), UndoMoveError> {
-        board.state.moving_team = board.get_previous_team(board.state.moving_team);
+        let previous_team = board.state.moving_team;
+
+        // TODO: Update full moves, sub moves, turns
+
+        board.state.current_turn -= 1;
+        if board.state.current_turn == u32::MAX {
+            board.state.moving_team = board.get_previous_team(previous_team);
+            board.state.current_turn = board.game.turns - 1;
+            board.state.sub_moves -= 1;
+
+            if previous_team == 0 {
+                board.state.full_moves -= 1;
+            }
+        }
 
         let history_move = board.state.history.pop();
         match history_move {
