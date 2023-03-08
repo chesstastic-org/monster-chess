@@ -57,7 +57,7 @@ impl<const T: usize> BitSet<T> {
     pub fn bitscan(&self, direction: Direction) -> u32 {
         match direction {
             Direction::LEFT => self.bitscan_forward(),
-            Direction::RIGHT => self.bitscan_reverse()
+            Direction::RIGHT => self.bitscan_reverse(),
         }
     }
 }

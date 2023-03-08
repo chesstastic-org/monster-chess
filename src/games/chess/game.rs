@@ -1,7 +1,7 @@
 use crate::{
-    Action, BishopPiece, BitBoard, Board, FenFullMoves, FenOptions, FenState, FenStateTeams,
-    FenSubMoves, FenTeamArgument, Game, KingPiece, KnightPiece, MoveRestrictions, PawnPiece,
-    QueenPiece, RookPiece, FenArgument, FenDecodeError, Direction,
+    Action, BishopPiece, BitBoard, Board, Direction, FenArgument, FenDecodeError, FenFullMoves,
+    FenOptions, FenState, FenStateTeams, FenSubMoves, FenTeamArgument, Game, KingPiece,
+    KnightPiece, MoveRestrictions, PawnPiece, QueenPiece, RookPiece, HistoryMove,
 };
 
 pub struct ChessCastlingRights;
@@ -11,16 +11,20 @@ impl FenArgument for ChessCastlingRights {
             board.state.first_move ^= &board.state.pieces[3];
             Ok(())
         } else {
-            let lost_castling_rights = vec![ 'Q', 'K', 'q', 'k' ];
-            let initial_lost_castling_rights = [ 'Q', 'K', 'q', 'k' ];
+            let lost_castling_rights = vec!['Q', 'K', 'q', 'k'];
+            let initial_lost_castling_rights = ['Q', 'K', 'q', 'k'];
 
             for char in arg.chars() {
                 if !lost_castling_rights.contains(&char) {
                     if initial_lost_castling_rights.contains(&char) {
-                        return Err(FenDecodeError::InvalidArgument(format!("The castling rights of '{char}' have already been specified.")));                        
+                        return Err(FenDecodeError::InvalidArgument(format!(
+                            "The castling rights of '{char}' have already been specified."
+                        )));
                     }
 
-                    return Err(FenDecodeError::InvalidArgument(format!("'{char}' is not a valid castling rights character.")));
+                    return Err(FenDecodeError::InvalidArgument(format!(
+                        "'{char}' is not a valid castling rights character."
+                    )));
                 }
             }
 
@@ -31,7 +35,9 @@ impl FenArgument for ChessCastlingRights {
                     'q' => (1, Direction::LEFT),
                     'k' => (1, Direction::RIGHT),
                     _ => {
-                        return Err(FenDecodeError::InvalidArgument(format!("'{char}' is not a valid castling rights character.")));
+                        return Err(FenDecodeError::InvalidArgument(format!(
+                            "'{char}' is not a valid castling rights character."
+                        )));
                     }
                 };
 
@@ -48,16 +54,14 @@ impl FenArgument for ChessCastlingRights {
         let mut castling_rights: Vec<char> = Vec::with_capacity(4);
         for team in 0..board.state.teams.len() {
             let king = board.state.pieces[5] & &board.state.teams[team] & &board.state.first_move;
-            if king.is_empty() { continue; }
+            if king.is_empty() {
+                continue;
+            }
 
             let rooks = board.state.pieces[3] & &board.state.teams[team] & &board.state.first_move;
             let one_bits = rooks.iter_one_bits(board.state.rows * board.state.cols);
             if one_bits.len() == 1 {
-                let mut side_castling_rights = if rooks > king {
-                    'k'
-                } else {
-                    'q'
-                };
+                let mut side_castling_rights = if rooks > king { 'k' } else { 'q' };
 
                 if team == 0 {
                     side_castling_rights = side_castling_rights.to_ascii_uppercase();
@@ -70,12 +74,76 @@ impl FenArgument for ChessCastlingRights {
         if castling_rights.len() == 0 {
             String::from("-")
         } else {
-            castling_rights.iter().map(|el| format!("{}", el)).collect::<Vec<_>>().join("")
+            castling_rights
+                .iter()
+                .map(|el| format!("{}", el))
+                .collect::<Vec<_>>()
+                .join("")
         }
     }
 
     fn duplicate(&self) -> Box<dyn FenArgument> {
         Box::new(ChessCastlingRights)
+    }
+}
+
+pub struct ChessEnPassant;
+
+impl FenArgument for ChessEnPassant {
+    fn decode(&self, board: &mut Board, arg: &str) -> Result<(), FenDecodeError> {
+        if arg == "-" {
+            return Ok(());
+        }
+
+        let previous_team = board.get_previous_team(board.state.moving_team);
+        let pos = arg.parse::<u32>().map_err(|_| {
+            FenDecodeError::InvalidArgument(format!(
+                "'{arg}' is not a valid en passant position (must be an integer.)"
+            ))
+        })?;
+
+        let cols = board.state.cols;
+
+        let pawn = BitBoard::from_lsb(pos);
+        let from = match previous_team {
+            0 => pawn.up(2, cols),
+            1 => pawn.down(2, cols),
+            _ => pawn.up(2, cols)
+        };
+
+        board.state.history.push(HistoryMove {
+            action: Action {
+                from: from.bitscan_forward(),
+                to: pos,
+                piece_type: 0,
+                info: 0
+            },
+            state: None
+        });
+
+        Ok(())
+    }
+
+    fn encode(&self, board: &Board) -> String {
+        let last_move = (&board.state.history).last();
+        if let None = last_move {
+            return "-".to_string();
+        }
+
+        let last_move = last_move.expect("The last move for exporting an en passant FEN must be Some.");
+        if last_move.action.piece_type != 0 {
+            return "-".to_string();
+        }
+
+        if (last_move.action.from.abs_diff(last_move.action.to) != (2 * board.state.cols)) {
+            return "-".to_string();
+        }
+
+        return last_move.action.to.to_string();
+    }
+
+    fn duplicate(&self) -> Box<dyn FenArgument> {
+        Box::new(ChessEnPassant)
     }
 }
 
@@ -127,7 +195,8 @@ impl Chess {
                         "team to move".to_string(),
                         Box::new(FenTeamArgument::Teams(vec!['w', 'b'])),
                     ),
-                    ("castling_rights".to_string(), Box::new(ChessCastlingRights)),
+                    ("castling rights".to_string(), Box::new(ChessCastlingRights)),
+                    ("en passant".to_string(), Box::new(ChessEnPassant)),
                     ("half moves".to_string(), Box::new(FenSubMoves)),
                     ("full moves".to_string(), Box::new(FenFullMoves)),
                 ],

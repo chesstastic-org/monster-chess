@@ -1,6 +1,6 @@
 use crate::{
     Action, AttackDirections, AttackLookup, BitBoard, Board, HistoryMove, IndexedPreviousBoard,
-    PieceType, PreviousBoard, UndoMoveError,
+    PieceType, PreviousBoard, UndoMoveError, HistoryState,
 };
 
 pub enum PieceSymbol {
@@ -51,16 +51,18 @@ pub trait Piece {
 
         let history_move = HistoryMove {
             action: *action,
-            teams: vec![
-                IndexedPreviousBoard(color, board.state.teams[color]),
-                IndexedPreviousBoard(captured_color, board.state.teams[captured_color]),
-            ],
-            pieces: vec![
-                IndexedPreviousBoard(piece_type, board.state.pieces[piece_type]),
-                IndexedPreviousBoard(captured_piece_type, board.state.pieces[captured_piece_type]),
-            ],
-            all_pieces: PreviousBoard(board.state.all_pieces),
-            first_move: PreviousBoard(board.state.first_move),
+            state: Some(HistoryState {
+                teams: vec![
+                    IndexedPreviousBoard(color, board.state.teams[color]),
+                    IndexedPreviousBoard(captured_color, board.state.teams[captured_color]),
+                ],
+                pieces: vec![
+                    IndexedPreviousBoard(piece_type, board.state.pieces[piece_type]),
+                    IndexedPreviousBoard(captured_piece_type, board.state.pieces[captured_piece_type]),
+                ],
+                all_pieces: PreviousBoard(board.state.all_pieces),
+                first_move: PreviousBoard(board.state.first_move),
+            })
         };
         board.state.history.push(history_move);
 
@@ -89,13 +91,15 @@ pub trait Piece {
 
         let history_move = HistoryMove {
             action: *action,
-            teams: vec![IndexedPreviousBoard(color, board.state.teams[color])],
-            pieces: vec![IndexedPreviousBoard(
-                piece_type,
-                board.state.pieces[piece_type],
-            )],
-            all_pieces: PreviousBoard(board.state.all_pieces),
-            first_move: PreviousBoard(board.state.first_move),
+            state: Some(HistoryState {
+                teams: vec![IndexedPreviousBoard(color, board.state.teams[color])],
+                pieces: vec![IndexedPreviousBoard(
+                    piece_type,
+                    board.state.pieces[piece_type],
+                )],
+                all_pieces: PreviousBoard(board.state.all_pieces),
+                first_move: PreviousBoard(board.state.first_move)
+            })
         };
         board.state.history.push(history_move);
 
@@ -153,16 +157,18 @@ pub trait Piece {
         let history_move = board.state.history.pop();
         match history_move {
             Some(history_move) => {
-                for IndexedPreviousBoard(index, bitboard) in history_move.teams {
-                    board.state.teams[index] = bitboard;
-                }
+                if let Some(history_state) = history_move.state {
+                    for IndexedPreviousBoard(index, bitboard) in history_state.teams {
+                        board.state.teams[index] = bitboard;
+                    }
 
-                for IndexedPreviousBoard(index, bitboard) in history_move.pieces {
-                    board.state.pieces[index] = bitboard;
-                }
+                    for IndexedPreviousBoard(index, bitboard) in history_state.pieces {
+                        board.state.pieces[index] = bitboard;
+                    }
 
-                board.state.all_pieces = history_move.all_pieces.0;
-                board.state.first_move = history_move.first_move.0;
+                    board.state.all_pieces = history_state.all_pieces.0;
+                    board.state.first_move = history_state.first_move.0;
+                }
 
                 Ok(())
             }
