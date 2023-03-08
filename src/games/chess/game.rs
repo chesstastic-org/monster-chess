@@ -7,17 +7,20 @@ pub struct ChessMoveRestrictions;
 
 impl MoveRestrictions for ChessMoveRestrictions {
     fn is_legal(&self, board: &mut Board, action: &Action) -> bool {
-        let from_board = BitBoard::from_lsb(action.from);
-        if (from_board & &board.state.pieces[5]).is_set() {
+        let to_board = BitBoard::from_lsb(action.to);
+        if (to_board & &board.state.pieces[5]).is_set() {
             return false;
         }
 
-        let piece_trait = board.game.pieces[action.piece_type].duplicate();
-        let moving_team = board.state.moving_team;
-        piece_trait.make_move(board, action);
-        let in_check = board.is_attacking(moving_team, from_board);
-        piece_trait.undo_move(board).unwrap();
-        in_check
+        let from_board = BitBoard::from_lsb(action.from);
+
+        let mut new_king_board = board.state.teams[board.state.moving_team as usize] & &board.state.pieces[5];
+        if (from_board & &new_king_board).is_set() {
+            new_king_board = to_board;
+        }
+
+        let in_check = board.is_attacking(board.get_next_team(board.state.moving_team), new_king_board);
+        !in_check
     }
 
     fn duplicate(&self) -> Box<dyn MoveRestrictions> {

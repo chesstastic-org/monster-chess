@@ -18,8 +18,7 @@ pub trait Piece {
 
     fn can_lookup(&self) -> bool;
 
-    #[allow(unused_variables)]
-    fn get_attack_lookup<'a>(&self, board: &'a Board, from: BitBoard) -> Option<&'a AttackLookup> {
+    fn get_attack_lookup<'a>(&self, board: &'a Board) -> Option<&'a AttackLookup> {
         board.attack_lookup.get(self.get_piece_type())
     }
 
@@ -126,6 +125,8 @@ pub trait Piece {
     }
 
     fn undo_move(&self, board: &mut Board) -> Result<(), UndoMoveError> {
+        board.state.moving_team = board.get_previous_team(board.state.moving_team);
+
         let history_move = board.state.history.pop();
         match history_move {
             Some(history_move) => {

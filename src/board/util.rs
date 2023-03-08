@@ -97,16 +97,17 @@ impl Board {
         (self.get_move_mask(team) & &target).is_set()
     }
 
-    pub fn generate_moves(&self, team: u32) -> Vec<Action> {
+    pub fn generate_moves(&self) -> Vec<Action> {
         let board_len = self.state.rows * self.state.cols;
         let mut actions: Vec<Action> = Vec::with_capacity(board_len as usize);
+
+        let team = self.state.moving_team;
 
         for (ind, board) in self.state.pieces.iter().enumerate() {
             let board = *board & &self.state.teams[team as usize];
             let piece = &self.game.pieces[ind];
 
             for bit in board.iter_one_bits(board_len as u32) {
-                println!("Baaa");
                 piece.add_actions(&mut actions, self, bit, team);
             }
         }
@@ -117,8 +118,8 @@ impl Board {
     /*
         Don't use when writing an engine directly; use `generate_moves` and `move_restrictions.is_legal` to avoid extra legality checks during pruning.
     */
-    pub fn generate_legal_moves(&mut self, team: u32) -> Vec<Action> {
-        let moves = self.generate_moves(team);
+    pub fn generate_legal_moves(&mut self) -> Vec<Action> {
+        let moves = self.generate_moves();
         let game_restrictions = self.game.move_restrictions.duplicate();
         moves
             .iter()

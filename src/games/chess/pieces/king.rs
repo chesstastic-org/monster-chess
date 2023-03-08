@@ -13,11 +13,11 @@ pub struct KingPiece {
 }
 
 fn right_one(from: BitBoard, edges: &Edges) -> BitBoard {
-    from.right(1) & &!edges.right
+    from.right(1) & &!edges.left
 }
 
 fn left_one(from: BitBoard, edges: &Edges) -> BitBoard {
-    from.left(1) & &!edges.left
+    from.left(1) & &!edges.right
 }
 
 fn up_one(from: BitBoard, cols: Cols, edges: &Edges) -> BitBoard {
@@ -140,7 +140,7 @@ impl Piece for KingPiece {
 
     #[allow(unused_variables)]
     fn get_moves(&self, board: &Board, from: BitBoard, team: u32) -> BitBoard {
-        let lookup = self.get_attack_lookup(board, from);
+        let lookup = self.get_attack_lookup(board);
         match lookup {
             Some(lookup) => lookup[from.bitscan_reverse() as usize][0],
             None => self.generate_lookup_moves(board, from)[0],

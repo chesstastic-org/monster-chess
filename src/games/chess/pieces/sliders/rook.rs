@@ -56,7 +56,7 @@ impl Piece for RookPiece {
     #[allow(unused_variables)]
     fn get_moves(&self, board: &Board, from: BitBoard, team: u32) -> BitBoard {
         let lookup = self
-            .get_attack_lookup(board, from)
+            .get_attack_lookup(board)
             .expect("Could not find the queen attack lookup.");
         let mut attacks = BitBoard::new();
 
