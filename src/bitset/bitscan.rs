@@ -1,5 +1,10 @@
 use crate::BitSet;
 
+pub enum Direction {
+    LEFT,
+    RIGHT,
+}
+
 impl<const T: usize> BitSet<T> {
     /// A forward bitscan, which finds the least significant 1-bit.
     pub fn bitscan_forward(&self) -> u32 {
@@ -46,6 +51,13 @@ impl<const T: usize> BitSet<T> {
                 zeros += 128;
             }
             (((T as u32) * 128) - 1) - zeros
+        }
+    }
+
+    pub fn bitscan(&self, direction: Direction) -> u32 {
+        match direction {
+            Direction::LEFT => self.bitscan_forward(),
+            Direction::RIGHT => self.bitscan_reverse()
         }
     }
 }

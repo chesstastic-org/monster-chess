@@ -1,11 +1,85 @@
 use crate::{
     Action, BishopPiece, BitBoard, Board, FenFullMoves, FenOptions, FenState, FenStateTeams,
     FenSubMoves, FenTeamArgument, Game, KingPiece, KnightPiece, MoveRestrictions, PawnPiece,
-    QueenPiece, RookPiece,
+    QueenPiece, RookPiece, FenArgument, FenDecodeError, Direction,
 };
 
-pub struct ChessMoveRestrictions;
+pub struct ChessCastlingRights;
+impl FenArgument for ChessCastlingRights {
+    fn decode(&self, board: &mut Board, arg: &str) -> Result<(), FenDecodeError> {
+        if arg == "-" {
+            board.state.first_move ^= &board.state.pieces[3];
+            Ok(())
+        } else {
+            let lost_castling_rights = vec![ 'Q', 'K', 'q', 'k' ];
+            let initial_lost_castling_rights = [ 'Q', 'K', 'q', 'k' ];
 
+            for char in arg.chars() {
+                if !lost_castling_rights.contains(&char) {
+                    if initial_lost_castling_rights.contains(&char) {
+                        return Err(FenDecodeError::InvalidArgument(format!("The castling rights of '{char}' have already been specified.")));                        
+                    }
+
+                    return Err(FenDecodeError::InvalidArgument(format!("'{char}' is not a valid castling rights character.")));
+                }
+            }
+
+            for char in lost_castling_rights {
+                let (team, scan_dir) = match char {
+                    'Q' => (0, Direction::LEFT),
+                    'K' => (0, Direction::RIGHT),
+                    'q' => (1, Direction::LEFT),
+                    'k' => (1, Direction::RIGHT),
+                    _ => {
+                        return Err(FenDecodeError::InvalidArgument(format!("'{char}' is not a valid castling rights character.")));
+                    }
+                };
+
+                let rook = (board.state.pieces[3] & &board.state.teams[team]).bitscan(scan_dir);
+                let rook_board = BitBoard::from_lsb(rook);
+
+                board.state.first_move ^= &rook_board;
+            }
+            Ok(())
+        }
+    }
+
+    fn encode(&self, board: &Board) -> String {
+        let mut castling_rights: Vec<char> = Vec::with_capacity(4);
+        for team in 0..board.state.teams.len() {
+            let king = board.state.pieces[5] & &board.state.teams[team] & &board.state.first_move;
+            if king.is_empty() { continue; }
+
+            let rooks = board.state.pieces[3] & &board.state.teams[team] & &board.state.first_move;
+            let one_bits = rooks.iter_one_bits(board.state.rows * board.state.cols);
+            if one_bits.len() == 1 {
+                let mut side_castling_rights = if rooks > king {
+                    'k'
+                } else {
+                    'q'
+                };
+
+                if team == 0 {
+                    side_castling_rights = side_castling_rights.to_ascii_uppercase();
+                }
+
+                castling_rights.push(side_castling_rights);
+            }
+        }
+
+        if castling_rights.len() == 0 {
+            String::from("-")
+        } else {
+            castling_rights.iter().map(|el| format!("{}", el)).collect::<Vec<_>>().join("")
+        }
+    }
+
+    fn duplicate(&self) -> Box<dyn FenArgument> {
+        Box::new(ChessCastlingRights)
+    }
+}
+
+pub struct ChessMoveRestrictions;
 impl MoveRestrictions for ChessMoveRestrictions {
     fn is_legal(&self, board: &mut Board, action: &Action) -> bool {
         let to_board = BitBoard::from_lsb(action.to);
@@ -53,6 +127,7 @@ impl Chess {
                         "team to move".to_string(),
                         Box::new(FenTeamArgument::Teams(vec!['w', 'b'])),
                     ),
+                    ("castling_rights".to_string(), Box::new(ChessCastlingRights)),
                     ("half moves".to_string(), Box::new(FenSubMoves)),
                     ("full moves".to_string(), Box::new(FenFullMoves)),
                 ],

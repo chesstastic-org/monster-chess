@@ -1,6 +1,6 @@
 use crate::{
     Action, AttackDirections, BitBoard, Board, Cols, Edges, HistoryMove, IndexedPreviousBoard,
-    Piece, PieceSymbol, PieceType, PreviousBoard,
+    Piece, PieceSymbol, PieceType, PreviousBoard, Direction,
 };
 
 const NORMAL_KING_MOVE: usize = 0;
@@ -26,11 +26,6 @@ fn up_one(from: BitBoard, cols: Cols, edges: &Edges) -> BitBoard {
 
 fn down_one(from: BitBoard, cols: Cols, edges: &Edges) -> BitBoard {
     from.down(1, cols) & &!edges.top
-}
-
-enum Direction {
-    LEFT,
-    RIGHT,
 }
 
 impl KingPiece {
