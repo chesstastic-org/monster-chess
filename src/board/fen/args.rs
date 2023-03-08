@@ -48,6 +48,69 @@ impl FenArgument for FenTeamArgument {
     }
 }
 
+pub struct FenTurns;
+
+impl FenArgument for FenTurns {
+    fn encode(&self, board: &Board) -> String {
+        board.state.turns.to_string()
+    }
+
+    fn decode(&self, board: &mut Board, arg: &str) -> Result<(), FenDecodeError> {
+        board.state.turns = arg.parse::<u32>().map_err(|_| {
+            FenDecodeError::InvalidArgument(format!(
+                "'{arg}' is not a valid amount of turns, as it isn't a positive integer."
+            ))
+        })?;
+        Ok(())
+    }
+
+    fn duplicate(&self) -> Box<dyn FenArgument> {
+        Box::new(FenTurns)
+    }
+}
+
+pub struct FenSubMoves;
+
+impl FenArgument for FenSubMoves {
+    fn encode(&self, board: &Board) -> String {
+        board.state.sub_moves.to_string()
+    }
+
+    fn decode(&self, board: &mut Board, arg: &str) -> Result<(), FenDecodeError> {
+        board.state.sub_moves = arg.parse::<u32>().map_err(|_| {
+            FenDecodeError::InvalidArgument(format!(
+                "'{arg}' is not a valid amount of sub moves, as it isn't a positive integer."
+            ))
+        })?;
+        Ok(())
+    }
+
+    fn duplicate(&self) -> Box<dyn FenArgument> {
+        Box::new(FenSubMoves)
+    }
+}
+
+pub struct FenFullMoves;
+
+impl FenArgument for FenFullMoves {
+    fn encode(&self, board: &Board) -> String {
+        board.state.full_moves.to_string()
+    }
+
+    fn decode(&self, board: &mut Board, arg: &str) -> Result<(), FenDecodeError> {
+        board.state.full_moves = arg.parse::<u32>().map_err(|_| {
+            FenDecodeError::InvalidArgument(format!(
+                "'{arg}' is not a valid amount of full moves, as it isn't a positive integer."
+            ))
+        })?;
+        Ok(())
+    }
+
+    fn duplicate(&self) -> Box<dyn FenArgument> {
+        Box::new(FenFullMoves)
+    }
+}
+
 #[derive(Debug, Clone)]
 pub enum FenDecodeError {
     InvalidArgument(String),

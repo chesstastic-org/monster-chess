@@ -121,7 +121,17 @@ pub trait Piece {
             self.make_normal_move(board, action, from, to);
         }
 
-        board.state.moving_team = board.get_next_team(board.state.moving_team);
+        board.state.current_turn += 1;
+        board.state.turns += 1;
+        if board.state.current_turn >= board.game.turns {
+            board.state.current_turn = 0;
+            board.state.sub_moves += 1;
+            board.state.moving_team = board.get_next_team(board.state.moving_team);
+        }
+
+        if board.state.moving_team == 0 {
+            board.state.full_moves = 1;
+        }
     }
 
     fn undo_move(&self, board: &mut Board) -> Result<(), UndoMoveError> {

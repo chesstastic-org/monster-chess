@@ -16,6 +16,16 @@ pub struct BoardState {
     pub teams: Vec<BitBoard>,
 
     pub moving_team: u32,
+    pub current_turn: u32,
+
+    /// Full Moves is one full move, where each team completes one sub move (or all of their turns)
+    pub full_moves: u32,
+
+    /// Sub Moves is one sub move, where a single team completes all of their turns
+    pub sub_moves: u32,
+
+    /// A turn is a single movement of a piece. Chess only has one turn, but games like duck chess have two (move the piece, then move the duck)
+    pub turns: u32,
 
     /// Edges is a list of "boundary bitboards" for validating the movement of delta pieces (pieces that move in a fixed way everytime)
     pub edges: Vec<Edges>,
@@ -69,6 +79,10 @@ impl Board {
                 rows,
                 history: vec![],
                 moving_team: 0,
+                current_turn: 0,
+                full_moves: 0,
+                sub_moves: 0,
+                turns: 0,
             },
         };
 
