@@ -53,15 +53,17 @@ impl Piece for PawnPiece {
         let cols = board.state.cols;
         let edges = &board.state.edges[0];
 
-        let single_moves = up(&from, 1, cols, team) & &!board.state.all_pieces;
+        let single_moves = up(&from, 1, cols, team);
         let first_move = (from & &board.state.first_move).is_set();
 
         moves |= &single_moves;
 
         if first_move {
-            let double_moves = up(&single_moves, 1, cols, team) & &!board.state.all_pieces;
+            let double_moves = up(&single_moves, 1, cols, team);
             moves |= &double_moves;
         }
+
+        moves &= &!board.state.all_pieces;
 
         let up_one = from.up(1, cols);
         let mut captures = (up_one & &!edges.right).right(1);
@@ -158,6 +160,8 @@ impl Piece for PawnPiece {
 
     fn make_normal_move(&self, board: &mut Board, action: &Action, from: BitBoard, to: BitBoard) {
         if action.info == EN_PASSANT_MOVE {
+            println!("goddamnit {}{}", board.encode_position(action.from), board.encode_position(action.to));
+
             let cols = board.state.cols;
 
             let color: usize = if (from & &board.state.teams[0]).is_set() {
@@ -286,9 +290,12 @@ impl Piece for PawnPiece {
                 if let Some(last_move) = board.state.history.last() {
                     let conditions = last_move.action.piece_type == 0
                         && (last_move.action.to.abs_diff(last_move.action.from) == (2 * (cols)))
-                        && (last_move.action.to.abs_diff(bit) == (cols));
+                        && (last_move.action.to.abs_diff(bit) == (cols))
+                        && (from.abs_diff(bit) % cols != 0);
 
                     if conditions {
+
+                        println!("shit: {}{}", board.encode_position(from), board.encode_position(bit));
                         en_passant = true;
                     }
                 }

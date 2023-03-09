@@ -1,4 +1,4 @@
-use crate::{FenArgument, Board};
+use crate::{Board, FenArgument};
 
 pub enum FenStateTeams {
     Number,
@@ -18,5 +18,5 @@ pub trait PostProcess {
 pub struct FenOptions {
     pub state: FenState,
     pub args: Vec<(String, Box<dyn FenArgument>)>,
-    pub post_process: Box<dyn PostProcess>
+    pub post_process: Box<dyn PostProcess>,
 }

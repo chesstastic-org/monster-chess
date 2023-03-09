@@ -15,36 +15,57 @@ fn main() {
         Chess::create(),
         2,
         (8, 8),
-        "rnbqkbnr/ppppppp1/7p/8/P7/8/1PPPPPPP/RNBQKBNR w KQkq - 0 2",
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+    );
+
+    let moves =  board
+        .generate_legal_moves();
+    let action = moves
+        .iter()
+        .find(|el| board.encode_position(el.to) == "a4")
+        .unwrap();
+
+    board.make_move(
+        *action
     );
 
     let lines = r#"
-    a1a2 - 1
-    a1a3 - 1
-    a4a5 - 1
-    b1a3 - 1
-    b1c3 - 1
-    b2b3 - 1
-    b2b4 - 1
-    c2c3 - 1
-    c2c4 - 1
-    d2d3 - 1
-    d2d4 - 1
-    e2e3 - 1
-    e2e4 - 1
-    f2f3 - 1
-    f2f4 - 1
-    g1f3 - 1
-    g1h3 - 1
-    g2g3 - 1
-    g2g4 - 1
-    h2h3 - 1
-    h2h4 - 1"#.split("\n").map(|el| el.trim().clone().to_string()).filter(|el| !el.is_empty()).collect::<Vec<_>>();
+    a7a5 - 20
+a7a6 - 21
+b7b5 - 22
+b7b6 - 21
+b8a6 - 21
+b8c6 - 21
+c7c5 - 21
+c7c6 - 21
+d7d5 - 21
+d7d6 - 21
+e7e5 - 21
+e7e6 - 21
+f7f5 - 21
+f7f6 - 21
+g7g5 - 21
+g7g6 - 21
+g8f6 - 21
+g8h6 - 21
+h7h5 - 21
+h7h6 - 21"#
+        .split("\n")
+        .map(|el| el.trim().clone().to_string())
+        .filter(|el| !el.is_empty())
+        .collect::<Vec<_>>();
 
-    let perft = board.perft(1);
+    let perft = board
+        .perft(2)
+        /* .branches
+        .iter()
+        .find(|el| el.0 == ("a7".to_string(), "a5".to_string()))
+        .unwrap()
+        .1*/
+        .clone();
     println!("TOTAL {}", perft.nodes);
-    for ((from, to), nodes) in perft.branches {
-        let line = format!("{}{} - {}", from, to, nodes);
+    for ((from, to), results) in perft.branches {
+        let line = format!("{}{} - {}", from, to, results.nodes);
         if !lines.contains(&line) {
             println!("{line}");
         }

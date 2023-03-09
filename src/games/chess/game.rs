@@ -1,7 +1,7 @@
 use crate::{
     Action, BishopPiece, BitBoard, Board, Direction, FenArgument, FenDecodeError, FenFullMoves,
     FenOptions, FenState, FenStateTeams, FenSubMoves, FenTeamArgument, Game, HistoryMove,
-    KingPiece, KnightPiece, MoveRestrictions, PawnPiece, QueenPiece, RookPiece, PostProcess,
+    KingPiece, KnightPiece, MoveRestrictions, PawnPiece, PostProcess, QueenPiece, RookPiece,
 };
 
 pub struct ChessCastlingRights;
@@ -61,7 +61,7 @@ impl FenArgument for ChessCastlingRights {
             }
 
             let rooks = board.state.pieces[3] & &board.state.teams[team] & &board.state.first_move;
-            let one_bits = rooks.iter_one_bits(board.state.rows * board.state.cols);
+            let mut one_bits = rooks.iter_one_bits(board.state.rows * board.state.cols);
             if one_bits.len() == 1 {
                 let mut side_castling_rights = if rooks > king { 'k' } else { 'q' };
 
@@ -70,6 +70,18 @@ impl FenArgument for ChessCastlingRights {
                 }
 
                 castling_rights.push(side_castling_rights);
+            } else if one_bits.len() > 1 {
+                one_bits.reverse();
+                for bit in one_bits {
+                    let bit = BitBoard::from_lsb(bit);
+                    let mut side_castling_rights = if bit > king { 'k' } else { 'q' };
+
+                    if team == 0 {
+                        side_castling_rights = side_castling_rights.to_ascii_uppercase();
+                    }
+    
+                    castling_rights.push(side_castling_rights);              
+                }
             }
         }
 
@@ -102,7 +114,8 @@ impl PostProcess for ChessPostProcess {
         bottom |= &bottom.up(1, cols);
         top |= &top.down(1, cols);
 
-        let first_move = (board.state.pieces[0] & &(bottom | &top)) | &(board.state.all_pieces ^ &board.state.pieces[0]);
+        let first_move = (board.state.pieces[0] & &(bottom | &top))
+            | &(board.state.all_pieces ^ &board.state.pieces[0]);
         board.state.first_move &= &first_move;
     }
 
@@ -224,7 +237,7 @@ impl Chess {
                     ("half moves".to_string(), Box::new(FenSubMoves)),
                     ("full moves".to_string(), Box::new(FenFullMoves)),
                 ],
-                post_process: Box::new(ChessPostProcess)
+                post_process: Box::new(ChessPostProcess),
             },
         }
     }

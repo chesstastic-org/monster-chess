@@ -1,8 +1,8 @@
 use crate::Board;
 
-pub type PerftBranch = ((String, String), u32);
+pub type PerftBranch = ((String, String), PerftResults);
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PerftResults {
     pub nodes: u32,
     pub branches: Vec<PerftBranch>,
@@ -27,7 +27,7 @@ impl Board {
     pub fn perft(&mut self, depth: u32) -> PerftResults {
         if depth == 0 {
             return PerftResults {
-                nodes: 0,
+                nodes: 1,
                 branches: vec![],
             };
         }
@@ -36,14 +36,14 @@ impl Board {
         let mut branches: Vec<PerftBranch> = vec![];
         for node in self.generate_legal_moves() {
             self.make_move(node);
-            let branch_nodes = self.sub_perft(depth - 1);
-            nodes += branch_nodes;
+            let results = self.perft(depth - 1);
+            nodes += results.nodes;
             branches.push((
                 (
                     self.encode_position(node.from),
                     self.encode_position(node.to),
                 ),
-                branch_nodes,
+                results,
             ));
             self.undo_move().unwrap();
         }
