@@ -19,38 +19,53 @@ fn main() {
     );
 
     let lines = r#"
-    a2a3 - 380
-    a2a4 - 420
-    b1a3 - 400
-    b1c3 - 440
-    b2b3 - 420
-    b2b4 - 421
-    c2c3 - 420
-    c2c4 - 441
-    d2d3 - 539
-    d2d4 - 560
-    e2e3 - 599
-    e2e4 - 600
-    f2f3 - 380
-    f2f4 - 401
-    g1f3 - 440
-    g1h3 - 400
-    g2g3 - 420
-    g2g4 - 421
-    h2h3 - 380
-    h2h4 - 420"#
-        .split("\n")
-        .map(|el| el.trim().clone().to_string())
-        .filter(|el| !el.is_empty())
-        .collect::<Vec<_>>();
+    a5b4 - 1
+    a8a6 - 1
+    a8a7 - 1
+    b7b5 - 1
+    b7b6 - 1
+    b8a6 - 1
+    b8c6 - 1
+    c7c5 - 1
+    c7c6 - 1
+    d7d5 - 1
+    d7d6 - 1
+    e7e5 - 1
+    e7e6 - 1
+    f7f5 - 1
+    f7f6 - 1
+    g7g5 - 1
+    g7g6 - 1
+    g8f6 - 1
+    g8h6 - 1
+    h7h5 - 1
+    h7h6 - 1
+    "#
+    .split("\n")
+    .map(|el| el.trim().clone().to_string())
+    .filter(|el| !el.is_empty())
+    .collect::<Vec<_>>();
 
     let perft = board
-        .perft(3);
+        .perft(4);
     println!("TOTAL {}", perft.nodes);
-    for ((from, to), results) in perft.branches {
-        let line = format!("{}{} - {}", from, to, results.nodes);
+
+    let new_lines = perft
+        .branches
+        .iter()
+        .map(|((from, to), results)| format!("{}{} - {}", from, to, results.nodes))
+        .collect::<Vec<_>>();
+
+    for line in &new_lines {
         if !lines.contains(&line) {
             println!("{line}");
+        }
+    }
+
+    println!("-");
+    for line in lines {
+        if !new_lines.contains(&line) {
+            //println!("{line}");
         }
     }
 

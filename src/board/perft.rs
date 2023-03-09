@@ -11,7 +11,12 @@ pub struct PerftResults {
 impl PerftResults {
     pub fn get_branch_results(&self, branch: (&str, &str)) -> PerftResults {
         let branch = (branch.0.to_string(), branch.1.to_string());
-        self.branches.iter().find(|el| el.0 == branch).unwrap().1.clone()
+        self.branches
+            .iter()
+            .find(|el| el.0 == branch)
+            .unwrap()
+            .1
+            .clone()
     }
 }
 

@@ -63,7 +63,7 @@ impl Piece for PawnPiece {
             moves |= &double_moves;
         }
 
-        let up_one = from.up(1, cols);
+        let up_one = up(&from, 1, cols, team);
         let mut captures = (up_one & &!edges.right).right(1);
         captures |= &(up_one & &!edges.left).left(1);
 
@@ -158,7 +158,11 @@ impl Piece for PawnPiece {
 
     fn make_normal_move(&self, board: &mut Board, action: &Action, from: BitBoard, to: BitBoard) {
         if action.info == EN_PASSANT_MOVE {
-            println!("goddamnit {}{}", board.encode_position(action.from), board.encode_position(action.to));
+            println!(
+                "goddamnit {}{}",
+                board.encode_position(action.from),
+                board.encode_position(action.to)
+            );
 
             let cols = board.state.cols;
 
@@ -292,8 +296,11 @@ impl Piece for PawnPiece {
                         && (from.abs_diff(bit) % cols != 0);
 
                     if conditions {
-
-                        println!("shit: {}{}", board.encode_position(from), board.encode_position(bit));
+                        println!(
+                            "shit: {}{}",
+                            board.encode_position(from),
+                            board.encode_position(bit)
+                        );
                         en_passant = true;
                     }
                 }

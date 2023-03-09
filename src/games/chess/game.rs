@@ -79,8 +79,8 @@ impl FenArgument for ChessCastlingRights {
                     if team == 0 {
                         side_castling_rights = side_castling_rights.to_ascii_uppercase();
                     }
-    
-                    castling_rights.push(side_castling_rights);              
+
+                    castling_rights.push(side_castling_rights);
                 }
             }
         }
