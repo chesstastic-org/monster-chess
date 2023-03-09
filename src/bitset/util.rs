@@ -1,3 +1,5 @@
+use std::backtrace::Backtrace;
+
 /// I've chosen to use this little utility because of its performance in benchmarks being the best, and because it makes it the easiest to specialize to the needs of this project (in terms of both optimizations and code structure.)
 /// In this case, those needs being a way to have bigger integer sizes that are compatible with bit operations at high speeds.
 
@@ -114,6 +116,10 @@ impl<const T: usize> BitSet<T> {
         }
 
         let first_bit = self.bitscan_forward();
+
+        if first_bit >= end {
+            panic!("in iter_one_bits, the first bit ({first_bit}) is out of bounds, cannot be greater than or equal to {end}.")
+        }
 
         let mut bits: Vec<u32> = Vec::with_capacity((end - first_bit) as usize);
         for bit in first_bit..end {

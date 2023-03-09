@@ -63,7 +63,7 @@ impl Piece for BishopPiece {
         for dir in 0..4 {
             attacks |= &get_ray_attacks(board, from, dir, &lookup);
         }
-
+        
         attacks
     }
 }

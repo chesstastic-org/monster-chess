@@ -13,19 +13,19 @@ pub struct KingPiece {
 }
 
 fn right_one(from: BitBoard, edges: &Edges) -> BitBoard {
-    from.right(1) & &!edges.left
+    (from & &!edges.right).right(1) & &!edges.left
 }
 
 fn left_one(from: BitBoard, edges: &Edges) -> BitBoard {
-    from.left(1) & &!edges.right
+    (from & &!edges.left).left(1) & &!edges.right
 }
 
 fn up_one(from: BitBoard, cols: Cols, edges: &Edges) -> BitBoard {
-    from.up(1, cols) & &!edges.bottom
+    (from & &!edges.top).up(1, cols)
 }
 
 fn down_one(from: BitBoard, cols: Cols, edges: &Edges) -> BitBoard {
-    from.down(1, cols) & &!edges.top
+    (from & &!edges.bottom).down(1, cols)
 }
 
 impl KingPiece {

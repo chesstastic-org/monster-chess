@@ -171,9 +171,10 @@ pub trait Piece {
     fn add_actions(&self, actions: &mut Vec<Action>, board: &Board, from: u32, team: u32) {
         let piece_type = self.get_piece_type();
         let from_board = BitBoard::from_lsb(from);
+
         let bit_actions =
             self.get_moves(board, from_board, team) & &!board.state.teams[team as usize];
-
+            
         if bit_actions.is_empty() {
             return;
         }
