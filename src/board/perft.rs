@@ -8,6 +8,13 @@ pub struct PerftResults {
     pub branches: Vec<PerftBranch>,
 }
 
+impl PerftResults {
+    pub fn get_branch_results(&self, branch: (&str, &str)) -> PerftResults {
+        let branch = (branch.0.to_string(), branch.1.to_string());
+        self.branches.iter().find(|el| el.0 == branch).unwrap().1.clone()
+    }
+}
+
 impl Board {
     pub fn sub_perft(&mut self, depth: u32) -> u32 {
         if depth == 0 {

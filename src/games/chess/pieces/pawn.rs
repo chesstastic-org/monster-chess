@@ -53,17 +53,15 @@ impl Piece for PawnPiece {
         let cols = board.state.cols;
         let edges = &board.state.edges[0];
 
-        let single_moves = up(&from, 1, cols, team);
+        let single_moves = up(&from, 1, cols, team) & &!board.state.all_pieces;
         let first_move = (from & &board.state.first_move).is_set();
 
         moves |= &single_moves;
 
         if first_move {
-            let double_moves = up(&single_moves, 1, cols, team);
+            let double_moves = up(&single_moves, 1, cols, team) & &!board.state.all_pieces;
             moves |= &double_moves;
         }
-
-        moves &= &!board.state.all_pieces;
 
         let up_one = from.up(1, cols);
         let mut captures = (up_one & &!edges.right).right(1);
