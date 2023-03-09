@@ -1,6 +1,6 @@
 use crate::{
-    Action, AttackDirections, AttackLookup, BitBoard, Board, HistoryMove, IndexedPreviousBoard,
-    PieceType, PreviousBoard, UndoMoveError, HistoryState,
+    Action, AttackDirections, AttackLookup, BitBoard, Board, HistoryMove, HistoryState,
+    IndexedPreviousBoard, PieceType, PreviousBoard, UndoMoveError,
 };
 
 pub enum PieceSymbol {
@@ -58,11 +58,14 @@ pub trait Piece {
                 ],
                 pieces: vec![
                     IndexedPreviousBoard(piece_type, board.state.pieces[piece_type]),
-                    IndexedPreviousBoard(captured_piece_type, board.state.pieces[captured_piece_type]),
+                    IndexedPreviousBoard(
+                        captured_piece_type,
+                        board.state.pieces[captured_piece_type],
+                    ),
                 ],
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 first_move: PreviousBoard(board.state.first_move),
-            })
+            }),
         };
         board.state.history.push(history_move);
 
@@ -98,8 +101,8 @@ pub trait Piece {
                     board.state.pieces[piece_type],
                 )],
                 all_pieces: PreviousBoard(board.state.all_pieces),
-                first_move: PreviousBoard(board.state.first_move)
-            })
+                first_move: PreviousBoard(board.state.first_move),
+            }),
         };
         board.state.history.push(history_move);
 
@@ -139,17 +142,14 @@ pub trait Piece {
     }
 
     fn undo_move(&self, board: &mut Board, history_move: &HistoryMove) {
-        let previous_team = board.state.moving_team;
-
-        // TODO: Update full moves, sub moves, turns
-
         board.state.current_turn -= 1;
+        board.state.turns -= 1;
         if board.state.current_turn == u32::MAX {
-            board.state.moving_team = board.get_previous_team(previous_team);
+            board.state.moving_team = board.get_previous_team(board.state.moving_team);
             board.state.current_turn = board.game.turns - 1;
             board.state.sub_moves -= 1;
 
-            if previous_team == 0 {
+            if board.state.moving_team == 0 {
                 board.state.full_moves -= 1;
             }
         }
@@ -174,7 +174,7 @@ pub trait Piece {
 
         let bit_actions =
             self.get_moves(board, from_board, team) & &!board.state.teams[team as usize];
-            
+
         if bit_actions.is_empty() {
             return;
         }

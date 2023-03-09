@@ -30,11 +30,11 @@ pub struct HistoryState {
     pub pieces: Vec<IndexedPreviousBoard>,
     pub teams: Vec<IndexedPreviousBoard>,
     pub all_pieces: PreviousBoard,
-    pub first_move: PreviousBoard
+    pub first_move: PreviousBoard,
 }
 
 #[derive(Clone, Debug)]
 pub struct HistoryMove {
     pub action: Action,
-    pub state: Option<HistoryState>
+    pub state: Option<HistoryState>,
 }

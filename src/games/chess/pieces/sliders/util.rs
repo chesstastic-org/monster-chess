@@ -36,7 +36,7 @@ pub fn get_ray_attacks(
         } else {
             blocker.bitscan_forward()
         };
-        
+
         attacks ^= &ray_attacks[square as usize][dir as usize];
     }
     return attacks;

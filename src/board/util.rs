@@ -1,4 +1,6 @@
-use crate::{generate_edge_list, Action, BitSet, Edges, Game, HistoryMove, PieceSymbol, UndoMoveError};
+use crate::{
+    generate_edge_list, Action, BitSet, Edges, Game, HistoryMove, PieceSymbol, UndoMoveError,
+};
 
 pub type BitBoard = BitSet<1>;
 pub type PieceType = usize;
@@ -174,9 +176,7 @@ impl Board {
                 let piece_trait = self.game.pieces[history_move.action.piece_type].duplicate();
                 piece_trait.undo_move(self, &history_move);
             }
-            None => {
-                return Err(UndoMoveError::NoHistoryMoves)
-            }
+            None => return Err(UndoMoveError::NoHistoryMoves),
         }
 
         Ok(())

@@ -1,7 +1,7 @@
 use crate::{
     Action, BishopPiece, BitBoard, Board, Direction, FenArgument, FenDecodeError, FenFullMoves,
-    FenOptions, FenState, FenStateTeams, FenSubMoves, FenTeamArgument, Game, KingPiece,
-    KnightPiece, MoveRestrictions, PawnPiece, QueenPiece, RookPiece, HistoryMove,
+    FenOptions, FenState, FenStateTeams, FenSubMoves, FenTeamArgument, Game, HistoryMove,
+    KingPiece, KnightPiece, MoveRestrictions, PawnPiece, QueenPiece, RookPiece, PostProcess,
 };
 
 pub struct ChessCastlingRights;
@@ -91,6 +91,26 @@ impl FenArgument for ChessCastlingRights {
 
 pub struct ChessEnPassant;
 
+pub struct ChessPostProcess;
+impl PostProcess for ChessPostProcess {
+    fn apply(&self, board: &mut Board) {
+        let cols = board.state.cols;
+        let edges = &board.state.edges[0];
+        let mut bottom = edges.bottom;
+        let mut top = edges.top;
+
+        bottom |= &bottom.up(1, cols);
+        top |= &top.down(1, cols);
+
+        let first_move = (board.state.pieces[0] & &(bottom | &top)) | &(board.state.all_pieces ^ &board.state.pieces[0]);
+        board.state.first_move &= &first_move;
+    }
+
+    fn duplicate(&self) -> Box<dyn PostProcess> {
+        Box::new(ChessPostProcess)
+    }
+}
+
 impl FenArgument for ChessEnPassant {
     fn decode(&self, board: &mut Board, arg: &str) -> Result<(), FenDecodeError> {
         if arg == "-" {
@@ -111,7 +131,7 @@ impl FenArgument for ChessEnPassant {
         let from = match previous_team {
             0 => pawn.down(2, cols),
             1 => pawn.up(2, cols),
-            _ => pawn.down(2, cols)
+            _ => pawn.down(2, cols),
         };
 
         board.state.history.push(HistoryMove {
@@ -119,9 +139,9 @@ impl FenArgument for ChessEnPassant {
                 from: from.bitscan_forward(),
                 to: pos,
                 piece_type: 0,
-                info: 0
+                info: 0,
             },
-            state: None
+            state: None,
         });
 
         Ok(())
@@ -133,7 +153,8 @@ impl FenArgument for ChessEnPassant {
             return "-".to_string();
         }
 
-        let last_move = last_move.expect("The last move for exporting an en passant FEN must be Some.");
+        let last_move =
+            last_move.expect("The last move for exporting an en passant FEN must be Some.");
         if last_move.action.piece_type != 0 {
             return "-".to_string();
         }
@@ -203,6 +224,7 @@ impl Chess {
                     ("half moves".to_string(), Box::new(FenSubMoves)),
                     ("full moves".to_string(), Box::new(FenFullMoves)),
                 ],
+                post_process: Box::new(ChessPostProcess)
             },
         }
     }

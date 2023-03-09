@@ -27,6 +27,10 @@ impl Board {
                 );
             }
         }
+
+        let post_process = board.game.fen_options.post_process.duplicate();
+        post_process.apply(&mut board);
+
         board
     }
 

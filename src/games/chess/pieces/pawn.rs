@@ -1,6 +1,6 @@
 use crate::{
-    Action, BitBoard, Board, Cols, HistoryMove, IndexedPreviousBoard, Piece, PieceSymbol,
-    PieceType, PreviousBoard, HistoryState, FenState,
+    Action, BitBoard, Board, Cols, FenState, HistoryMove, HistoryState, IndexedPreviousBoard,
+    Piece, PieceSymbol, PieceType, PreviousBoard,
 };
 
 const NORMAL_PAWN_MOVE: usize = 0;
@@ -117,11 +117,14 @@ impl Piece for PawnPiece {
                 ],
                 pieces: vec![
                     IndexedPreviousBoard(piece_type, board.state.pieces[piece_type]),
-                    IndexedPreviousBoard(captured_piece_type, board.state.pieces[captured_piece_type]),
+                    IndexedPreviousBoard(
+                        captured_piece_type,
+                        board.state.pieces[captured_piece_type],
+                    ),
                 ],
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 first_move: PreviousBoard(board.state.first_move),
-            })
+            }),
         };
 
         board.state.teams[captured_color] ^= &to;
@@ -187,7 +190,7 @@ impl Piece for PawnPiece {
                     )],
                     all_pieces: PreviousBoard(board.state.all_pieces),
                     first_move: PreviousBoard(board.state.first_move),
-                })
+                }),
             };
 
             board.state.teams[color] ^= &from;
@@ -222,7 +225,7 @@ impl Piece for PawnPiece {
                 )],
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 first_move: PreviousBoard(board.state.first_move),
-            })
+            }),
         };
 
         board.state.teams[color] ^= &from;

@@ -1,6 +1,6 @@
 use crate::{
-    Action, AttackDirections, BitBoard, Board, Cols, Direction, Edges, HistoryMove,
-    IndexedPreviousBoard, Piece, PieceSymbol, PieceType, PreviousBoard, HistoryState,
+    Action, AttackDirections, BitBoard, Board, Cols, Direction, Edges, HistoryMove, HistoryState,
+    IndexedPreviousBoard, Piece, PieceSymbol, PieceType, PreviousBoard,
 };
 
 const NORMAL_KING_MOVE: usize = 0;
@@ -64,8 +64,8 @@ impl KingPiece {
                     IndexedPreviousBoard(piece_type, board.state.pieces[ROOK_PIECE_TYPE]),
                 ],
                 all_pieces: PreviousBoard(board.state.all_pieces),
-                first_move: PreviousBoard(board.state.first_move)
-            })
+                first_move: PreviousBoard(board.state.first_move),
+            }),
         };
         board.state.history.push(history_move);
 
@@ -172,18 +172,21 @@ impl Piece for KingPiece {
 
         let history_move = HistoryMove {
             action: *action,
-            state: Some(HistoryState {                
+            state: Some(HistoryState {
                 teams: vec![
                     IndexedPreviousBoard(color, board.state.teams[color]),
                     IndexedPreviousBoard(captured_color, board.state.teams[captured_color]),
                 ],
                 pieces: vec![
                     IndexedPreviousBoard(piece_type, board.state.pieces[piece_type]),
-                    IndexedPreviousBoard(captured_piece_type, board.state.pieces[captured_piece_type]),
+                    IndexedPreviousBoard(
+                        captured_piece_type,
+                        board.state.pieces[captured_piece_type],
+                    ),
                 ],
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 first_move: PreviousBoard(board.state.first_move),
-            })
+            }),
         };
         board.state.history.push(history_move);
 
