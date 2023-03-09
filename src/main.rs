@@ -15,12 +15,14 @@ fn main() {
         Chess::create(),
         2,
         (8, 8),
-        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+        "rnbqkbnr/ppppppp1/7p/8/P7/8/1PPPPPPP/RNBQKBNR w KQkq - 0 2",
     );
 
     let lines = r#"
     a1a2 - 1
-    a3a4 - 1
+    a1a3 - 1
+    a4a5 - 1
+    b1a3 - 1
     b1c3 - 1
     b2b3 - 1
     b2b4 - 1
@@ -37,15 +39,15 @@ fn main() {
     g2g3 - 1
     g2g4 - 1
     h2h3 - 1
-    h2h4 - 1"#.split("\n").map(|el| el.trim().clone().to_string()).collect::<Vec<_>>();
+    h2h4 - 1"#.split("\n").map(|el| el.trim().clone().to_string()).filter(|el| !el.is_empty()).collect::<Vec<_>>();
 
-    let perft = board.perft(3);
+    let perft = board.perft(1);
     println!("TOTAL {}", perft.nodes);
     for ((from, to), nodes) in perft.branches {
         let line = format!("{}{} - {}", from, to, nodes);
-        //if !lines.contains(&line) {
+        if !lines.contains(&line) {
             println!("{line}");
-        //}
+        }
     }
 
     println!("{}", board.to_fen());

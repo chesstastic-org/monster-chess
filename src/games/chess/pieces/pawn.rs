@@ -51,6 +51,7 @@ impl Piece for PawnPiece {
     fn get_moves(&self, board: &Board, from: BitBoard, team: u32) -> BitBoard {
         let mut moves = BitBoard::new();
         let cols = board.state.cols;
+        let edges = &board.state.edges[0];
 
         let single_moves = up(&from, 1, cols, team) & &!board.state.all_pieces;
         let first_move = (from & &board.state.first_move).is_set();
@@ -63,8 +64,8 @@ impl Piece for PawnPiece {
         }
 
         let up_one = from.up(1, cols);
-        let mut captures = up_one.right(1);
-        captures |= &up_one.left(1);
+        let mut captures = (up_one & &!edges.right).right(1);
+        captures |= &(up_one & &!edges.left).left(1);
 
         let mut capture_requirements = board.state.all_pieces;
         if let Some(last_move) = board.state.history.last() {
