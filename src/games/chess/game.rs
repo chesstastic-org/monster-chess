@@ -11,7 +11,7 @@ impl FenArgument for ChessCastlingRights {
             board.state.first_move ^= &board.state.pieces[3];
             Ok(())
         } else {
-            let lost_castling_rights = vec!['Q', 'K', 'q', 'k'];
+            let mut lost_castling_rights = vec!['Q', 'K', 'q', 'k'];
             let initial_lost_castling_rights = ['Q', 'K', 'q', 'k'];
 
             for char in arg.chars() {
@@ -26,6 +26,8 @@ impl FenArgument for ChessCastlingRights {
                         "'{char}' is not a valid castling rights character."
                     )));
                 }
+
+                lost_castling_rights.retain(|el| el != &char);
             }
 
             for char in lost_castling_rights {

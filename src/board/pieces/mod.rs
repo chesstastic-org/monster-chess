@@ -138,7 +138,7 @@ pub trait Piece {
         }
     }
 
-    fn undo_move(&self, board: &mut Board) -> Result<(), UndoMoveError> {
+    fn undo_move(&self, board: &mut Board, history_move: &HistoryMove) {
         let previous_team = board.state.moving_team;
 
         // TODO: Update full moves, sub moves, turns
@@ -154,25 +154,17 @@ pub trait Piece {
             }
         }
 
-        let history_move = board.state.history.pop();
-        match history_move {
-            Some(history_move) => {
-                if let Some(history_state) = history_move.state {
-                    for IndexedPreviousBoard(index, bitboard) in history_state.teams {
-                        board.state.teams[index] = bitboard;
-                    }
-
-                    for IndexedPreviousBoard(index, bitboard) in history_state.pieces {
-                        board.state.pieces[index] = bitboard;
-                    }
-
-                    board.state.all_pieces = history_state.all_pieces.0;
-                    board.state.first_move = history_state.first_move.0;
-                }
-
-                Ok(())
+        if let Some(history_state) = &history_move.state {
+            for IndexedPreviousBoard(index, bitboard) in &history_state.teams {
+                board.state.teams[*index] = *bitboard;
             }
-            None => Err(UndoMoveError::NoHistoryMoves),
+
+            for IndexedPreviousBoard(index, bitboard) in &history_state.pieces {
+                board.state.pieces[*index] = *bitboard;
+            }
+
+            board.state.all_pieces = history_state.all_pieces.0;
+            board.state.first_move = history_state.first_move.0;
         }
     }
 

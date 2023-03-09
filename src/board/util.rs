@@ -1,4 +1,4 @@
-use crate::{generate_edge_list, Action, BitSet, Edges, Game, HistoryMove, PieceSymbol};
+use crate::{generate_edge_list, Action, BitSet, Edges, Game, HistoryMove, PieceSymbol, UndoMoveError};
 
 pub type BitBoard = BitSet<1>;
 pub type PieceType = usize;
@@ -160,5 +160,24 @@ impl Board {
         } else {
             team
         }
+    }
+
+    pub fn make_move(&self, action: Action) {
+
+    }
+
+    pub fn undo_move(&mut self) -> Result<(), UndoMoveError> {
+        let history_move = self.state.history.pop();
+        match history_move {
+            Some(history_move) => {
+                let piece_trait = self.game.pieces[history_move.action.piece_type].duplicate();
+                piece_trait.undo_move(self, &history_move);
+            }
+            None => {
+                return Err(UndoMoveError::NoHistoryMoves)
+            }
+        }
+
+        Ok(())
     }
 }
