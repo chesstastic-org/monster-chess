@@ -5,7 +5,7 @@ impl Board {
         if depth == 0 { return 1; }
 
         let mut nodes = 0;
-        for node in self.generate_moves() {
+        for node in self.generate_legal_moves() {
             self.make_move(node);
             nodes += self.perft(depth - 1);
             self.undo_move().unwrap();

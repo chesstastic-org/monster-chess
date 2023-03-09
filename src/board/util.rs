@@ -162,8 +162,9 @@ impl Board {
         }
     }
 
-    pub fn make_move(&self, action: Action) {
-
+    pub fn make_move(&mut self, action: Action) {
+        let piece_trait = self.game.pieces[action.piece_type].duplicate();
+        piece_trait.make_move(self, &action);
     }
 
     pub fn undo_move(&mut self) -> Result<(), UndoMoveError> {

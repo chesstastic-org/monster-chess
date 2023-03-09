@@ -13,6 +13,6 @@ fn main() {
 
     let mut board = Board::new(Chess::create(), 2, (8, 8), "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
-    println!("{}", board.generate_moves().len());
+    println!("{}", board.perft(3));
     //println!("{}", board.state.pieces[5].display(8, 8));
 }

@@ -81,7 +81,7 @@ impl Piece for QueenPiece {
         let mut attacks = BitBoard::new();
 
         for dir in 0..8 {
-            //attacks |= &get_ray_attacks(board, from, dir, &lookup);
+            attacks |= &get_ray_attacks(board, from, dir, &lookup);
         }
 
         attacks
