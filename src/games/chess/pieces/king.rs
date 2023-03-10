@@ -271,10 +271,12 @@ impl Piece for KingPiece {
         let castle_right_king = left_center.right(3);
         let castle_right_rook = left_center.right(2);
 
-        let castle_left = castle_left_king & &castle_left_rook;
-        let castle_right = castle_right_king & &castle_right_rook;
+        let castle_left = castle_left_king | &castle_left_rook;
+        let castle_right = castle_right_king | &castle_right_rook;
 
         for rook in rooks.iter_one_bits(board_len) {
+            println!("> {}", board.encode_position(rook));
+
             let rook_board = BitBoard::from_lsb(rook);
 
             /*
@@ -283,9 +285,9 @@ impl Piece for KingPiece {
             */
 
             let dir = if from > rook {
-                Direction::RIGHT
-            } else {
                 Direction::LEFT
+            } else {
+                Direction::RIGHT
             };
 
             let castling_spots = match dir {
@@ -294,8 +296,8 @@ impl Piece for KingPiece {
             };
 
             let in_between = match dir {
-                Direction::LEFT => BitBoard::starting_at_lsb(from, rook - from + 1),
-                Direction::RIGHT => BitBoard::starting_at_lsb(rook, from - rook + 1),
+                Direction::LEFT => BitBoard::starting_at_lsb(rook, from - rook + 1),
+                Direction::RIGHT => BitBoard::starting_at_lsb(from, rook - from + 1),
             };
 
             let all_spots = (castling_spots | &in_between) & &!(from_board | &rook_board);
@@ -305,12 +307,22 @@ impl Piece for KingPiece {
                 Calculating which squares for castling are attacked is semi-expensive, so this will avoid it if needs be.
             */
             if (all_spots & &board.state.all_pieces).is_set() {
-                return;
+                continue;
             }
 
+            let king_dest = match dir {
+                Direction::LEFT => castle_left_king,
+                Direction::RIGHT => castle_right_king,
+            }.bitscan_forward();
+
+            let between_king_dest = match dir {
+                Direction::LEFT => BitBoard::starting_at_lsb(king_dest, from - king_dest + 1),
+                Direction::RIGHT => BitBoard::starting_at_lsb(from, king_dest - from + 1),
+            };
+
             let attack_mask = board.get_move_mask(board.get_next_team(team));
-            if (all_spots & &attack_mask).is_set() {
-                return;
+            if (between_king_dest & &attack_mask).is_set() {
+                continue;
             }
 
             actions.push(Action {

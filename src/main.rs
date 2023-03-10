@@ -15,7 +15,7 @@ fn main() {
         Chess::create(),
         2,
         (8, 8),
-        "rnbqkbnr/1pp1pppp/8/p2pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3",
+        "r3k2r/p1pNqpb1/bn2pnp1/3P4/1p2P3/2N2Q1p/PPPBBPPP/R3K2R b KQkq - 0 1",
     );
 
     /*let actions = board.generate_legal_moves();
@@ -40,41 +40,52 @@ fn main() {
     board.make_move(action);*/
 
     let lines = r#"
-    a5a4 - 1
-    a8a6 - 1
-    a8a7 - 1
-    b7b5 - 1
-    b7b6 - 1
-    b8a6 - 1
-    b8c6 - 1
-    b8d7 - 1
+    a6b5 - 1
+    a6b7 - 1
+    a6c4 - 1
+    a6c8 - 1
+    a6d3 - 1
+    a6e2 - 1
+    a8b8 - 1
+    a8c8 - 1
+    a8d8 - 1
+    b4b3 - 1
+    b4c3 - 1
+    b6a4 - 1
+    b6c4 - 1
+    b6c8 - 1
+    b6d5 - 1
+    b6d7 - 1
     c7c5 - 1
     c7c6 - 1
-    c7d6 - 1
-    c8d7 - 1
-    c8e6 - 1
-    c8f5 - 1
-    c8g4 - 1
-    c8h3 - 1
-    d8d6 - 1
-    d8d7 - 1
-    d8e7 - 1
-    d8f6 - 1
-    d8g5 - 1
-    d8h4 - 1
-    e5e4 - 1
+    e6d5 - 1
+    e6e5 - 1
+    e7c5 - 1
+    e7d6 - 1
+    e7d7 - 1
+    e7d8 - 1
+    e7f8 - 1
+    e8c8 - 1
     e8d7 - 1
-    f7f5 - 1
-    f7f6 - 1
-    f8d6 - 1
-    f8e7 - 1
-    g7g5 - 1
-    g7g6 - 1
-    g8e7 - 1
-    g8f6 - 1
-    g8h6 - 1
-    h7h5 - 1
-    h7h6 - 1
+    e8d8 - 1
+    f6d5 - 1
+    f6d7 - 1
+    f6e4 - 1
+    f6g4 - 1
+    f6g8 - 1
+    f6h5 - 1
+    f6h7 - 1
+    g6g5 - 1
+    g7f8 - 1
+    g7h6 - 1
+    h3g2 - 1
+    h8f8 - 1
+    h8g8 - 1
+    h8h4 - 1
+    h8h5 - 1
+    h8h6 - 1
+    h8h7 - 1
+    
     
     
     "#
@@ -83,10 +94,8 @@ fn main() {
     .filter(|el| !el.is_empty())
     .collect::<Vec<_>>();
 
-    let perft = board.perft(4);
-    //.get_branch_results(("e5", "d6"))
-    //.get_branch_results(("e7", "e5"))
-    //.get_branch_results(("g1", "f3"));
+    let perft = board.perft(1);
+    //.get_branch_results(("e5", "d7"));
     println!("TOTAL {}", perft.nodes);
 
     let new_lines = perft

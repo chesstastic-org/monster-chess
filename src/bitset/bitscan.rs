@@ -1,5 +1,6 @@
 use crate::BitSet;
 
+#[derive(Debug)]
 pub enum Direction {
     LEFT,
     RIGHT,
