@@ -16,6 +16,13 @@ pub trait Piece {
     fn get_piece_type(&self) -> PieceType;
     fn get_piece_symbol(&self) -> PieceSymbol;
 
+    fn format_info(&self, board: &Board, info: u32) -> String {
+        "".to_string()
+    }
+    fn parse_info(&self, board: &Board, info: String) -> u32 {
+        0
+    }
+
     fn can_lookup(&self) -> bool;
 
     fn get_attack_lookup<'a>(&self, board: &'a Board) -> Option<&'a AttackLookup> {

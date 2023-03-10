@@ -44,8 +44,38 @@ impl Piece for PawnPiece {
         PieceSymbol::Char('p')
     }
 
+    fn parse_info(&self, board: &Board, info: String) -> u32 {
+        if info.is_empty() {
+            // TODO: Check for En Passant
+            0
+        } else {
+            if info.len() > 1 {
+                panic!("Promotion Piece Types can only be a single char. '{info}' is invalid.")
+            }
+            let char = info.chars().nth(0).unwrap();
+            let piece_type = board.game.pieces.iter().position(|piece_trait| match piece_trait.get_piece_symbol() {
+                PieceSymbol::Char(piece_symbol) => char == piece_symbol,
+                PieceSymbol::TeamSymbol(chars) => chars.contains(&char)
+            }).expect(&format!("Could not find a promotion piece type from '{info}'"));
+            (piece_type as u32) + 2
+        }
+    }
+
     fn get_piece_type(&self) -> PieceType {
         self.piece_type
+    }
+
+    fn format_info(&self, board: &Board, info: u32) -> String {
+        if info > 1 {
+            let piece_trait = &board.game.pieces[(info as usize) - 2];
+            if let PieceSymbol::Char(char) = piece_trait.get_piece_symbol() {
+                char.to_string()
+            } else {
+                "".to_string()
+            }
+        } else {
+            "".to_string()
+        }
     }
 
     fn get_moves(&self, board: &Board, from: BitBoard, team: u32) -> BitBoard {
@@ -136,7 +166,7 @@ impl Piece for PawnPiece {
             let promotion_piece_type = action.info - 2;
             if let Some(state) = &mut history_move.state {
                 state.pieces.push(IndexedPreviousBoard(
-                    piece_type,
+                    promotion_piece_type,
                     board.state.teams[promotion_piece_type],
                 ));
             }
@@ -224,10 +254,10 @@ impl Piece for PawnPiece {
         if action.info < 1 {
             board.state.pieces[piece_type] |= &to;
         } else {
-            let promotion_piece_type = action.info - 1;
+            let promotion_piece_type = action.info - 2;
             if let Some(state) = &mut history_move.state {
                 state.pieces.push(IndexedPreviousBoard(
-                    piece_type,
+                    promotion_piece_type,
                     board.state.pieces[promotion_piece_type],
                 ));
             }
@@ -262,6 +292,8 @@ impl Piece for PawnPiece {
         for bit in bit_actions.iter_one_bits((rows * cols) as u32) {
             if (BitBoard::from_lsb(bit) & &promotion_rows).is_set() {
                 for promotion_piece_type in 0..piece_types {
+                    if promotion_piece_type == 0 { continue; }
+                    if promotion_piece_type == 5 { continue; }
                     actions.push(Action {
                         from,
                         to: bit,

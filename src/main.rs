@@ -15,8 +15,18 @@ fn main() {
         Chess::create(),
         2,
         (8, 8),
-        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/R3KBNR w kqKQ - 0 1",
+        "8/5P2/8/8/8/7K/8/n6k w - - 0 1",
     );
+
+    let actions = board.generate_moves();
+    let action = actions.iter().find(|el| board.encode_position(el.to) == "f8").unwrap();
+
+    println!("{}", board.state.pieces[0].display(8, 8));
+    println!("{:?}", action);
+    board.make_move(action);
+    println!("{}", board.state.pieces[1].display(8, 8));
+
+    return;
 
     let lines = r#"
     a2a3 - 181046
