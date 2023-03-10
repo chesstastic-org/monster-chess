@@ -1,7 +1,7 @@
 use crate::{
     Action, BishopPiece, BitBoard, Board, Direction, FenArgument, FenDecodeError, FenFullMoves,
     FenOptions, FenState, FenStateTeams, FenSubMoves, FenTeamArgument, Game, HistoryMove,
-    KingPiece, KnightPiece, MoveRestrictions, PawnPiece, PostProcess, QueenPiece, RookPiece,
+    KingPiece, KnightPiece, MoveRestrictions, PawnPiece, PostProcess, QueenPiece, RookPiece, down, up,
 };
 
 pub struct ChessCastlingRights;
@@ -103,27 +103,6 @@ impl FenArgument for ChessCastlingRights {
 
 pub struct ChessEnPassant;
 
-pub struct ChessPostProcess;
-impl PostProcess for ChessPostProcess {
-    fn apply(&self, board: &mut Board) {
-        let cols = board.state.cols;
-        let edges = &board.state.edges[0];
-        let mut bottom = edges.bottom;
-        let mut top = edges.top;
-
-        bottom |= &bottom.up(1, cols);
-        top |= &top.down(1, cols);
-
-        let first_move = (board.state.pieces[0] & &(bottom | &top))
-            | &(board.state.all_pieces ^ &board.state.pieces[0]);
-        board.state.first_move &= &first_move;
-    }
-
-    fn duplicate(&self) -> Box<dyn PostProcess> {
-        Box::new(ChessPostProcess)
-    }
-}
-
 impl FenArgument for ChessEnPassant {
     fn decode(&self, board: &mut Board, arg: &str) -> Result<(), FenDecodeError> {
         if arg == "-" {
@@ -131,7 +110,7 @@ impl FenArgument for ChessEnPassant {
         }
 
         let previous_team = board.get_previous_team(board.state.moving_team);
-        let pos = board.decode_position(arg.to_string()).map_err(|err| {
+        let en_passant_target = board.decode_position(arg.to_string()).map_err(|err| {
             FenDecodeError::InvalidArgument(format!(
                 "'{arg}' is not a valid en passant position ({})",
                 err
@@ -140,17 +119,13 @@ impl FenArgument for ChessEnPassant {
 
         let cols = board.state.cols;
 
-        let pawn = BitBoard::from_lsb(pos);
-        let from = match previous_team {
-            0 => pawn.down(2, cols),
-            1 => pawn.up(2, cols),
-            _ => pawn.down(2, cols),
-        };
+        let to = up(&BitBoard::from_lsb(en_passant_target), 1, cols, 1);
+        let from = down(&to, 2, cols, previous_team);
 
         board.state.history.push(HistoryMove {
             action: Action {
                 from: from.bitscan_forward(),
-                to: pos,
+                to: to.bitscan_forward(),
                 team: previous_team,
                 piece_type: 0,
                 info: 0,
@@ -182,6 +157,28 @@ impl FenArgument for ChessEnPassant {
 
     fn duplicate(&self) -> Box<dyn FenArgument> {
         Box::new(ChessEnPassant)
+    }
+}
+
+
+pub struct ChessPostProcess;
+impl PostProcess for ChessPostProcess {
+    fn apply(&self, board: &mut Board) {
+        let cols = board.state.cols;
+        let edges = &board.state.edges[0];
+        let mut bottom = edges.bottom;
+        let mut top = edges.top;
+
+        bottom |= &bottom.up(1, cols);
+        top |= &top.down(1, cols);
+
+        let first_move = (board.state.pieces[0] & &(bottom | &top))
+            | &(board.state.all_pieces ^ &board.state.pieces[0]);
+        board.state.first_move &= &first_move;
+    }
+
+    fn duplicate(&self) -> Box<dyn PostProcess> {
+        Box::new(ChessPostProcess)
     }
 }
 
@@ -229,7 +226,7 @@ impl Chess {
             ],
             move_restrictions: Box::new(ChessMoveRestrictions),
             fen_options: FenOptions {
-                state: FenState { first_moves: true },
+                state: FenState { first_moves: false },
                 args: vec![
                     (
                         "team to move".to_string(),

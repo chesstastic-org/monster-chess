@@ -112,4 +112,28 @@ mod tests {
 
         board.assert_perfts([ 7, 25, 299, 1931 ]);
     }
+
+    #[test]
+    fn black_promotion() {
+        let mut board = Board::new(
+            Chess::create(),
+            2,
+            (8, 8),
+            "N6K/8/8/7k/8/8/5p2/8 b - - 0 1",
+        );        
+
+        board.assert_perfts([ 9, 41, 524, 3674 ]);
+    }
+
+    #[test]
+    fn en_passant() {
+        let mut board = Board::new(
+            Chess::create(),
+            2,
+            (8, 8),
+            "rnbqkbnr/1pp1pppp/8/p2pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3",
+        );        
+
+        board.assert_perfts([ 31, 839, 25956, 723699 ]);
+    }
 }

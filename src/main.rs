@@ -15,16 +15,16 @@ fn main() {
         Chess::create(),
         2,
         (8, 8),
-        "8/5P2/8/8/8/7K/8/n6k w - - 0 1",
+        "rnbqkbnr/1pp1pppp/8/p2pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3",
     );
 
     let actions = board.generate_moves();
-    let action = actions.iter().find(|el| board.encode_position(el.to) == "f8").unwrap();
+    let action = actions.iter().find(|el| board.encode_position(el.to) == "d6").unwrap();
 
     println!("{}", board.state.pieces[0].display(8, 8));
     println!("{:?}", action);
     board.make_move(action);
-    println!("{}", board.state.pieces[1].display(8, 8));
+    println!("{}", board.state.pieces[0].display(8, 8));
 
     return;
 
