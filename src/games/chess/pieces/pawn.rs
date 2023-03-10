@@ -90,11 +90,7 @@ impl Piece for PawnPiece {
     }
 
     fn make_capture_move(&self, board: &mut Board, action: &Action, from: BitBoard, to: BitBoard) {
-        let color: usize = if (from & &board.state.teams[0]).is_set() {
-            0
-        } else {
-            1
-        };
+        let color: usize = action.team as usize;
         let captured_color: usize = if (to & &board.state.teams[0]).is_set() {
             0
         } else {
@@ -160,11 +156,7 @@ impl Piece for PawnPiece {
         if action.info == EN_PASSANT_MOVE {
             let cols = board.state.cols;
 
-            let color: usize = if (from & &board.state.teams[0]).is_set() {
-                0
-            } else {
-                1
-            };
+            let color: usize = action.team as usize;
             let piece_type = self.get_piece_type();
             let en_passant_target = down(&to, 1, cols, color as u32);
 
@@ -209,11 +201,7 @@ impl Piece for PawnPiece {
             return;
         }
 
-        let color: usize = if (from & &board.state.teams[0]).is_set() {
-            0
-        } else {
-            1
-        };
+        let color: usize = action.team as usize;
         let piece_type = self.get_piece_type();
 
         let mut history_move = HistoryMove {

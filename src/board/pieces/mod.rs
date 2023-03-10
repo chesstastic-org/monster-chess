@@ -30,11 +30,7 @@ pub trait Piece {
     }
 
     fn make_capture_move(&self, board: &mut Board, action: &Action, from: BitBoard, to: BitBoard) {
-        let color: usize = if (from & &board.state.teams[0]).is_set() {
-            0
-        } else {
-            1
-        };
+        let color: usize = action.team as usize;
         let captured_color: usize = if (to & &board.state.teams[0]).is_set() {
             0
         } else {
@@ -85,11 +81,7 @@ pub trait Piece {
     }
 
     fn make_normal_move(&self, board: &mut Board, action: &Action, from: BitBoard, to: BitBoard) {
-        let color: usize = if (from & &board.state.teams[0]).is_set() {
-            0
-        } else {
-            1
-        };
+        let color: usize = action.team as usize;
         let piece_type = self.get_piece_type();
 
         let history_move = HistoryMove {

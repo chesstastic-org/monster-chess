@@ -52,11 +52,7 @@ impl KingPiece {
             Direction::LEFT
         };
 
-        let color: usize = if (from & &board.state.teams[0]).is_set() {
-            0
-        } else {
-            1
-        };
+        let color: usize = action.team as usize;
         let piece_type = self.get_piece_type();
 
         let history_move = HistoryMove {
@@ -155,11 +151,7 @@ impl Piece for KingPiece {
             return;
         }
 
-        let color: usize = if (from & &board.state.teams[0]).is_set() {
-            0
-        } else {
-            1
-        };
+        let color: usize = action.team as usize;
         let captured_color: usize = if (to & &board.state.teams[0]).is_set() {
             0
         } else {

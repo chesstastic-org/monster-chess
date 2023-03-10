@@ -90,7 +90,7 @@ mod tests {
     }
 
     #[test]
-    fn castling_test() {
+    fn castling() {
         let mut board = Board::new(
             Chess::create(),
             2,
@@ -102,7 +102,7 @@ mod tests {
     }
 
     #[test]
-    fn white_promotion_test() {
+    fn white_promotion() {
         let mut board = Board::new(
             Chess::create(),
             2,
