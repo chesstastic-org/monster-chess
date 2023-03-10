@@ -28,7 +28,7 @@ impl Board {
 
         let mut nodes = 0;
         for node in self.generate_legal_moves() {
-            self.make_move(node);
+            self.make_move(&node);
             nodes += self.sub_perft(depth - 1);
             self.undo_move().unwrap();
         }
@@ -47,7 +47,7 @@ impl Board {
         let mut nodes = 0;
         let mut branches: Vec<PerftBranch> = vec![];
         for node in self.generate_legal_moves() {
-            self.make_move(node);
+            self.make_move(&node);
             let results = self.perft(depth - 1);
             nodes += results.nodes;
             branches.push((

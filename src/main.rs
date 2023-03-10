@@ -19,27 +19,27 @@ fn main() {
     );
 
     let lines = r#"
-    a5b4 - 1
-    a8a6 - 1
-    a8a7 - 1
-    b7b5 - 1
-    b7b6 - 1
-    b8a6 - 1
-    b8c6 - 1
-    c7c5 - 1
-    c7c6 - 1
-    d7d5 - 1
-    d7d6 - 1
-    e7e5 - 1
-    e7e6 - 1
-    f7f5 - 1
-    f7f6 - 1
-    g7g5 - 1
-    g7g6 - 1
-    g8f6 - 1
-    g8h6 - 1
-    h7h5 - 1
-    h7h6 - 1
+    a2a3 - 8457
+    a2a4 - 9329
+    b1a3 - 8885
+    b1c3 - 9755
+    b2b3 - 9345
+    b2b4 - 9332
+    c2c3 - 9272
+    c2c4 - 9744
+    d2d3 - 11959
+    d2d4 - 12435
+    e2e3 - 13134
+    e2e4 - 13160
+    f2f3 - 8457
+    f2f4 - 8929
+    g1f3 - 9748
+    g1h3 - 8881
+    g2g3 - 9345
+    g2g4 - 9328
+    h2h3 - 8457
+    h2h4 - 9329
+    
     "#
     .split("\n")
     .map(|el| el.trim().clone().to_string())
@@ -65,7 +65,7 @@ fn main() {
     println!("-");
     for line in lines {
         if !new_lines.contains(&line) {
-            //println!("{line}");
+            println!("{line}");
         }
     }
 
