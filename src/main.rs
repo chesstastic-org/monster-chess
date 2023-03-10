@@ -15,7 +15,7 @@ fn main() {
         Chess::create(),
         2,
         (8, 8),
-        "r3k2r/p1pNqpb1/bn2pnp1/3P4/1p2P3/2N2Q1p/PPPBBPPP/R3K2R b KQkq - 0 1",
+        "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1",
     );
 
     /*let actions = board.generate_legal_moves();
@@ -40,62 +40,63 @@ fn main() {
     board.make_move(action);*/
 
     let lines = r#"
-    a6b5 - 1
-    a6b7 - 1
-    a6c4 - 1
-    a6c8 - 1
-    a6d3 - 1
-    a6e2 - 1
-    a8b8 - 1
-    a8c8 - 1
-    a8d8 - 1
-    b4b3 - 1
-    b4c3 - 1
-    b6a4 - 1
-    b6c4 - 1
-    b6c8 - 1
-    b6d5 - 1
-    b6d7 - 1
-    c7c5 - 1
-    c7c6 - 1
-    e6d5 - 1
-    e6e5 - 1
-    e7c5 - 1
-    e7d6 - 1
-    e7d7 - 1
-    e7d8 - 1
-    e7f8 - 1
-    e8c8 - 1
-    e8d7 - 1
-    e8d8 - 1
-    f6d5 - 1
-    f6d7 - 1
-    f6e4 - 1
-    f6g4 - 1
-    f6g8 - 1
-    f6h5 - 1
-    f6h7 - 1
-    g6g5 - 1
-    g7f8 - 1
-    g7h6 - 1
-    h3g2 - 1
-    h8f8 - 1
-    h8g8 - 1
-    h8h4 - 1
-    h8h5 - 1
-    h8h6 - 1
-    h8h7 - 1
-    
-    
-    
+    a1b1 - 43
+    a1c1 - 43
+    a1d1 - 43
+    a2a3 - 44
+    a2a4 - 44
+    b2b3 - 42
+    c3a4 - 42
+    c3b1 - 42
+    c3b5 - 39
+    c3d1 - 42
+    d2c1 - 43
+    d2e3 - 43
+    d2f4 - 43
+    d2g5 - 42
+    d2h6 - 41
+    d5d6 - 41
+    d5e6 - 46
+    e1c1 - 43
+    e1d1 - 43
+    e1f1 - 43
+    e1g1 - 43
+    e2a6 - 36
+    e2b5 - 39
+    e2c4 - 41
+    e2d1 - 44
+    e2d3 - 42
+    e2f1 - 44
+    e5c4 - 42
+    e5c6 - 41
+    e5d3 - 43
+    e5d7 - 45
+    e5f7 - 44
+    e5g4 - 44
+    e5g6 - 42
+    f3d3 - 42
+    f3e3 - 43
+    f3f4 - 43
+    f3f5 - 45
+    f3f6 - 39
+    f3g3 - 43
+    f3g4 - 43
+    f3h3 - 43
+    f3h5 - 43
+    g2g3 - 42
+    g2g4 - 42
+    g2h3 - 43
+    h1f1 - 43
+    h1g1 - 43
     "#
     .split("\n")
     .map(|el| el.trim().clone().to_string())
     .filter(|el| !el.is_empty())
     .collect::<Vec<_>>();
 
-    let perft = board.perft(1);
-    //.get_branch_results(("e5", "d7"));
+    let perft = board.perft(2);
+    //.get_branch_results(("e7", "e5"))
+    //.get_branch_results(("g1", "f3"));
     println!("TOTAL {}", perft.nodes);
 
     let new_lines = perft

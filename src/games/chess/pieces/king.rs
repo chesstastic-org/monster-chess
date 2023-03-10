@@ -275,8 +275,6 @@ impl Piece for KingPiece {
         let castle_right = castle_right_king | &castle_right_rook;
 
         for rook in rooks.iter_one_bits(board_len) {
-            println!("> {}", board.encode_position(rook));
-
             let rook_board = BitBoard::from_lsb(rook);
 
             /*
@@ -321,6 +319,7 @@ impl Piece for KingPiece {
             };
 
             let attack_mask = board.get_move_mask(board.get_next_team(team));
+
             if (between_king_dest & &attack_mask).is_set() {
                 continue;
             }

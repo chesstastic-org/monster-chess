@@ -190,16 +190,12 @@ impl MoveRestrictions for ChessMoveRestrictions {
             return false;
         }
 
-        let from_board = BitBoard::from_lsb(action.from);
-
-        let mut new_king_board =
-            board.state.teams[board.state.moving_team as usize] & &board.state.pieces[5];
-        if (from_board & &new_king_board).is_set() {
-            new_king_board = to_board;
-        }
+        let current_team = board.state.moving_team;
 
         board.make_move(action);
-        let in_check = board.is_attacking(board.state.moving_team, new_king_board);
+        let king_board =
+            board.state.teams[current_team as usize] & &board.state.pieces[5];
+        let in_check = board.is_attacking(board.state.moving_team, king_board);
         board.undo_move().unwrap();
         !in_check
     }
