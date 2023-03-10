@@ -16,39 +16,49 @@ fn main() {
         2,
         (8, 8),
         "rnbqkbnr/1pp1pppp/8/p2pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3",
-    );
+    ); 
 
     let actions = board.generate_moves();
     let action = actions.iter().find(|el| board.encode_position(el.to) == "d6").unwrap();
 
-    println!("{}", board.state.pieces[0].display(8, 8));
-    println!("{:?}", action);
     board.make_move(action);
-    println!("{}", board.state.pieces[0].display(8, 8));
-
-    return;
 
     let lines = r#"
-    a2a3 - 181046
-    a2a4 - 217832
-    b1a3 - 198572
-    b1c3 - 234656
-    b2b3 - 215255
-    b2b4 - 216145
-    c2c3 - 222861
-    c2c4 - 240082
-    d2d3 - 328511
-    d2d4 - 361790
-    e2e3 - 402988
-    e2e4 - 405385
-    f2f3 - 178889
-    f2f4 - 198473
-    g1f3 - 233491
-    g1h3 - 198502
-    g2g3 - 217210
-    g2g4 - 214048
-    h2h3 - 181044
-    h2h4 - 218829
+    a5a4 - 1
+    a8a6 - 1
+    a8a7 - 1
+    a8b8 - 1
+    b7b5 - 1
+    b7b6 - 1
+    c6a7 - 1
+    c6b4 - 1
+    c6b8 - 1
+    c6d4 - 1
+    c6e5 - 1
+    c8d7 - 1
+    c8e6 - 1
+    c8f5 - 1
+    c8g4 - 1
+    c8h3 - 1
+    d8c7 - 1
+    d8d2 - 1
+    d8d3 - 1
+    d8d4 - 1
+    d8d5 - 1
+    d8d6 - 1
+    d8d7 - 1
+    e7e5 - 1
+    e7e6 - 1
+    e8d7 - 1
+    f7f5 - 1
+    f7f6 - 1
+    g7g5 - 1
+    g7g6 - 1
+    g8f6 - 1
+    g8h6 - 1
+    h7h5 - 1
+    h7h6 - 1
+    
     
     "#
     .split("\n")
@@ -57,7 +67,10 @@ fn main() {
     .collect::<Vec<_>>();
 
     let perft = board
-        .perft(1);
+        .perft(3)
+        //.get_branch_results(("e5", "d6"))
+        .get_branch_results(("b8", "c6"))
+        .get_branch_results(("d6", "c7"));
     println!("TOTAL {}", perft.nodes);
 
     let new_lines = perft
@@ -74,7 +87,7 @@ fn main() {
 
     println!("-");
     for line in lines {
-        if false {// !new_lines.contains(&line) {
+        if !new_lines.contains(&line) {
             println!("{line}");
         }
     }

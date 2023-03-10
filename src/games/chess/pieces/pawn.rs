@@ -217,14 +217,15 @@ impl Piece for PawnPiece {
             };
 
             board.state.teams[color] ^= &from;
-            board.state.teams[en_passant_target_color] ^= &en_passant_target;
             board.state.teams[color] |= &to;
+            board.state.teams[en_passant_target_color] ^= &en_passant_target;
 
             board.state.pieces[piece_type] ^= &from;
             board.state.pieces[piece_type] ^= &en_passant_target;
             board.state.pieces[piece_type] |= &to;
 
             board.state.all_pieces ^= &from;
+            board.state.all_pieces ^= &en_passant_target;
             board.state.all_pieces |= &to;
 
             board.state.first_move ^= &from;
