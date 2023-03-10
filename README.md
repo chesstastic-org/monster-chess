@@ -164,11 +164,11 @@ In addition, it's likely that we will also support the following out of the box:
 Once you have a `Game`, initializing a board becomes very easy. The example below should showcase this without any further explanation.
 
 ```rust
-    let mut board = Board::new(
+    let mut board = Board::from_fen(
         Chess::create(),
         2,
         (8, 8),
-        "k7/8/K7/8/8/8/8/1Q6"
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     );
 
 ```
