@@ -158,12 +158,6 @@ impl Piece for PawnPiece {
 
     fn make_normal_move(&self, board: &mut Board, action: &Action, from: BitBoard, to: BitBoard) {
         if action.info == EN_PASSANT_MOVE {
-            println!(
-                "goddamnit {}{}",
-                board.encode_position(action.from),
-                board.encode_position(action.to)
-            );
-
             let cols = board.state.cols;
 
             let color: usize = if (from & &board.state.teams[0]).is_set() {
@@ -296,11 +290,6 @@ impl Piece for PawnPiece {
                         && (from.abs_diff(bit) % cols != 0);
 
                     if conditions {
-                        println!(
-                            "shit: {}{}",
-                            board.encode_position(from),
-                            board.encode_position(bit)
-                        );
                         en_passant = true;
                     }
                 }

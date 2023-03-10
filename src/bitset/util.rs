@@ -118,7 +118,7 @@ impl<const T: usize> BitSet<T> {
         let first_bit = self.bitscan_forward();
 
         if first_bit >= end {
-            panic!("in iter_one_bits, the first bit ({first_bit}) is out of bounds, cannot be greater than or equal to {end}.")
+            panic!("in iter_one_bits, the first bit ({first_bit}) is out of bounds, cannot be greater than or equal to {end}.");
         }
 
         let mut bits: Vec<u32> = Vec::with_capacity((end - first_bit) as usize);

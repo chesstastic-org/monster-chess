@@ -236,11 +236,15 @@ impl Piece for KingPiece {
             If necessary, I can remake this.
         */
 
-        let bottom_row = board.state.edges[0].bottom;
+        let bottom_row = match team {
+            0 => board.state.edges[0].bottom,
+            1 => board.state.edges[0].top,
+            _ => board.state.edges[0].bottom
+        };
         let team_board = board.state.teams[team as usize];
         let first_move = board.state.first_move;
 
-        if (from_board & &!bottom_row & &!first_move).is_empty() {
+        if (from_board & &!bottom_row & &first_move).is_empty() {
             return;
         }
 
