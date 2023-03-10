@@ -236,7 +236,7 @@ impl Piece for KingPiece {
         let bottom_row = match team {
             0 => board.state.edges[0].bottom,
             1 => board.state.edges[0].top,
-            _ => board.state.edges[0].bottom
+            _ => board.state.edges[0].bottom,
         };
         let team_board = board.state.teams[team as usize];
         let first_move = board.state.first_move;

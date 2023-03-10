@@ -1,7 +1,8 @@
 use crate::{
-    Action, BishopPiece, BitBoard, Board, Direction, FenArgument, FenDecodeError, FenFullMoves,
-    FenOptions, FenState, FenStateTeams, FenSubMoves, FenTeamArgument, Game, HistoryMove,
-    KingPiece, KnightPiece, MoveRestrictions, PawnPiece, PostProcess, QueenPiece, RookPiece, down, up,
+    down, up, Action, BishopPiece, BitBoard, Board, Direction, FenArgument, FenDecodeError,
+    FenFullMoves, FenOptions, FenState, FenStateTeams, FenSubMoves, FenTeamArgument, Game,
+    HistoryMove, KingPiece, KnightPiece, MoveRestrictions, PawnPiece, PostProcess, QueenPiece,
+    RookPiece,
 };
 
 pub struct ChessCastlingRights;
@@ -160,7 +161,6 @@ impl FenArgument for ChessEnPassant {
     }
 }
 
-
 pub struct ChessPostProcess;
 impl PostProcess for ChessPostProcess {
     fn apply(&self, board: &mut Board) {
@@ -199,8 +199,7 @@ impl MoveRestrictions for ChessMoveRestrictions {
         }
 
         board.make_move(action);
-        let in_check =
-            board.is_attacking(board.state.moving_team, new_king_board);
+        let in_check = board.is_attacking(board.state.moving_team, new_king_board);
         board.undo_move().unwrap();
         !in_check
     }

@@ -36,11 +36,19 @@ impl Board {
         nodes
     }
 
-    pub fn assert_perfts<const T: usize>(&mut self, nodes: [ u32; T ]) {
+    pub fn assert_perfts<const T: usize>(&mut self, nodes: [u32; T]) {
         for (ind, true_nodes) in nodes.iter().enumerate() {
             let depth = (ind + 1) as u32;
             let nodes = self.sub_perft(depth);
-            assert_eq!(&nodes, true_nodes, "Perft of {} for FEN {} is {} (not {}, the expected result)", depth, self.to_fen(), nodes, true_nodes);
+            assert_eq!(
+                &nodes,
+                true_nodes,
+                "Perft of {} for FEN {} is {} (not {}, the expected result)",
+                depth,
+                self.to_fen(),
+                nodes,
+                true_nodes
+            );
         }
     }
 
@@ -74,7 +82,7 @@ impl Board {
 
 #[cfg(test)]
 mod tests {
-    use crate::{BitSet, Chess, Board};
+    use crate::{BitSet, Board, Chess};
 
     #[test]
     fn startpos() {
@@ -83,9 +91,9 @@ mod tests {
             2,
             (8, 8),
             "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
-        );        
+        );
 
-        board.assert_perfts([ 20, 400, 8902, 197281 ]);
+        board.assert_perfts([20, 400, 8902, 197281]);
         //board.assert_perfts([ 20, 400, 8902, 197281, 4865609 ]);
     }
 
@@ -96,33 +104,23 @@ mod tests {
             2,
             (8, 8),
             "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/R3KBNR w kqKQ - 0 1",
-        );        
+        );
 
-        board.assert_perfts([ 23, 460, 10664, 236936 ]);
+        board.assert_perfts([23, 460, 10664, 236936]);
     }
 
     #[test]
     fn white_promotion() {
-        let mut board = Board::new(
-            Chess::create(),
-            2,
-            (8, 8),
-            "8/5P2/8/8/8/7K/8/n6k w - - 0 1",
-        );        
+        let mut board = Board::new(Chess::create(), 2, (8, 8), "8/5P2/8/8/8/7K/8/n6k w - - 0 1");
 
-        board.assert_perfts([ 7, 25, 299, 1931 ]);
+        board.assert_perfts([7, 25, 299, 1931]);
     }
 
     #[test]
     fn black_promotion() {
-        let mut board = Board::new(
-            Chess::create(),
-            2,
-            (8, 8),
-            "N6K/8/8/7k/8/8/5p2/8 b - - 0 1",
-        );        
+        let mut board = Board::new(Chess::create(), 2, (8, 8), "N6K/8/8/7k/8/8/5p2/8 b - - 0 1");
 
-        board.assert_perfts([ 9, 41, 524, 3674 ]);
+        board.assert_perfts([9, 41, 524, 3674]);
     }
 
     #[test]
@@ -132,8 +130,8 @@ mod tests {
             2,
             (8, 8),
             "rnbqkbnr/1pp1pppp/8/p2pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3",
-        );        
+        );
 
-        board.assert_perfts([ 31, 839, 25956, 723699 ]);
+        board.assert_perfts([31, 839, 25956, 723699]);
     }
 }

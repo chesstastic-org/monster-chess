@@ -53,10 +53,17 @@ impl Piece for PawnPiece {
                 panic!("Promotion Piece Types can only be a single char. '{info}' is invalid.")
             }
             let char = info.chars().nth(0).unwrap();
-            let piece_type = board.game.pieces.iter().position(|piece_trait| match piece_trait.get_piece_symbol() {
-                PieceSymbol::Char(piece_symbol) => char == piece_symbol,
-                PieceSymbol::TeamSymbol(chars) => chars.contains(&char)
-            }).expect(&format!("Could not find a promotion piece type from '{info}'"));
+            let piece_type = board
+                .game
+                .pieces
+                .iter()
+                .position(|piece_trait| match piece_trait.get_piece_symbol() {
+                    PieceSymbol::Char(piece_symbol) => char == piece_symbol,
+                    PieceSymbol::TeamSymbol(chars) => chars.contains(&char),
+                })
+                .expect(&format!(
+                    "Could not find a promotion piece type from '{info}'"
+                ));
             (piece_type as u32) + 2
         }
     }
@@ -175,7 +182,7 @@ impl Piece for PawnPiece {
 
         board.state.all_pieces ^= &from;
 
-        board.state.first_move &= &!from;
+        board.state.first_move ^= &from;
         board.state.first_move &= &!to;
         // We actually don't need to swap the blockers. A blocker will still exist on `to`, just not on `from`.
 
@@ -271,7 +278,8 @@ impl Piece for PawnPiece {
         board.state.all_pieces ^= &from;
         board.state.all_pieces |= &to;
 
-        board.state.first_move &= &!from;
+        board.state.first_move ^= &from;
+        board.state.first_move &= &!to;
 
         board.state.history.push(history_move);
     }
@@ -296,8 +304,12 @@ impl Piece for PawnPiece {
         for bit in bit_actions.iter_one_bits((rows * cols) as u32) {
             if (BitBoard::from_lsb(bit) & &promotion_rows).is_set() {
                 for promotion_piece_type in 0..piece_types {
-                    if promotion_piece_type == 0 { continue; }
-                    if promotion_piece_type == 5 { continue; }
+                    if promotion_piece_type == 0 {
+                        continue;
+                    }
+                    if promotion_piece_type == 5 {
+                        continue;
+                    }
                     actions.push(Action {
                         from,
                         to: bit,

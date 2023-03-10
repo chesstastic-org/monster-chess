@@ -16,44 +16,61 @@ fn main() {
         2,
         (8, 8),
         "rnbqkbnr/1pp1pppp/8/p2pP3/8/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 3",
-    ); 
+    );
 
-    let actions = board.generate_moves();
-    let action = actions.iter().find(|el| board.encode_position(el.to) == "d6").unwrap();
-
+    /*let actions = board.generate_legal_moves();
+    let action = actions
+        .iter()
+        .find(|el| board.encode_position(el.to) == "d6")
+        .unwrap();
     board.make_move(action);
+
+    let actions = board.generate_legal_moves();
+    let action = actions
+        .iter()
+        .find(|el| board.encode_position(el.to) == "e5")
+        .unwrap();
+    board.make_move(action);
+
+    let actions = board.generate_legal_moves();
+    let action = actions
+        .iter()
+        .find(|el| board.encode_position(el.to) == "f3")
+        .unwrap();
+    board.make_move(action);*/
 
     let lines = r#"
     a5a4 - 1
     a8a6 - 1
     a8a7 - 1
-    a8b8 - 1
     b7b5 - 1
     b7b6 - 1
-    c6a7 - 1
-    c6b4 - 1
-    c6b8 - 1
-    c6d4 - 1
-    c6e5 - 1
+    b8a6 - 1
+    b8c6 - 1
+    b8d7 - 1
+    c7c5 - 1
+    c7c6 - 1
+    c7d6 - 1
     c8d7 - 1
     c8e6 - 1
     c8f5 - 1
     c8g4 - 1
     c8h3 - 1
-    d8c7 - 1
-    d8d2 - 1
-    d8d3 - 1
-    d8d4 - 1
-    d8d5 - 1
     d8d6 - 1
     d8d7 - 1
-    e7e5 - 1
-    e7e6 - 1
+    d8e7 - 1
+    d8f6 - 1
+    d8g5 - 1
+    d8h4 - 1
+    e5e4 - 1
     e8d7 - 1
     f7f5 - 1
     f7f6 - 1
+    f8d6 - 1
+    f8e7 - 1
     g7g5 - 1
     g7g6 - 1
+    g8e7 - 1
     g8f6 - 1
     g8h6 - 1
     h7h5 - 1
@@ -66,11 +83,10 @@ fn main() {
     .filter(|el| !el.is_empty())
     .collect::<Vec<_>>();
 
-    let perft = board
-        .perft(3)
-        //.get_branch_results(("e5", "d6"))
-        .get_branch_results(("b8", "c6"))
-        .get_branch_results(("d6", "c7"));
+    let perft = board.perft(4);
+    //.get_branch_results(("e5", "d6"))
+    //.get_branch_results(("e7", "e5"))
+    //.get_branch_results(("g1", "f3"));
     println!("TOTAL {}", perft.nodes);
 
     let new_lines = perft
