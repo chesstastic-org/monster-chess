@@ -36,6 +36,14 @@ impl Board {
         nodes
     }
 
+    pub fn assert_perfts<const T: usize>(&mut self, nodes: [ u32; T ]) {
+        for (ind, true_nodes) in nodes.iter().enumerate() {
+            let depth = (ind + 1) as u32;
+            let nodes = self.sub_perft(depth);
+            assert_eq!(&nodes, true_nodes, "Perft of {} for FEN {} is {} (not {}, the expected result)", depth, self.to_fen(), nodes, true_nodes);
+        }
+    }
+
     pub fn perft(&mut self, depth: u32) -> PerftResults {
         if depth == 0 {
             return PerftResults {
@@ -64,22 +72,44 @@ impl Board {
     }
 }
 
-/*
-u64 Perft(int depth)
-{
-  MOVE move_list[256];
-  int n_moves, i;
-  u64 nodes = 0;
+#[cfg(test)]
+mod tests {
+    use crate::{BitSet, Chess, Board};
 
-  if (depth == 0)
-    return 1ULL;
+    #[test]
+    fn startpos() {
+        let mut board = Board::new(
+            Chess::create(),
+            2,
+            (8, 8),
+            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+        );        
 
-  n_moves = GenerateLegalMoves(move_list);
-  for (i = 0; i < n_moves; i++) {
-    MakeMove(move_list[i]);
-    nodes += Perft(depth - 1);
-    UndoMove(move_list[i]);
-  }
-  return nodes;
+        board.assert_perfts([ 20, 400, 8902, 197281 ]);
+        //board.assert_perfts([ 20, 400, 8902, 197281, 4865609 ]);
+    }
+
+    #[test]
+    fn castling_test() {
+        let mut board = Board::new(
+            Chess::create(),
+            2,
+            (8, 8),
+            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/R3KBNR w kqKQ - 0 1",
+        );        
+
+        board.assert_perfts([ 23, 460, 10664, 236936 ]);
+    }
+
+    #[test]
+    fn white_promotion_test() {
+        let mut board = Board::new(
+            Chess::create(),
+            2,
+            (8, 8),
+            "8/5P2/8/8/8/7K/8/n6k w - - 0 1",
+        );        
+
+        board.assert_perfts([ 7, 25, 299, 1931 ]);
+    }
 }
-*/

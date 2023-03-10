@@ -240,7 +240,7 @@ impl Piece for PawnPiece {
             if let Some(state) = &mut history_move.state {
                 state.pieces.push(IndexedPreviousBoard(
                     piece_type,
-                    board.state.teams[promotion_piece_type],
+                    board.state.pieces[promotion_piece_type],
                 ));
             }
             board.state.pieces[promotion_piece_type] |= &to;

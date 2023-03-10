@@ -47,10 +47,10 @@ fn main() {
     .collect::<Vec<_>>();
 
     let perft = board
-        .perft(5);
-    println!("TOTAL {}", perft.nodes);
+        .sub_perft(5);
+    println!("TOTAL {}", perft);
 
-    let new_lines = perft
+    /*let new_lines = perft
         .branches
         .iter()
         .map(|((from, to), results)| format!("{}{} - {}", from, to, results.nodes))
@@ -72,5 +72,5 @@ fn main() {
     println!("{}", board.to_fen());
 
     //println!("{:#?}", board.perft(1));
-    //println!("{}", board.state.pieces[5].display(8, 8));
+    //println!("{}", board.state.pieces[5].display(8, 8));*/
 }
