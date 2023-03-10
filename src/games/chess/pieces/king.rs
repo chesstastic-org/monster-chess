@@ -31,18 +31,22 @@ fn down_one(from: BitBoard, cols: Cols, edges: &Edges) -> BitBoard {
 impl KingPiece {
     fn make_castling_move(&self, board: &mut Board, action: &Action, from: BitBoard, to: BitBoard) {
         let cols = board.state.cols;
-        let left_center = BitBoard::from_lsb(if cols % 2 == 0 {
+        let mut left_center = BitBoard::from_lsb(if cols % 2 == 0 {
             (cols / 2) - 1
         } else {
             cols / 2
         });
+
+        if action.team == 0 {
+            left_center = left_center.down(7, cols);
+        }
 
         let castle_left_king = left_center.left(1);
         let castle_left_rook = left_center;
         let castle_right_king = left_center.right(3);
         let castle_right_rook = left_center.right(2);
 
-        let dir = if action.from > action.to {
+        let dir = if action.from < action.to {
             Direction::RIGHT
         } else {
             Direction::LEFT
@@ -61,7 +65,7 @@ impl KingPiece {
                 teams: vec![IndexedPreviousBoard(color, board.state.teams[color])],
                 pieces: vec![
                     IndexedPreviousBoard(piece_type, board.state.pieces[piece_type]),
-                    IndexedPreviousBoard(piece_type, board.state.pieces[ROOK_PIECE_TYPE]),
+                    IndexedPreviousBoard(ROOK_PIECE_TYPE, board.state.pieces[ROOK_PIECE_TYPE]),
                 ],
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 first_move: PreviousBoard(board.state.first_move),
@@ -223,6 +227,7 @@ impl Piece for KingPiece {
             actions.push(Action {
                 from,
                 to: bit,
+                team,
                 info: NORMAL_KING_MOVE,
                 piece_type,
             });
@@ -244,7 +249,7 @@ impl Piece for KingPiece {
         let team_board = board.state.teams[team as usize];
         let first_move = board.state.first_move;
 
-        if (from_board & &!bottom_row & &first_move).is_empty() {
+        if (from_board & &bottom_row & &first_move).is_empty() {
             return;
         }
 
@@ -259,11 +264,15 @@ impl Piece for KingPiece {
             If there are two center points, `left_center` is the center point on the left.
         */
 
-        let left_center = BitBoard::from_lsb(if board.state.cols % 2 == 0 {
+        let mut left_center = BitBoard::from_lsb(if board.state.cols % 2 == 0 {
             (cols / 2) - 1
         } else {
             cols / 2
         });
+
+        if team == 0 {
+            left_center = left_center.down(7, cols);
+        }
 
         let castle_left_king = left_center.left(1);
         let castle_left_rook = left_center;
@@ -297,7 +306,7 @@ impl Piece for KingPiece {
                 Direction::RIGHT => BitBoard::starting_at_lsb(rook, from - rook + 1),
             };
 
-            let all_spots = (castling_spots & &in_between) & &!(from_board & &rook_board);
+            let all_spots = (castling_spots | &in_between) & &!(from_board | &rook_board);
 
             /*
                 We're not checking if the squares are attacked here, because if the squares aren't empty, we won't need to.
@@ -315,7 +324,8 @@ impl Piece for KingPiece {
             actions.push(Action {
                 from,
                 to: rook,
-                info: NORMAL_KING_MOVE,
+                team,
+                info: CASTLING_MOVE,
                 piece_type,
             });
         }

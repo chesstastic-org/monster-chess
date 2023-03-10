@@ -11,6 +11,7 @@ pub type ActionInfo = usize;
 pub struct Action {
     pub from: u32,
     pub to: u32,
+    pub team: u32,
     pub piece_type: PieceType,
 
     /// Moves can store extra information both for optimizing `make_move` or for specifying additional variants of a move.

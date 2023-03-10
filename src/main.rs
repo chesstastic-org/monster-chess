@@ -15,7 +15,7 @@ fn main() {
         Chess::create(),
         2,
         (8, 8),
-        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/R3KBNR w kqKQ - 0 1",
     );
 
     let lines = r#"
@@ -47,10 +47,10 @@ fn main() {
     .collect::<Vec<_>>();
 
     let perft = board
-        .sub_perft(5);
-    println!("TOTAL {}", perft);
+        .perft(1);
+    println!("TOTAL {}", perft.nodes);
 
-    /*let new_lines = perft
+    let new_lines = perft
         .branches
         .iter()
         .map(|((from, to), results)| format!("{}{} - {}", from, to, results.nodes))
@@ -64,7 +64,7 @@ fn main() {
 
     println!("-");
     for line in lines {
-        if !new_lines.contains(&line) {
+        if false {// !new_lines.contains(&line) {
             println!("{line}");
         }
     }

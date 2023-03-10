@@ -151,6 +151,7 @@ impl FenArgument for ChessEnPassant {
             action: Action {
                 from: from.bitscan_forward(),
                 to: pos,
+                team: previous_team,
                 piece_type: 0,
                 info: 0,
             },

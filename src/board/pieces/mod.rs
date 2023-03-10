@@ -186,6 +186,7 @@ pub trait Piece {
             actions.push(Action {
                 from,
                 to: bit,
+                team,
                 info: NORMAL_MOVE,
                 piece_type,
             });

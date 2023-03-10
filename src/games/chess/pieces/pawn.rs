@@ -277,6 +277,7 @@ impl Piece for PawnPiece {
                     actions.push(Action {
                         from,
                         to: bit,
+                        team,
                         info: promotion_move(promotion_piece_type),
                         piece_type,
                     });
@@ -297,6 +298,7 @@ impl Piece for PawnPiece {
                 actions.push(Action {
                     from,
                     to: bit,
+                    team,
                     info: if en_passant {
                         EN_PASSANT_MOVE
                     } else {
