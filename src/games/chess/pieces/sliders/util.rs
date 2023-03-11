@@ -28,13 +28,13 @@ pub fn get_ray_attacks(
     dir: u32,
     ray_attacks: &AttackLookup,
 ) -> BitBoard {
-    let mut attacks = ray_attacks[from.bitscan_forward() as usize as usize][dir as usize];
+    let mut attacks = ray_attacks[from.bitscan_forward() as usize][dir as usize];
     let blocker = attacks & &board.state.all_pieces;
     if blocker.is_set() {
-        let square = if from >= blocker {
-            blocker.bitscan_reverse()
-        } else {
+        let square = if from < blocker {
             blocker.bitscan_forward()
+        } else {
+            blocker.bitscan_reverse()
         };
 
         attacks ^= &ray_attacks[square as usize][dir as usize];
@@ -49,15 +49,15 @@ pub fn can_ray_attack(
     ray_attacks: &AttackLookup,
     to: BitBoard
 ) -> BitBoard {
-    let mut attacks = ray_attacks[from.bitscan_forward() as usize as usize][dir as usize];
+    let mut attacks = ray_attacks[from.bitscan_forward() as usize][dir as usize];
     let blocker = attacks & &to & &board.state.all_pieces;
     if blocker.is_set() {
-        let square = if from >= blocker {
-            blocker.bitscan_reverse()
-        } else {
+        let square = if from < blocker {
             blocker.bitscan_forward()
+        } else {
+            blocker.bitscan_reverse()
         };
-
+        
         attacks ^= &ray_attacks[square as usize][dir as usize];
     }
     return attacks;

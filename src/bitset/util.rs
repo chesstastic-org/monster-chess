@@ -124,24 +124,6 @@ impl<const T: usize> BitSet<T> {
     }
 
     pub fn iter_one_bits(mut self, end: u32) -> Vec<u32> {
-/*
-
-uint64_t bitset;
-for (size_t k = 0; k < bitmapsize; ++k) {
-    bitset = bitmap[k];
-    while (bitset != 0) {
-      uint64_t t = bitset & -bitset;
-      int r = __builtin_ctzl(bitset);
-      callback(k * 64 + r);
-      bitset ^= t;
-    }
-}
-*/
-
-        /*if first_bit >= end {
-            panic!("in iter_one_bits, the first bit ({first_bit}) is out of bounds, cannot be greater than or equal to {end}.");
-        }*/
-
         let mut bits: Vec<u32> = Vec::with_capacity(end as usize);
         while self.is_set() {
             let bit = self.bitscan_forward();
