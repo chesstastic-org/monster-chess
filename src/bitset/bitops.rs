@@ -5,6 +5,10 @@ impl<const T: usize> ops::Not for BitSet<T> {
     type Output = BitSet<T>;
 
     fn not(self) -> Self::Output {
+        if T == 1 {
+            return BitSet { data: [ !self.data[0]; T ] };
+        }
+
         BitSet::<T> {
             data: self
                 .data
