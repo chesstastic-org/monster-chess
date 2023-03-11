@@ -1,5 +1,7 @@
 use std::backtrace::Backtrace;
 
+use crate::board::BitBoard;
+
 /// I've chosen to use this little utility because of its performance in benchmarks being the best, and because it makes it the easiest to specialize to the needs of this project (in terms of both optimizations and code structure.)
 /// In this case, those needs being a way to have bigger integer sizes that are compatible with bit operations at high speeds.
 
@@ -110,22 +112,30 @@ impl<const T: usize> BitSet<T> {
         bits
     }
 
-    pub fn iter_one_bits(&self, end: u32) -> Vec<u32> {
-        if !self.is_set() {
-            return Vec::new();
-        }
+    pub fn iter_one_bits(mut self, end: u32) -> Vec<u32> {
+/*
 
-        let first_bit = self.bitscan_forward();
+uint64_t bitset;
+for (size_t k = 0; k < bitmapsize; ++k) {
+    bitset = bitmap[k];
+    while (bitset != 0) {
+      uint64_t t = bitset & -bitset;
+      int r = __builtin_ctzl(bitset);
+      callback(k * 64 + r);
+      bitset ^= t;
+    }
+}
+*/
 
-        if first_bit >= end {
+        /*if first_bit >= end {
             panic!("in iter_one_bits, the first bit ({first_bit}) is out of bounds, cannot be greater than or equal to {end}.");
-        }
+        }*/
 
-        let mut bits: Vec<u32> = Vec::with_capacity((end - first_bit) as usize);
-        for bit in first_bit..end {
-            if self.has_bit(bit) {
-                bits.push(bit);
-            }
+        let mut bits: Vec<u32> = Vec::with_capacity(end as usize);
+        while self.is_set() {
+            let bit = self.bitscan_forward();
+            bits.push(bit);
+            self ^= &BitSet::<T>::from_lsb(bit);
         }
         bits
     }

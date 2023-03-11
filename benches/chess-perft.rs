@@ -13,7 +13,7 @@ fn startpos(depth: u32) {
 }
 
 fn criterion_benchmark(c: &mut Criterion) {
-    c.bench_function("startpos", |b| b.iter(|| startpos(4)));
+    c.bench_function("startpos", |b| b.iter(|| startpos(3)));
 }
 
 criterion_group!(benches, criterion_benchmark);

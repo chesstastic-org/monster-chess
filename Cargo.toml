@@ -7,6 +7,7 @@ edition = "2021"
 debug = true
 
 [dependencies]
+flamegraph = "0.6.2"
 shell-words = "1.1.0"
 
 [dev-dependencies]
