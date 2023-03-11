@@ -1,6 +1,6 @@
-use crate::{
-    generate_edge_list, Action, BitSet, Edges, Game, HistoryMove, PieceSymbol, UndoMoveError,
-};
+use crate::bitset::BitSet;
+
+use super::{actions::{HistoryMove, Action, UndoMoveError}, edges::{Edges, generate_edge_list}, pieces::Piece, game::Game};
 
 pub type BitBoard = BitSet<1>;
 pub type PieceType = usize;

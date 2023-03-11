@@ -1,9 +1,6 @@
-use crate::{
-    down, up, Action, BishopPiece, BitBoard, Board, Direction, FenArgument, FenDecodeError,
-    FenFullMoves, FenOptions, FenState, FenStateTeams, FenSubMoves, FenTeamArgument, Game,
-    HistoryMove, KingPiece, KnightPiece, MoveRestrictions, PawnPiece, PostProcess, QueenPiece,
-    RookPiece,
-};
+use crate::{board::{BitBoard, PieceType, Cols, Board, AttackDirections, edges::Edges, actions::{Action, HistoryMove, IndexedPreviousBoard, HistoryState, PreviousBoard}, pieces::{PieceSymbol, Piece}, fen::{FenDecodeError, FenArgument, FenFullMoves, FenTeamArgument, FenState, FenSubMoves, FenOptions, PostProcess}, game::{Game, MoveRestrictions}}, bitset::Direction};
+
+use super::pieces::{KingPiece, QueenPiece, RookPiece, BishopPiece, KnightPiece, PawnPiece, down, up};
 
 pub const NORMAL_MODE: u32 = 0;
 pub const ATTACKS_MODE: u32 = 1;

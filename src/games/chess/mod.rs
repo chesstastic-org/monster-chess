@@ -1,12 +1,11 @@
 mod game;
-mod pieces;
+pub mod pieces;
 
 pub use game::*;
-pub use pieces::*;
 
 #[cfg(test)]
 mod tests {
-    use crate::{BitSet, Board, Chess};
+    use crate::{board::Board, games::chess::Chess};
 
     #[test]
     fn startpos() {

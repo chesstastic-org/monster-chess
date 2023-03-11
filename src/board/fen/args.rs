@@ -1,4 +1,4 @@
-use crate::Board;
+use super::{super::{actions::{HistoryMove, Action, UndoMoveError}, pieces::Piece, game::Game, Board, BitBoard, Rows, Cols}};
 
 #[derive(Clone)]
 pub enum FenTeamArgument {

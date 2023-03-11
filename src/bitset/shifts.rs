@@ -1,4 +1,6 @@
-use crate::{BitSet, Cols};
+use crate::board::Cols;
+
+use super::BitSet;
 
 impl<const T: usize> BitSet<T> {
     pub fn up(&self, shift: u32, cols: Cols) -> BitSet<T> {

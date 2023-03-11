@@ -1,6 +1,6 @@
 use shell_words::split;
 
-use crate::{BitBoard, Board, Cols, Game, PieceSymbol, Rows};
+use super::{super::{actions::{HistoryMove, Action, UndoMoveError}, pieces::Piece, game::Game, Board, BitBoard, Rows, Cols}};
 
 impl Board {
     pub fn new(game: Game, teams: u128, (rows, cols): (Rows, Cols), fen: &str) -> Board {

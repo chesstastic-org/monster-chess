@@ -1,4 +1,4 @@
-use crate::Board;
+use super::{actions::{HistoryMove, Action, UndoMoveError}, edges::Edges, pieces::Piece, game::Game, Board};
 
 const COLS: [char; 52] = [
     'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',

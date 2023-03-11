@@ -1,4 +1,4 @@
-use crate::{Action, Board, FenOptions, Piece};
+use super::{Board, pieces::Piece, fen::FenOptions, actions::Action};
 
 pub trait MoveRestrictions {
     fn is_legal(&self, board: &mut Board, action: &Action) -> bool;

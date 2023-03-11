@@ -1,4 +1,4 @@
-use crate::{AttackLookup, BitBoard, Board};
+use crate::board::{pieces::{PieceSymbol, Piece}, PieceType, BitBoard, Board, AttackDirections, AttackLookup};
 
 pub fn get_moves_ray(
     mut from: BitBoard,

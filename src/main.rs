@@ -1,12 +1,5 @@
-mod bitset;
-mod board;
-mod games;
-
 use std::env;
-
-pub use bitset::*;
-pub use board::*;
-pub use games::*;
+use monster_chess::{games::chess::Chess, board::Board};
 
 fn main() {
     env::set_var("RUST_BACKTRACE", "1000");
@@ -81,7 +74,7 @@ fn main() {
     .filter(|el| !el.is_empty())
     .collect::<Vec<_>>();
 
-    let perft = board.perft(5);
+    let perft = board.perft(2);
     println!("TOTAL {}", perft.nodes);
 
     let new_lines = perft

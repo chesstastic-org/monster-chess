@@ -1,3 +1,1 @@
-mod chess;
-
-pub use chess::*;
+pub mod chess;

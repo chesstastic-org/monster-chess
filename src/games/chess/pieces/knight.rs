@@ -1,4 +1,4 @@
-use crate::{AttackDirections, BitBoard, Board, Cols, Edges, Piece, PieceSymbol, PieceType};
+use crate::{board::{BitBoard, PieceType, Cols, Board, AttackDirections, edges::Edges, actions::{Action, HistoryMove, IndexedPreviousBoard, HistoryState, PreviousBoard}, pieces::{PieceSymbol, Piece}}, bitset::Direction, games::chess::game::ATTACKS_MODE};
 
 pub struct KnightPiece {
     pub piece_type: PieceType,

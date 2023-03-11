@@ -1,4 +1,6 @@
-use crate::{BitBoard, Board, Cols, Game, PieceSymbol, Rows};
+use crate::board::pieces::PieceSymbol;
+
+use super::{super::{actions::{HistoryMove, Action, UndoMoveError}, pieces::Piece, game::Game, Board, BitBoard, Rows, Cols}};
 
 impl Board {
     pub(crate) fn from_fen_state(

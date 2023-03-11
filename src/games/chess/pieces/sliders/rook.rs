@@ -1,7 +1,6 @@
-use crate::{
-    get_moves_ray, get_ray_attacks, AttackDirections, BitBoard, Board, Piece, PieceSymbol,
-    PieceType,
-};
+use crate::board::{pieces::{PieceSymbol, Piece}, PieceType, BitBoard, Board, AttackDirections};
+
+use super::{get_moves_ray, get_ray_attacks};
 
 pub struct RookPiece {
     pub piece_type: PieceType,

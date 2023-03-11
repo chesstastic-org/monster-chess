@@ -1,4 +1,4 @@
-use crate::BitSet;
+use super::BitSet;
 use std::ops;
 
 impl<const T: usize> ops::Not for BitSet<T> {
@@ -147,7 +147,7 @@ impl<const T: usize> ops::ShrAssign<u32> for BitSet<T> {
 
 #[cfg(test)]
 mod tests {
-    use crate::BitSet;
+    use super::BitSet;
 
     #[test]
     fn not() {

@@ -1,4 +1,4 @@
-use crate::BitSet;
+use super::BitSet;
 use std::ops::{Add, AddAssign, Sub, SubAssign};
 
 impl<const T: usize> Add<&BitSet<T>> for BitSet<T> {
@@ -56,7 +56,7 @@ impl<const T: usize> SubAssign<&BitSet<T>> for BitSet<T> {
 
 #[cfg(test)]
 mod tests {
-    use crate::BitSet;
+    use super::BitSet;
 
     #[test]
     fn add() {

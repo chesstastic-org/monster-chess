@@ -1,4 +1,4 @@
-use crate::{AttackLookup, BitBoard, Board, Cols, Piece, Rows};
+use super::{AttackLookup, Cols, Rows, Board, BitBoard, pieces::Piece};
 
 pub fn generate_lookups(
     board: &Board,

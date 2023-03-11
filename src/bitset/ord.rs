@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 
-use crate::BitSet;
+use super::BitSet;
 
 impl<const T: usize> PartialOrd<BitSet<T>> for BitSet<T> {
     fn partial_cmp(&self, other: &BitSet<T>) -> Option<Ordering> {
@@ -28,7 +28,7 @@ impl<const T: usize> PartialOrd<BitSet<T>> for BitSet<T> {
 mod tests {
     use std::cmp::Ordering;
 
-    use crate::BitSet;
+    use super::BitSet;
 
     #[test]
     fn ord() {

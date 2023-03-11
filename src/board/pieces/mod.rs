@@ -1,7 +1,4 @@
-use crate::{
-    Action, AttackDirections, AttackLookup, BitBoard, Board, HistoryMove, HistoryState,
-    IndexedPreviousBoard, PieceType, PreviousBoard, UndoMoveError,
-};
+use super::{actions::{HistoryMove, Action, UndoMoveError, IndexedPreviousBoard, HistoryState, PreviousBoard}, game::Game, Board, BitBoard, Rows, Cols, PieceType, AttackLookup, AttackDirections};
 
 pub enum PieceSymbol {
     Char(char),

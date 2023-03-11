@@ -1,4 +1,4 @@
-use crate::BitSet;
+use super::BitSet;
 
 #[derive(Debug)]
 pub enum Direction {
@@ -65,7 +65,7 @@ impl<const T: usize> BitSet<T> {
 
 #[cfg(test)]
 mod tests {
-    use crate::BitSet;
+    use super::BitSet;
 
     #[test]
     fn bitscan_forward() {

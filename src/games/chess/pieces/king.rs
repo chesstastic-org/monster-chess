@@ -1,7 +1,4 @@
-use crate::{
-    Action, AttackDirections, BitBoard, Board, Cols, Direction, Edges, HistoryMove, HistoryState,
-    IndexedPreviousBoard, Piece, PieceSymbol, PieceType, PreviousBoard, ATTACKS_MODE,
-};
+use crate::{board::{BitBoard, PieceType, Cols, Board, AttackDirections, edges::Edges, actions::{Action, HistoryMove, IndexedPreviousBoard, HistoryState, PreviousBoard}, pieces::{PieceSymbol, Piece}}, bitset::Direction, games::chess::game::ATTACKS_MODE};
 
 const NORMAL_KING_MOVE: usize = 0;
 const CASTLING_MOVE: usize = 1;

@@ -1,4 +1,4 @@
-use crate::{BitBoard, PieceType};
+use super::{BitBoard, PieceType};
 
 #[derive(Debug)]
 pub enum UndoMoveError {
