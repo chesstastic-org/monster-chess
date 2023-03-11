@@ -304,7 +304,14 @@ impl Piece for PawnPiece {
         board.state.history.push(history_move);
     }
 
-    fn add_actions(&self, actions: &mut Vec<Action>, board: &Board, from: u32, team: u32, mode: u32) {
+    fn add_actions(
+        &self,
+        actions: &mut Vec<Action>,
+        board: &Board,
+        from: u32,
+        team: u32,
+        mode: u32,
+    ) {
         let piece_type = self.get_piece_type();
         let promotion_rows = board.state.edges[0].bottom | &board.state.edges[0].top;
 

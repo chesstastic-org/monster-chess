@@ -201,7 +201,14 @@ impl Piece for KingPiece {
         // We actually don't need to swap the blockers. A blocker will still exist on `to`, just not on `from`.
     }
 
-    fn add_actions(&self, actions: &mut Vec<Action>, board: &Board, from: u32, team: u32, mode: u32) {
+    fn add_actions(
+        &self,
+        actions: &mut Vec<Action>,
+        board: &Board,
+        from: u32,
+        team: u32,
+        mode: u32,
+    ) {
         let rows = board.state.rows;
         let cols = board.state.cols;
         let board_len = rows * cols;

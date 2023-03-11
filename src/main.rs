@@ -15,7 +15,7 @@ fn main() {
         Chess::create(),
         2,
         (8, 8),
-        "r3k2r/p2pPpb1/bnp1pnp1/4N3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R b KQkq - 0 2",
+        "n1n5/PPPk4/8/8/8/8/4Kppp/5N1N b - - 0 1",
     );
 
     /*let actions = board.generate_legal_moves();
@@ -81,7 +81,7 @@ fn main() {
     .filter(|el| !el.is_empty())
     .collect::<Vec<_>>();
 
-    let perft = board.perft(1);
+    let perft = board.perft(5);
     println!("TOTAL {}", perft.nodes);
 
     let new_lines = perft

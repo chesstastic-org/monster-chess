@@ -17,8 +17,7 @@ mod tests {
             "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
         );
 
-        board.assert_perfts([20, 400, 8902, 197281]);
-        //board.assert_perfts([ 20, 400, 8902, 197281, 4865609 ]);
+        board.assert_perfts([20, 400, 8902, 197281, 4865609]);
     }
 
     #[test]
@@ -117,5 +116,17 @@ mod tests {
         );
 
         board.assert_perfts([46, 2079, 89890, 3894594]);
+    }
+
+    #[test]
+    fn multiple_pawns_promoting() {
+        let mut board = Board::new(
+            Chess::create(),
+            2,
+            (8, 8),
+            "n1n5/PPPk4/8/8/8/8/4Kppp/5N1N b - - 0 1",
+        );
+
+        board.assert_perfts([24, 496, 9483, 182838, 3605103]);
     }
 }
