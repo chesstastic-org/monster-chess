@@ -1,6 +1,6 @@
 use crate::{
     Action, BitBoard, Board, Cols, FenState, HistoryMove, HistoryState, IndexedPreviousBoard,
-    Piece, PieceSymbol, PieceType, PreviousBoard,
+    Piece, PieceSymbol, PieceType, PreviousBoard, ATTACKS_MODE,
 };
 
 const NORMAL_PAWN_MOVE: usize = 0;
@@ -85,7 +85,7 @@ impl Piece for PawnPiece {
         }
     }
 
-    fn get_moves(&self, board: &Board, from: BitBoard, team: u32) -> BitBoard {
+    fn get_moves(&self, board: &Board, from: BitBoard, team: u32, mode: u32) -> BitBoard {
         let mut moves = BitBoard::new();
         let cols = board.state.cols;
         let edges = &board.state.edges[0];
@@ -117,6 +117,10 @@ impl Piece for PawnPiece {
                     board.get_next_team(team),
                 );
             }
+        }
+
+        if mode == ATTACKS_MODE {
+            capture_requirements = BitBoard::max();
         }
 
         captures &= &capture_requirements;
@@ -160,7 +164,7 @@ impl Piece for PawnPiece {
                 first_move: PreviousBoard(board.state.first_move),
             }),
         };
-        
+
         let mut promotion_piece_type: Option<usize> = None;
         if action.info >= 2 {
             let promotion_type = action.info - 2;
@@ -300,13 +304,13 @@ impl Piece for PawnPiece {
         board.state.history.push(history_move);
     }
 
-    fn add_actions(&self, actions: &mut Vec<Action>, board: &Board, from: u32, team: u32) {
+    fn add_actions(&self, actions: &mut Vec<Action>, board: &Board, from: u32, team: u32, mode: u32) {
         let piece_type = self.get_piece_type();
         let promotion_rows = board.state.edges[0].bottom | &board.state.edges[0].top;
 
         let from_board = BitBoard::from_lsb(from);
         let bit_actions =
-            self.get_moves(board, from_board, team) & &!board.state.teams[team as usize];
+            self.get_moves(board, from_board, team, mode) & &!board.state.teams[team as usize];
 
         if bit_actions.is_empty() {
             return;

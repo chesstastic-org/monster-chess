@@ -29,7 +29,7 @@ pub trait Piece {
         board.attack_lookup.get(self.get_piece_type())
     }
 
-    fn get_moves(&self, board: &Board, from: BitBoard, team: u32) -> BitBoard;
+    fn get_moves(&self, board: &Board, from: BitBoard, team: u32, mode: u32) -> BitBoard;
 
     #[allow(unused_variables)]
     fn generate_lookup_moves(&self, board: &Board, from: BitBoard) -> AttackDirections {
@@ -167,12 +167,12 @@ pub trait Piece {
         }
     }
 
-    fn add_actions(&self, actions: &mut Vec<Action>, board: &Board, from: u32, team: u32) {
+    fn add_actions(&self, actions: &mut Vec<Action>, board: &Board, from: u32, team: u32, mode: u32) {
         let piece_type = self.get_piece_type();
         let from_board = BitBoard::from_lsb(from);
 
         let bit_actions =
-            self.get_moves(board, from_board, team) & &!board.state.teams[team as usize];
+            self.get_moves(board, from_board, team, mode) & &!board.state.teams[team as usize];
 
         if bit_actions.is_empty() {
             return;

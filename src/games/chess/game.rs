@@ -5,6 +5,9 @@ use crate::{
     RookPiece,
 };
 
+pub const NORMAL_MODE: u32 = 0;
+pub const ATTACKS_MODE: u32 = 1;
+
 pub struct ChessCastlingRights;
 impl FenArgument for ChessCastlingRights {
     fn decode(&self, board: &mut Board, arg: &str) -> Result<(), FenDecodeError> {
@@ -193,9 +196,8 @@ impl MoveRestrictions for ChessMoveRestrictions {
         let current_team = board.state.moving_team;
 
         board.make_move(action);
-        let king_board =
-            board.state.teams[current_team as usize] & &board.state.pieces[5];
-        let in_check = board.is_attacking(board.state.moving_team, king_board);
+        let king_board = board.state.teams[current_team as usize] & &board.state.pieces[5];
+        let in_check = board.is_attacking(board.state.moving_team, king_board, ATTACKS_MODE);
         board.undo_move().unwrap();
         !in_check
     }

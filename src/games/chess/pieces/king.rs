@@ -1,6 +1,6 @@
 use crate::{
     Action, AttackDirections, BitBoard, Board, Cols, Direction, Edges, HistoryMove, HistoryState,
-    IndexedPreviousBoard, Piece, PieceSymbol, PieceType, PreviousBoard,
+    IndexedPreviousBoard, Piece, PieceSymbol, PieceType, PreviousBoard, ATTACKS_MODE,
 };
 
 const NORMAL_KING_MOVE: usize = 0;
@@ -136,7 +136,7 @@ impl Piece for KingPiece {
     }
 
     #[allow(unused_variables)]
-    fn get_moves(&self, board: &Board, from: BitBoard, team: u32) -> BitBoard {
+    fn get_moves(&self, board: &Board, from: BitBoard, team: u32, mode: u32) -> BitBoard {
         let lookup = self.get_attack_lookup(board);
         match lookup {
             Some(lookup) => lookup[from.bitscan_reverse() as usize][0],
@@ -201,7 +201,7 @@ impl Piece for KingPiece {
         // We actually don't need to swap the blockers. A blocker will still exist on `to`, just not on `from`.
     }
 
-    fn add_actions(&self, actions: &mut Vec<Action>, board: &Board, from: u32, team: u32) {
+    fn add_actions(&self, actions: &mut Vec<Action>, board: &Board, from: u32, team: u32, mode: u32) {
         let rows = board.state.rows;
         let cols = board.state.cols;
         let board_len = rows * cols;
@@ -209,7 +209,7 @@ impl Piece for KingPiece {
         let piece_type = self.get_piece_type();
         let from_board = BitBoard::from_lsb(from);
         let bit_actions =
-            self.get_moves(board, from_board, team) & &!board.state.teams[team as usize];
+            self.get_moves(board, from_board, team, mode) & &!board.state.teams[team as usize];
 
         if bit_actions.is_empty() {
             return;
@@ -311,14 +311,15 @@ impl Piece for KingPiece {
             let king_dest = match dir {
                 Direction::LEFT => castle_left_king,
                 Direction::RIGHT => castle_right_king,
-            }.bitscan_forward();
+            }
+            .bitscan_forward();
 
             let between_king_dest = match dir {
                 Direction::LEFT => BitBoard::starting_at_lsb(king_dest, from - king_dest + 1),
                 Direction::RIGHT => BitBoard::starting_at_lsb(from, king_dest - from + 1),
             };
 
-            let attack_mask = board.get_move_mask(board.get_next_team(team));
+            let attack_mask = board.get_move_mask(board.get_next_team(team), ATTACKS_MODE);
 
             if (between_king_dest & &attack_mask).is_set() {
                 continue;

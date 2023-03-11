@@ -93,7 +93,7 @@ impl Board {
         board
     }
 
-    pub fn get_move_mask(&self, team: u32) -> BitBoard {
+    pub fn get_move_mask(&self, team: u32, mode: u32) -> BitBoard {
         let board_len = self.state.rows * self.state.cols;
         let mut bitboard = BitBoard::new();
 
@@ -102,18 +102,18 @@ impl Board {
             let piece = &self.game.pieces[ind];
 
             for bit in board.iter_one_bits(board_len as u32) {
-                bitboard |= &piece.get_moves(self, BitBoard::from_lsb(bit), team);
+                bitboard |= &piece.get_moves(self, BitBoard::from_lsb(bit), team, mode);
             }
         }
 
         bitboard
     }
 
-    pub fn is_attacking(&self, team: u32, target: BitBoard) -> bool {
-        (self.get_move_mask(team) & &target).is_set()
+    pub fn is_attacking(&self, team: u32, target: BitBoard, mode: u32) -> bool {
+        (self.get_move_mask(team, mode) & &target).is_set()
     }
 
-    pub fn generate_moves(&self) -> Vec<Action> {
+    pub fn generate_moves(&self, mode: u32) -> Vec<Action> {
         let board_len = self.state.rows * self.state.cols;
         let mut actions: Vec<Action> = Vec::with_capacity(board_len as usize);
 
@@ -124,7 +124,7 @@ impl Board {
             let piece = &self.game.pieces[ind];
 
             for bit in board.iter_one_bits(board_len as u32) {
-                piece.add_actions(&mut actions, self, bit, team);
+                piece.add_actions(&mut actions, self, bit, team, mode);
             }
         }
 
@@ -134,8 +134,8 @@ impl Board {
     /*
         Don't use when writing an engine directly; use `generate_moves` and `move_restrictions.is_legal` to avoid extra legality checks during pruning.
     */
-    pub fn generate_legal_moves(&mut self) -> Vec<Action> {
-        let moves = self.generate_moves();
+    pub fn generate_legal_moves(&mut self, mode: u32) -> Vec<Action> {
+        let moves = self.generate_moves(mode);
         let game_restrictions = self.game.move_restrictions.duplicate();
         moves
             .iter()
