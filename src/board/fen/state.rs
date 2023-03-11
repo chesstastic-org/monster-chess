@@ -123,7 +123,7 @@ impl Board {
             }
             empty_spaces = 0;
 
-            let mut team = 0;
+            let mut team = usize::MAX;
             for ind in 0..self.state.teams.len() {
                 if (self.state.teams[ind] & &bitboard).is_set() {
                     team = ind;

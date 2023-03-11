@@ -94,7 +94,7 @@ fn main() {
     .filter(|el| !el.is_empty())
     .collect::<Vec<_>>();
 
-    let perft = board.perft(2);
+    let perft = board.perft(4);
     //.get_branch_results(("e7", "e5"))
     //.get_branch_results(("g1", "f3"));
     println!("TOTAL {}", perft.nodes);

@@ -160,6 +160,18 @@ impl Piece for PawnPiece {
                 first_move: PreviousBoard(board.state.first_move),
             }),
         };
+        
+        let mut promotion_piece_type: Option<usize> = None;
+        if action.info >= 2 {
+            let promotion_type = action.info - 2;
+            promotion_piece_type = Some(promotion_type);
+            if let Some(state) = &mut history_move.state {
+                state.pieces.push(IndexedPreviousBoard(
+                    promotion_type,
+                    board.state.pieces[promotion_type],
+                ));
+            }
+        }
 
         board.state.teams[captured_color] ^= &to;
         board.state.teams[color] ^= &from;
@@ -167,17 +179,13 @@ impl Piece for PawnPiece {
 
         board.state.pieces[captured_piece_type] ^= &to;
         board.state.pieces[piece_type] ^= &from;
-        if action.info < 2 {
-            board.state.pieces[piece_type] |= &to;
-        } else {
-            let promotion_piece_type = action.info - 2;
-            if let Some(state) = &mut history_move.state {
-                state.pieces.push(IndexedPreviousBoard(
-                    promotion_piece_type,
-                    board.state.pieces[promotion_piece_type],
-                ));
+        match promotion_piece_type {
+            None => {
+                board.state.pieces[piece_type] |= &to;
             }
-            board.state.pieces[promotion_piece_type] |= &to;
+            Some(promotion_piece_type) => {
+                board.state.pieces[promotion_piece_type] |= &to;
+            }
         }
 
         board.state.all_pieces ^= &from;
@@ -258,21 +266,29 @@ impl Piece for PawnPiece {
             }),
         };
 
+        let mut promotion_piece_type: Option<usize> = None;
+        if action.info >= 2 {
+            let promotion_type = action.info - 2;
+            promotion_piece_type = Some(promotion_type);
+            if let Some(state) = &mut history_move.state {
+                state.pieces.push(IndexedPreviousBoard(
+                    promotion_type,
+                    board.state.pieces[promotion_type],
+                ));
+            }
+        }
+
         board.state.teams[color] ^= &from;
         board.state.teams[color] |= &to;
 
         board.state.pieces[piece_type] ^= &from;
-        if action.info < 1 {
-            board.state.pieces[piece_type] |= &to;
-        } else {
-            let promotion_piece_type = action.info - 2;
-            if let Some(state) = &mut history_move.state {
-                state.pieces.push(IndexedPreviousBoard(
-                    promotion_piece_type,
-                    board.state.pieces[promotion_piece_type],
-                ));
+        match promotion_piece_type {
+            None => {
+                board.state.pieces[piece_type] |= &to;
             }
-            board.state.pieces[promotion_piece_type] |= &to;
+            Some(promotion_piece_type) => {
+                board.state.pieces[promotion_piece_type] |= &to;
+            }
         }
 
         board.state.all_pieces ^= &from;
