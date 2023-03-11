@@ -87,14 +87,16 @@ impl Piece for PawnPiece {
         let cols = board.state.cols;
         let edges = &board.state.edges[0];
 
-        let single_moves = up(&from, 1, cols, team) & &!board.state.all_pieces;
-        let first_move = (from & &board.state.first_move).is_set();
-
-        moves |= &single_moves;
-
-        if first_move {
-            let double_moves = up(&single_moves, 1, cols, team) & &!board.state.all_pieces;
-            moves |= &double_moves;
+        if mode != ATTACKS_MODE {
+            let single_moves = up(&from, 1, cols, team) & &!board.state.all_pieces;
+            let first_move = (from & &board.state.first_move).is_set();
+    
+            moves |= &single_moves;
+    
+            if first_move {
+                let double_moves = up(&single_moves, 1, cols, team) & &!board.state.all_pieces;
+                moves |= &double_moves;
+            }
         }
 
         let up_one = up(&from, 1, cols, team);

@@ -27,6 +27,9 @@ pub trait Piece {
     }
 
     fn get_moves(&self, board: &Board, from: BitBoard, team: u32, mode: u32) -> BitBoard;
+    fn can_move(&self, board: &Board, from: BitBoard, team: u32, mode: u32, to: BitBoard) -> BitBoard {
+        self.get_moves(board, from, team, mode) & &to
+    }
 
     #[allow(unused_variables)]
     fn generate_lookup_moves(&self, board: &Board, from: BitBoard) -> AttackDirections {

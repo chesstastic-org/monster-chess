@@ -41,3 +41,24 @@ pub fn get_ray_attacks(
     }
     return attacks;
 }
+
+pub fn can_ray_attack(
+    board: &Board,
+    from: BitBoard,
+    dir: u32,
+    ray_attacks: &AttackLookup,
+    to: BitBoard
+) -> BitBoard {
+    let mut attacks = ray_attacks[from.bitscan_forward() as usize as usize][dir as usize];
+    let blocker = attacks & &to & &board.state.all_pieces;
+    if blocker.is_set() {
+        let square = if from >= blocker {
+            blocker.bitscan_reverse()
+        } else {
+            blocker.bitscan_forward()
+        };
+
+        attacks ^= &ray_attacks[square as usize][dir as usize];
+    }
+    return attacks;
+}

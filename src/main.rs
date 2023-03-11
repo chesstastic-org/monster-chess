@@ -11,7 +11,8 @@ fn main() {
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
     );
 
-    for i in 0..20 {
-        board.sub_perft(3);
+    for i in 0..200 {
+        let nodes = board.sub_perft(3);
+        println!("{i}: {}", nodes);
     }
 }

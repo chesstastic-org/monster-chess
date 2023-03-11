@@ -109,6 +109,22 @@ impl Board {
         bitboard
     }
 
+    pub fn get_targeted_mask(&self, team: u32, mode: u32, to: BitBoard) -> BitBoard {
+        let board_len = self.state.rows * self.state.cols;
+        let mut bitboard = BitBoard::new();
+
+        for (ind, board) in self.state.pieces.iter().enumerate() {
+            let board = *board & &self.state.teams[team as usize];
+            let piece = &self.game.pieces[ind];
+
+            for bit in board.iter_one_bits(board_len as u32) {
+                bitboard |= &piece.can_move(self, BitBoard::from_lsb(bit), team, mode, to);
+            }
+        }
+
+        bitboard
+    }
+
     pub fn is_attacking(&self, team: u32, target: BitBoard, mode: u32) -> bool {
         (self.get_move_mask(team, mode) & &target).is_set()
     }
@@ -137,11 +153,18 @@ impl Board {
     pub fn generate_legal_moves(&mut self, mode: u32) -> Vec<Action> {
         let moves = self.generate_moves(mode);
         let game_restrictions = self.game.move_restrictions.duplicate();
-        moves
+        let mut legal_moves = Vec::with_capacity(moves.len());
+        for action in moves {
+            if game_restrictions.is_legal(self, &action) {
+                legal_moves.push(action);
+            }
+        }
+        legal_moves
+        /*moves
             .iter()
             .map(|el| el.clone())
             .filter(|el| game_restrictions.is_legal(self, el))
-            .collect::<Vec<_>>()
+            .collect::<Vec<_>>()*/
     }
 
     pub fn get_next_team(&self, mut team: u32) -> u32 {

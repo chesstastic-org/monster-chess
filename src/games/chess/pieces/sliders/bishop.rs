@@ -1,6 +1,6 @@
 use crate::board::{pieces::{PieceSymbol, Piece}, PieceType, BitBoard, Board, AttackDirections};
 
-use super::{get_moves_ray, get_ray_attacks};
+use super::{get_moves_ray, get_ray_attacks, can_ray_attack};
 
 pub struct BishopPiece {
     pub piece_type: PieceType,
@@ -50,6 +50,20 @@ impl Piece for BishopPiece {
 
     fn get_piece_type(&self) -> PieceType {
         self.piece_type
+    }
+    
+    #[allow(unused_variables)]
+    fn can_move(&self, board: &Board, from: BitBoard, team: u32, mode: u32, to: BitBoard) -> BitBoard {
+        let lookup = self
+            .get_attack_lookup(board)
+            .expect("Could not find the queen attack lookup.");
+        let mut attacks = BitBoard::new();
+
+        for dir in 0..8 {
+            attacks |= &can_ray_attack(board, from, dir, &lookup, to);
+        }
+
+        attacks
     }
 
     #[allow(unused_variables)]
