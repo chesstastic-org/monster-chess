@@ -87,7 +87,15 @@ impl Piece for PawnPiece {
         let cols = board.state.cols;
         let edges = &board.state.edges[0];
 
-        if mode != ATTACKS_MODE {
+        let mut capture_requirements = board.state.all_pieces;
+
+        let up_one = up(&from, 1, cols, team);
+        let mut captures = (up_one & &!edges.right).right(1);
+        captures |= &(up_one & &!edges.left).left(1);
+
+        if mode == ATTACKS_MODE {
+            capture_requirements = BitBoard::max();
+        } else {
             let single_moves = up(&from, 1, cols, team) & &!board.state.all_pieces;
             let first_move = (from & &board.state.first_move).is_set();
     
@@ -97,29 +105,20 @@ impl Piece for PawnPiece {
                 let double_moves = up(&single_moves, 1, cols, team) & &!board.state.all_pieces;
                 moves |= &double_moves;
             }
-        }
 
-        let up_one = up(&from, 1, cols, team);
-        let mut captures = (up_one & &!edges.right).right(1);
-        captures |= &(up_one & &!edges.left).left(1);
-
-        let mut capture_requirements = board.state.all_pieces;
-        if let Some(last_move) = board.state.history.last() {
-            let conditions = last_move.action.piece_type == 0
-                && (last_move.action.to.abs_diff(last_move.action.from) == (2 * (cols)));
-
-            if conditions {
-                capture_requirements |= &up(
-                    &BitBoard::from_lsb(last_move.action.from),
-                    1,
-                    cols,
-                    board.get_next_team(team),
-                );
+            if let Some(last_move) = board.state.history.last() {
+                let conditions = last_move.action.piece_type == 0
+                    && (last_move.action.to.abs_diff(last_move.action.from) == (2 * (cols)));
+    
+                if conditions {
+                    capture_requirements |= &up(
+                        &BitBoard::from_lsb(last_move.action.from),
+                        1,
+                        cols,
+                        board.get_next_team(team),
+                    );
+                }
             }
-        }
-
-        if mode == ATTACKS_MODE {
-            capture_requirements = BitBoard::max();
         }
 
         captures &= &capture_requirements;

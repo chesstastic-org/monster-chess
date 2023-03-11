@@ -59,7 +59,7 @@ impl Piece for RookPiece {
             .expect("Could not find the queen attack lookup.");
         let mut attacks = BitBoard::new();
 
-        for dir in 0..8 {
+        for dir in 0..4 {
             attacks |= &can_ray_attack(board, from, dir, &lookup, to);
         }
 

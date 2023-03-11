@@ -126,7 +126,7 @@ impl Board {
     }
 
     pub fn is_attacking(&self, team: u32, target: BitBoard, mode: u32) -> bool {
-        (self.get_move_mask(team, mode) & &target).is_set()
+        (self.get_targeted_mask(team, mode, target) & &target).is_set()
     }
 
     pub fn generate_moves(&self, mode: u32) -> Vec<Action> {

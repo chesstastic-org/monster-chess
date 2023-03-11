@@ -56,10 +56,10 @@ impl Piece for BishopPiece {
     fn can_move(&self, board: &Board, from: BitBoard, team: u32, mode: u32, to: BitBoard) -> BitBoard {
         let lookup = self
             .get_attack_lookup(board)
-            .expect("Could not find the queen attack lookup.");
+            .expect("Could not find the bishop attack lookup.");
         let mut attacks = BitBoard::new();
 
-        for dir in 0..8 {
+        for dir in 0..4 {
             attacks |= &can_ray_attack(board, from, dir, &lookup, to);
         }
 
