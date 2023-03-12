@@ -2,17 +2,16 @@ use crate::board::pieces::PieceSymbol;
 
 use super::{super::{actions::{HistoryMove, Action, UndoMoveError}, pieces::Piece, game::Game, Board, BitBoard, Rows, Cols}};
 
-impl Board {
+impl<'a> Board<'a> {
     pub(crate) fn from_fen_state(
-        game: Game,
+        game: &'a Game,
         teams: u128,
         (rows, cols): (Rows, Cols),
         fen: &str,
-    ) -> Board {
+    ) -> Board<'a> {
         let pieces = game
             .pieces
             .iter()
-            .map(|el| el.duplicate())
             .collect::<Vec<_>>();
 
         let mut board = Board::empty(game, teams, (rows, cols));

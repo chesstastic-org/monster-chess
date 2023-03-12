@@ -16,7 +16,7 @@ pub fn generate_lookups(
     lookups
 }
 
-impl Board {
+impl<'a> Board<'a> {
     pub fn generate_lookups(&mut self) {
         for (ind, piece) in self.game.pieces.iter().enumerate() {
             if !piece.can_lookup() {

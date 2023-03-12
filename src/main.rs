@@ -15,8 +15,9 @@ fn get_time_ms() -> u128  {
 fn main() {
     env::set_var("RUST_BACKTRACE", "1000");
 
+    let chess = Chess::create();
     let mut board = Board::new(
-        Chess::create(),
+        &chess,
         2,
         (8, 8),
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",

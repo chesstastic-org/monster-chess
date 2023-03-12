@@ -53,14 +53,14 @@ pub type AttackDirections = Vec<BitBoard>;
 
 pub type AttackLookup = Vec<AttackDirections>;
 
-pub struct Board {
+pub struct Board<'a> {
     pub state: BoardState,
-    pub game: Game,
+    pub game: &'a Game,
     pub attack_lookup: Vec<AttackLookup>,
 }
 
-impl Board {
-    pub fn empty(game: Game, teams: u128, (rows, cols): (Rows, Cols)) -> Board {
+impl<'a> Board<'a> {
+    pub fn empty(game: &'a Game, teams: u128, (rows, cols): (Rows, Cols)) -> Board<'a> {
         let pieces_state = game
             .pieces
             .iter()
@@ -153,9 +153,8 @@ impl Board {
     pub fn generate_legal_moves(&mut self, mode: u32) -> Vec<Action> {
         let moves = self.generate_moves(mode);
         let mut legal_moves = Vec::with_capacity(moves.len());
-        let move_restrictions = self.game.move_restrictions.duplicate();
         for action in moves {
-            if move_restrictions.is_legal(self, &action) {
+            if self.game.move_restrictions.is_legal(self, &action) {
                 legal_moves.push(action);
             }
         }
@@ -183,16 +182,14 @@ impl Board {
     }
 
     pub fn make_move(&mut self, action: &Action) {
-        let piece_trait = self.game.pieces[action.piece_type].duplicate();
-        piece_trait.make_move(self, action);
+        self.game.pieces[action.piece_type].make_move(self, action);
     }
 
     pub fn undo_move(&mut self) -> Result<(), UndoMoveError> {
         let history_move = self.state.history.pop();
         match history_move {
             Some(history_move) => {
-                let piece_trait = self.game.pieces[history_move.action.piece_type].duplicate();
-                piece_trait.undo_move(self, &history_move);
+                self.game.pieces[history_move.action.piece_type].undo_move(self, &history_move);
             }
             None => return Err(UndoMoveError::NoHistoryMoves),
         }

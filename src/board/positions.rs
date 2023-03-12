@@ -6,7 +6,7 @@ const COLS: [char; 52] = [
     'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
 ];
 
-impl Board {
+impl<'a> Board<'a> {
     pub fn encode_position(&self, pos: u32) -> String {
         let base_row = pos / self.state.cols;
         let col = pos - (self.state.cols * base_row);

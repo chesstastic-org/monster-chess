@@ -2,8 +2,8 @@ use shell_words::split;
 
 use super::{super::{actions::{HistoryMove, Action, UndoMoveError}, pieces::Piece, game::Game, Board, BitBoard, Rows, Cols}};
 
-impl Board {
-    pub fn new(game: Game, teams: u128, (rows, cols): (Rows, Cols), fen: &str) -> Board {
+impl<'a> Board<'a> {
+    pub fn new(game: &'a Game, teams: u128, (rows, cols): (Rows, Cols), fen: &str) -> Board<'a> {
         let args = split(fen).expect(&format!("{fen} cannot be split into arguments."));
         let mut board = Board::from_fen_state(game, teams, (rows, cols), &args[0]);
 

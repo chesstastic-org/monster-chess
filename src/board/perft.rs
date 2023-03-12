@@ -20,7 +20,7 @@ impl PerftResults {
     }
 }
 
-impl Board {
+impl<'a> Board<'a> {
     pub fn sub_perft(&mut self, depth: u32) -> u32 {
         if depth == 0 {
             return 1;
