@@ -18,7 +18,6 @@ fn main() {
     let chess = Chess::create();
     let mut board = Board::new(
         &chess,
-        2,
         (8, 8),
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
     );

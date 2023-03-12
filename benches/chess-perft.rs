@@ -5,7 +5,6 @@ fn startpos(depth: u32) {
     let game = Chess::create();
     let mut board = Board::new(
         &game,
-        2,
         (8, 8),
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
     );

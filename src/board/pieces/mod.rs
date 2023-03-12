@@ -109,22 +109,21 @@ pub trait Piece {
         let from = BitBoard::from_lsb(action.from);
         let to = BitBoard::from_lsb(action.to);
 
-        if (board.state.all_pieces & to).is_set() {
-            self.make_capture_move(board, action, action.piece_type, from, to);
-        } else {
+        if (board.state.all_pieces & to).is_empty() {
             self.make_normal_move(board, action, action.piece_type, from, to);
+        } else {
+            self.make_capture_move(board, action, action.piece_type, from, to);
         }
 
-        board.state.current_turn += 1;
         board.state.turns += 1;
-        if board.state.current_turn >= board.game.turns {
-            board.state.current_turn = 0;
+        board.state.current_turn = board.state.turn_lookup[board.state.current_turn as usize];
+        if board.state.current_turn == 0 {
             board.state.sub_moves += 1;
 
             if board.state.moving_team == 0 {
                 board.state.full_moves += 1;
             }
-            board.state.moving_team = board.get_next_team(board.state.moving_team);
+            board.state.moving_team = board.state.team_lookup[board.state.moving_team as usize];
         }
     }
 

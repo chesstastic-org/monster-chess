@@ -210,6 +210,7 @@ pub struct Chess;
 impl Chess {
     pub fn create() -> Game {
         Game {
+            teams: 2,
             turns: 1,
             pieces: vec![
                 Box::new(PawnPiece),

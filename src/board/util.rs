@@ -39,6 +39,11 @@ pub struct BoardState {
     pub squares: u32,
 
     pub history: ArrayVec<HistoryMove, 2048>,
+
+    pub turn_lookup: ArrayVec<u32, 16>,
+    pub team_lookup: ArrayVec<u32, 16>,
+    pub turn_reverse_lookup: ArrayVec<u32, 16>,
+    pub team_reverse_lookup: ArrayVec<u32, 16>
 }
 
 impl BoardState {
@@ -60,17 +65,47 @@ pub type AttackLookup = Vec<AttackDirections>;
 pub struct Board<'a> {
     pub state: BoardState,
     pub game: &'a Game,
-    pub attack_lookup: Vec<AttackLookup>,
+    pub attack_lookup: Vec<AttackLookup>
+}
+
+fn generate_forward_lookup(count: u32) -> ArrayVec<u32, 16> {
+    let mut lookup = ArrayVec::new();
+    for i in 0..count {
+        let mut new_val = i + 1;
+        if new_val >= count {
+            new_val = 0;
+        }
+        lookup.push(new_val);
+    }
+    lookup
+}
+
+fn generate_reverse_lookup(count: u32) -> ArrayVec<u32, 16> {
+    let mut lookup = ArrayVec::new();
+    for i in 0..count {
+        let i = i as i32;
+        let mut new_val = i - 1;
+        if new_val < 0 {
+            new_val = (count - 1) as i32;
+        }
+        lookup.push(new_val as u32);
+    }
+    lookup
 }
 
 impl<'a> Board<'a> {
-    pub fn empty(game: &'a Game, teams: u128, (rows, cols): (Rows, Cols)) -> Board<'a> {
+    pub fn empty(game: &'a Game, (rows, cols): (Rows, Cols)) -> Board<'a> {
         let pieces_state = game
             .pieces
             .iter()
             .map(|_| BitBoard::new())
             .collect::<Vec<_>>()
             .clone();
+
+        let turn_lookup = generate_forward_lookup(game.turns);
+        let turn_reverse_lookup = generate_reverse_lookup(game.turns);
+        let team_lookup = generate_forward_lookup(game.teams);
+        let team_reverse_lookup = generate_reverse_lookup(game.teams);
 
         let mut board = Board {
             attack_lookup: vec![],
@@ -79,7 +114,7 @@ impl<'a> Board<'a> {
                 all_pieces: BitBoard::new(),
                 first_move: BitBoard::new(),
                 pieces: pieces_state.clone(),
-                teams: (0..teams).map(|_| BitBoard::new()).collect::<Vec<_>>(),
+                teams: (0..game.teams).map(|_| BitBoard::new()).collect::<Vec<_>>(),
                 edges: generate_edge_list(rows, cols),
                 cols,
                 rows,
@@ -89,7 +124,11 @@ impl<'a> Board<'a> {
                 current_turn: 0,
                 full_moves: 0,
                 sub_moves: 0,
-                turns: 0
+                turns: 0,
+                team_lookup,
+                team_reverse_lookup,
+                turn_lookup,
+                turn_reverse_lookup
             },
         };
 

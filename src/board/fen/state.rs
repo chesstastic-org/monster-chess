@@ -5,7 +5,6 @@ use super::{super::{actions::{HistoryMove, Action, UndoMoveError}, pieces::Piece
 impl<'a> Board<'a> {
     pub(crate) fn from_fen_state(
         game: &'a Game,
-        teams: u128,
         (rows, cols): (Rows, Cols),
         fen: &str,
     ) -> Board<'a> {
@@ -14,7 +13,7 @@ impl<'a> Board<'a> {
             .iter()
             .collect::<Vec<_>>();
 
-        let mut board = Board::empty(game, teams, (rows, cols));
+        let mut board = Board::empty(game, (rows, cols));
 
         let mut board_ind = 0;
         for row in fen.split("/") {

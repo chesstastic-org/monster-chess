@@ -9,5 +9,6 @@ pub struct Game {
     pub pieces: Vec<Box<dyn Piece>>,
     pub move_restrictions: Box<dyn MoveRestrictions>,
     pub fen_options: FenOptions,
-    pub turns: u32,
+    pub teams: u32,
+    pub turns: u32
 }
