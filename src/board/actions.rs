@@ -36,10 +36,13 @@ pub enum HistoryUpdate {
 }
 
 #[derive(Clone, Debug)]
-pub struct HistoryState(pub Vec<HistoryUpdate>);
+pub enum HistoryState {
+    Any(Vec<HistoryUpdate>),
+    None
+}
 
 #[derive(Clone, Debug)]
 pub struct HistoryMove {
     pub action: Action,
-    pub state: Option<HistoryState>,
+    pub state: HistoryState,
 }

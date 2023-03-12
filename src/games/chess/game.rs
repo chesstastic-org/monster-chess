@@ -131,7 +131,7 @@ impl FenArgument for ChessEnPassant {
                 piece_type: 0,
                 info: 0,
             },
-            state: None,
+            state: HistoryState::None,
         });
 
         Ok(())

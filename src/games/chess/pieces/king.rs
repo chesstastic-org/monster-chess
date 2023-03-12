@@ -52,13 +52,13 @@ impl KingPiece {
 
         let history_move = HistoryMove {
             action: *action,
-            state: Some(HistoryState(vec![
+            state: HistoryState::Any(vec![
                 HistoryUpdate::Team(IndexedPreviousBoard(color, board.state.teams[color])),
                 HistoryUpdate::Piece(IndexedPreviousBoard(piece_type, board.state.pieces[piece_type])),
                 HistoryUpdate::Piece(IndexedPreviousBoard(ROOK_PIECE_TYPE, board.state.pieces[ROOK_PIECE_TYPE])),
                 HistoryUpdate::AllPieces(PreviousBoard(board.state.all_pieces)),
                 HistoryUpdate::FirstMove(PreviousBoard(board.state.first_move))
-            ]))
+            ])
         };
         board.state.history.push(history_move);
 
@@ -154,14 +154,14 @@ impl Piece for KingPiece {
 
         let history_move = HistoryMove {
             action: *action,
-            state: Some(HistoryState(vec![
+            state: HistoryState::Any(vec![
                 HistoryUpdate::Team(IndexedPreviousBoard(color, board.state.teams[color])),
                 HistoryUpdate::Team(IndexedPreviousBoard(captured_color, board.state.teams[captured_color])),
                 HistoryUpdate::Piece(IndexedPreviousBoard(piece_type, board.state.pieces[piece_type])),
                 HistoryUpdate::Piece(IndexedPreviousBoard(captured_piece_type, board.state.pieces[captured_piece_type])),
                 HistoryUpdate::AllPieces(PreviousBoard(board.state.all_pieces)),
                 HistoryUpdate::FirstMove(PreviousBoard(board.state.first_move))
-            ]))
+            ])
         };
         board.state.history.push(history_move);
 
