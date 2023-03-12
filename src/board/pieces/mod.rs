@@ -128,11 +128,10 @@ pub trait Piece {
     }
 
     fn undo_move(&self, board: &mut Board, history_move: HistoryMove) {
-        board.state.current_turn -= 1;
         board.state.turns -= 1;
-        if board.state.current_turn == u32::MAX {
-            board.state.moving_team = board.get_previous_team(board.state.moving_team);
-            board.state.current_turn = board.game.turns - 1;
+        board.state.current_turn = board.state.turn_reverse_lookup[board.state.current_turn as usize];
+        if board.state.current_turn == board.game.turns - 1 {
+            board.state.moving_team = board.state.team_reverse_lookup[board.state.moving_team as usize];
             board.state.sub_moves -= 1;
 
             if board.state.moving_team == 0 {
