@@ -5,9 +5,7 @@ const CASTLING_MOVE: usize = 1;
 
 const ROOK_PIECE_TYPE: usize = 3;
 
-pub struct KingPiece {
-    pub piece_type: PieceType,
-}
+pub struct KingPiece;
 
 fn right_one(from: BitBoard, edges: &Edges) -> BitBoard {
     (from & &!edges.right).right(1) & &!edges.left
@@ -105,9 +103,7 @@ impl KingPiece {
 
 impl Piece for KingPiece {
     fn duplicate(&self) -> Box<dyn Piece> {
-        Box::new(Self {
-            piece_type: self.piece_type,
-        })
+        Box::new(Self)
     }
 
     fn get_piece_symbol(&self) -> PieceSymbol {

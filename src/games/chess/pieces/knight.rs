@@ -1,8 +1,6 @@
 use crate::{board::{BitBoard, PieceType, Cols, Board, AttackDirections, edges::Edges, actions::{Action, HistoryMove, IndexedPreviousBoard, HistoryState, PreviousBoard}, pieces::{PieceSymbol, Piece}}, bitset::Direction, games::chess::game::ATTACKS_MODE};
 
-pub struct KnightPiece {
-    pub piece_type: PieceType,
-}
+pub struct KnightPiece;
 
 fn up2_right(b: BitBoard, cols: Cols, edges: &Edges, deep_edges: &Edges) -> BitBoard {
     (b & &!deep_edges.top & &!edges.right).up(2, cols).right(1)
@@ -46,9 +44,7 @@ fn down_left2(b: BitBoard, cols: Cols, edges: &Edges, deep_edges: &Edges) -> Bit
 
 impl Piece for KnightPiece {
     fn duplicate(&self) -> Box<dyn Piece> {
-        Box::new(Self {
-            piece_type: self.piece_type,
-        })
+        Box::new(Self)
     }
 
     fn get_piece_symbol(&self) -> PieceSymbol {

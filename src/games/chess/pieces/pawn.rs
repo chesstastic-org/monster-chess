@@ -6,9 +6,7 @@ fn promotion_move(piece_type: PieceType) -> usize {
     piece_type + 2
 }
 
-pub struct PawnPiece {
-    pub piece_type: PieceType,
-}
+pub struct PawnPiece;
 
 pub fn up(bitboard: &BitBoard, shift: u32, cols: Cols, team: u32) -> BitBoard {
     match team {
@@ -28,9 +26,7 @@ pub fn down(bitboard: &BitBoard, shift: u32, cols: Cols, team: u32) -> BitBoard 
 
 impl Piece for PawnPiece {
     fn duplicate(&self) -> Box<dyn Piece> {
-        Box::new(Self {
-            piece_type: self.piece_type,
-        })
+        Box::new(Self)
     }
 
     fn can_lookup(&self) -> bool {

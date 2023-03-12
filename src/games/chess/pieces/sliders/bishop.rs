@@ -2,15 +2,11 @@ use crate::board::{pieces::{PieceSymbol, Piece}, PieceType, BitBoard, Board, Att
 
 use super::{get_moves_ray, get_ray_attacks, can_ray_attack};
 
-pub struct BishopPiece {
-    pub piece_type: PieceType,
-}
+pub struct BishopPiece;
 
 impl Piece for BishopPiece {
     fn duplicate(&self) -> Box<dyn Piece> {
-        Box::new(Self {
-            piece_type: self.piece_type,
-        })
+        Box::new(Self)
     }
 
     fn get_piece_symbol(&self) -> PieceSymbol {

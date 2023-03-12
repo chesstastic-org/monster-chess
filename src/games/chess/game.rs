@@ -212,12 +212,12 @@ impl Chess {
         Game {
             turns: 1,
             pieces: vec![
-                Box::new(PawnPiece { piece_type: 0 }),
-                Box::new(KnightPiece { piece_type: 1 }),
-                Box::new(BishopPiece { piece_type: 2 }),
-                Box::new(RookPiece { piece_type: 3 }),
-                Box::new(QueenPiece { piece_type: 4 }),
-                Box::new(KingPiece { piece_type: 5 }),
+                Box::new(PawnPiece),
+                Box::new(KnightPiece),
+                Box::new(BishopPiece),
+                Box::new(RookPiece),
+                Box::new(QueenPiece),
+                Box::new(KingPiece)
             ],
             move_restrictions: Box::new(ChessMoveRestrictions),
             fen_options: FenOptions {
