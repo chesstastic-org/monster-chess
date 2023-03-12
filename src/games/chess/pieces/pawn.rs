@@ -24,6 +24,50 @@ pub fn down(bitboard: &BitBoard, shift: u32, cols: Cols, team: u32) -> BitBoard 
     }
 }
 
+impl PawnPiece {
+    fn make_en_passant_move(&self, board: &mut Board, action: &Action, piece_type: usize, from: BitBoard, to: BitBoard) {
+        let cols = board.state.cols;
+
+        let color: usize = action.team as usize;
+        let en_passant_target = down(&to, 1, cols, color as u32);
+
+        let en_passant_target_color: usize =
+            if (en_passant_target & board.state.teams[0]).is_set() {
+                0
+            } else {
+                1
+            };
+
+        board.state.history.push(HistoryMove {
+            action: *action,
+            state: HistoryState::Any {
+                all_pieces: PreviousBoard(board.state.all_pieces),
+                first_move: PreviousBoard(board.state.first_move),
+                updates: vec![                    
+                    HistoryUpdate::Team(IndexedPreviousBoard(color, board.state.teams[color])),
+                    HistoryUpdate::Team(IndexedPreviousBoard(en_passant_target_color, board.state.teams[en_passant_target_color])),
+                    HistoryUpdate::Piece(IndexedPreviousBoard(piece_type, board.state.pieces[piece_type])),
+                ]
+            }
+        });
+
+        board.state.teams[color] ^= from;
+        board.state.teams[color] |= to;
+        board.state.teams[en_passant_target_color] ^= en_passant_target;
+
+        board.state.pieces[piece_type] ^= from;
+        board.state.pieces[piece_type] ^= en_passant_target;
+        board.state.pieces[piece_type] |= to;
+
+        board.state.all_pieces ^= from;
+        board.state.all_pieces ^= en_passant_target;
+        board.state.all_pieces |= to;
+
+        board.state.first_move ^= from;
+        board.state.first_move ^= en_passant_target;
+    }
+}
+
 impl Piece for PawnPiece {
     fn duplicate(&self) -> Box<dyn Piece> {
         Box::new(Self)
@@ -192,47 +236,7 @@ impl Piece for PawnPiece {
 
     fn make_normal_move(&self, board: &mut Board, action: &Action, piece_type: usize, from: BitBoard, to: BitBoard) {
         if action.info == EN_PASSANT_MOVE {
-            let cols = board.state.cols;
-
-            let color: usize = action.team as usize;
-            let en_passant_target = down(&to, 1, cols, color as u32);
-
-            let en_passant_target_color: usize =
-                if (en_passant_target & board.state.teams[0]).is_set() {
-                    0
-                } else {
-                    1
-                };
-
-            let history_move = HistoryMove {
-                action: *action,
-                state: HistoryState::Any {
-                    all_pieces: PreviousBoard(board.state.all_pieces),
-                    first_move: PreviousBoard(board.state.first_move),
-                    updates: vec![                    
-                        HistoryUpdate::Team(IndexedPreviousBoard(color, board.state.teams[color])),
-                        HistoryUpdate::Team(IndexedPreviousBoard(en_passant_target_color, board.state.teams[en_passant_target_color])),
-                        HistoryUpdate::Piece(IndexedPreviousBoard(piece_type, board.state.pieces[piece_type])),
-                    ]
-                }
-            };
-
-            board.state.teams[color] ^= from;
-            board.state.teams[color] |= to;
-            board.state.teams[en_passant_target_color] ^= en_passant_target;
-
-            board.state.pieces[piece_type] ^= from;
-            board.state.pieces[piece_type] ^= en_passant_target;
-            board.state.pieces[piece_type] |= to;
-
-            board.state.all_pieces ^= from;
-            board.state.all_pieces ^= en_passant_target;
-            board.state.all_pieces |= to;
-
-            board.state.first_move ^= from;
-            board.state.first_move ^= en_passant_target;
-
-            board.state.history.push(history_move);
+            self.make_en_passant_move(board, action, piece_type, from, to);
             return;
         }
 

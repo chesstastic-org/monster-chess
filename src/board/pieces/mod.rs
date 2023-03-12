@@ -139,24 +139,28 @@ pub trait Piece {
             }
         }
 
-        if let HistoryState::Single { all_pieces, first_move, team, piece } = history_move.state {
-            board.state.all_pieces = all_pieces.0;
-            board.state.first_move = first_move.0;
-            board.state.teams[team.0] = team.1;
-            board.state.pieces[piece.0] = piece.1;
-        } else if let HistoryState::Any { first_move, all_pieces, updates } = history_move.state {
-            board.state.all_pieces = all_pieces.0;
-            board.state.first_move = first_move.0;
-            for change in updates {
-                match change {
-                    HistoryUpdate::Team(team) => {
-                        board.state.teams[team.0] = team.1;
+        match history_move.state {
+            HistoryState::Single { all_pieces, first_move, team, piece } => {
+                board.state.all_pieces = all_pieces.0;
+                board.state.first_move = first_move.0;
+                board.state.teams[team.0] = team.1;
+                board.state.pieces[piece.0] = piece.1;
+            }
+            HistoryState::Any { first_move, all_pieces, updates } => {
+                board.state.all_pieces = all_pieces.0;
+                board.state.first_move = first_move.0;
+                for change in updates {
+                    match change {
+                        HistoryUpdate::Team(team) => {
+                            board.state.teams[team.0] = team.1;
+                        }
+                        HistoryUpdate::Piece(piece) => {
+                            board.state.pieces[piece.0] = piece.1;
+                        }
                     }
-                    HistoryUpdate::Piece(piece) => {
-                        board.state.pieces[piece.0] = piece.1;
-                    }
-                }
-            }    
+                }    
+            }
+            HistoryState::None => {}
         }
     }
 
@@ -177,9 +181,6 @@ pub trait Piece {
         if bit_actions.is_empty() {
             return;
         }
-
-        let rows = board.state.rows;
-        let cols = board.state.cols;
 
         for bit in bit_actions.iter_one_bits(board.state.squares) {
             actions.push(Action {
