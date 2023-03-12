@@ -248,7 +248,7 @@ impl Piece for PawnPiece {
         if action.info > 3 {
             let promotion_type = action.info - 2;
             promotion_piece_type = Some(promotion_type);
-            if let HistoryState::Single { .. } = &mut history_move.state {
+            if let HistoryState::Single { .. } = history_move.state {
                 history_move.state = HistoryState::Any(vec![
                     HistoryUpdate::Team(IndexedPreviousBoard(color, board.state.teams[color])),
                     HistoryUpdate::Piece(IndexedPreviousBoard(piece_type, board.state.pieces[piece_type])),

@@ -141,6 +141,12 @@ pub trait Piece {
         }
 
         match history_move.state {
+            HistoryState::Single { all_pieces, first_move, team, piece } => {
+                board.state.all_pieces = all_pieces.0;
+                board.state.first_move = first_move.0;
+                board.state.teams[team.0] = team.1;
+                board.state.pieces[piece.0] = piece.1;
+            }
             HistoryState::Any(history_state) => {
                 for change in history_state {
                     match change {
@@ -158,12 +164,6 @@ pub trait Piece {
                         }
                     }
                 }       
-            }
-            HistoryState::Single { all_pieces, first_move, team, piece } => {
-                board.state.all_pieces = all_pieces.0;
-                board.state.first_move = first_move.0;
-                board.state.teams[team.0] = team.1;
-                board.state.pieces[piece.0] = piece.1;
             }
             HistoryState::None => {}
         }
