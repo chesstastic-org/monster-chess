@@ -1,3 +1,6 @@
+use arrayvec::ArrayVec;
+use smallvec::{SmallVec, smallvec};
+
 use crate::bitset::BitSet;
 
 use super::{actions::{HistoryMove, Action, UndoMoveError}, edges::{Edges, generate_edge_list}, pieces::Piece, game::Game};
@@ -34,7 +37,7 @@ pub struct BoardState {
     pub rows: Rows,
     pub cols: Cols,
 
-    pub history: Vec<HistoryMove>,
+    pub history: ArrayVec<HistoryMove, 2048>,
 }
 
 impl BoardState {
@@ -79,7 +82,7 @@ impl<'a> Board<'a> {
                 edges: generate_edge_list(rows, cols),
                 cols,
                 rows,
-                history: Vec::with_capacity(1000),
+                history: ArrayVec::new(),
                 moving_team: 0,
                 current_turn: 0,
                 full_moves: 0,
