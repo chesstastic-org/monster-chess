@@ -36,6 +36,7 @@ pub struct BoardState {
     pub edges: Vec<Edges>,
     pub rows: Rows,
     pub cols: Cols,
+    pub squares: u32,
 
     pub history: ArrayVec<HistoryMove, 2048>,
 }
@@ -82,12 +83,13 @@ impl<'a> Board<'a> {
                 edges: generate_edge_list(rows, cols),
                 cols,
                 rows,
+                squares: rows * cols,
                 history: ArrayVec::new(),
                 moving_team: 0,
                 current_turn: 0,
                 full_moves: 0,
                 sub_moves: 0,
-                turns: 0,
+                turns: 0
             },
         };
 
@@ -97,7 +99,7 @@ impl<'a> Board<'a> {
     }
 
     pub fn get_move_mask(&self, team: u32, mode: u32) -> BitBoard {
-        let board_len = self.state.rows * self.state.cols;
+        let board_len = self.state.squares;
         let mut bitboard = BitBoard::new();
 
         for (ind, board) in self.state.pieces.iter().enumerate() {
@@ -113,7 +115,7 @@ impl<'a> Board<'a> {
     }
 
     pub fn get_targeted_mask(&self, team: u32, mode: u32, to: BitBoard) -> BitBoard {
-        let board_len = self.state.rows * self.state.cols;
+        let board_len = self.state.squares;
         let mut bitboard = BitBoard::new();
 
         for (ind, board) in self.state.pieces.iter().enumerate() {
@@ -133,7 +135,7 @@ impl<'a> Board<'a> {
     }
 
     pub fn generate_moves(&self, mode: u32) -> Vec<Action> {
-        let board_len = self.state.rows * self.state.cols;
+        let board_len = self.state.squares;
         let mut actions: Vec<Action> = Vec::with_capacity(board_len as usize);
 
         let team = self.state.moving_team;

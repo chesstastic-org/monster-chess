@@ -195,7 +195,7 @@ impl Piece for KingPiece {
     ) {
         let rows = board.state.rows;
         let cols = board.state.cols;
-        let board_len = rows * cols;
+        let board_len = board.state.squares;
 
         let from_board = BitBoard::from_lsb(from);
         let bit_actions =

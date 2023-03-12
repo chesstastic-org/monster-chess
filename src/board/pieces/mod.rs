@@ -109,7 +109,7 @@ pub trait Piece {
         let from = BitBoard::from_lsb(action.from);
         let to = BitBoard::from_lsb(action.to);
 
-        if board.state.all_pieces.has_bit(action.to) {
+        if (board.state.all_pieces & to).is_set() {
             self.make_capture_move(board, action, action.piece_type, from, to);
         } else {
             self.make_normal_move(board, action, action.piece_type, from, to);
@@ -183,7 +183,7 @@ pub trait Piece {
         let rows = board.state.rows;
         let cols = board.state.cols;
 
-        for bit in bit_actions.iter_one_bits((rows * cols) as u32) {
+        for bit in bit_actions.iter_one_bits(board.state.squares) {
             actions.push(Action {
                 from,
                 to: bit,

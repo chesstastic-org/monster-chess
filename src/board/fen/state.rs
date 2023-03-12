@@ -93,7 +93,7 @@ impl<'a> Board<'a> {
     }
 
     pub(crate) fn to_fen_state(&self) -> String {
-        let board_len = self.state.cols * self.state.rows;
+        let board_len = self.state.squares;
         let mut fen_state = "".to_string();
         let mut empty_spaces = 0;
         for i in 0..(board_len + 1) {

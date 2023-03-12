@@ -33,8 +33,8 @@ impl<const T: usize> BitSet<T> {
         (BitSet::<T>::from_lsb(length) - BitSet::<T>::from_element(1)) << bit
     }
 
-    pub fn has_bit(&self, bit: u32) -> bool {
-        (*self & (BitSet::<T>::from_element(1) << bit)).is_set()
+    pub fn has_bit(self, bit: u32) -> bool {
+        (self & (BitSet::<T>::from_element(1) << bit)).is_set()
     }
 
     pub fn is_empty(&self) -> bool {

@@ -301,7 +301,7 @@ impl Piece for PawnPiece {
 
         let piece_types = board.game.pieces.len();
 
-        for bit in bit_actions.iter_one_bits((rows * cols) as u32) {
+        for bit in bit_actions.iter_one_bits(board.state.squares) {
             if (BitBoard::from_lsb(bit) & promotion_rows).is_set() {
                 for promotion_piece_type in 0..piece_types {
                     if promotion_piece_type == 0 {

@@ -6,10 +6,10 @@ pub fn generate_lookups(
     rows: Rows,
     cols: Cols,
 ) -> AttackLookup {
-    let mut lookups = Vec::with_capacity((rows * cols) as usize);
+    let mut lookups = Vec::with_capacity(board.state.squares as usize);
 
-    for i in 0..(rows * cols) {
-        let from = BitBoard::from_lsb(i as u32);
+    for i in 0..board.state.squares {
+        let from = BitBoard::from_lsb(i);
         lookups.insert(i as usize, piece.generate_lookup_moves(board, from));
     }
 
