@@ -37,7 +37,19 @@ pub enum HistoryUpdate {
 
 #[derive(Clone, Debug)]
 pub enum HistoryState {
+    /*
+        This is when we want to a less common change where we effect many more bitboards then can be predicted. Avoid this when possible. 
+    */
     Any(Vec<HistoryUpdate>),
+    /*
+        This is a change that only applies to one piece of one specific team, like moving a piece to a new square without capturing. Use this when possible for performancce.
+    */
+    Single {
+        all_pieces: PreviousBoard,
+        first_move: PreviousBoard,
+        team: IndexedPreviousBoard,
+        piece: IndexedPreviousBoard
+    },
     None
 }
 

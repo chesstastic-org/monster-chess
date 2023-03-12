@@ -83,12 +83,12 @@ pub trait Piece {
 
         let history_move = HistoryMove {
             action: *action,
-            state: HistoryState::Any(vec![
-                HistoryUpdate::Team(IndexedPreviousBoard(color, board.state.teams[color])),
-                HistoryUpdate::Piece(IndexedPreviousBoard(piece_type, board.state.pieces[piece_type])),
-                HistoryUpdate::AllPieces(PreviousBoard(board.state.all_pieces)),
-                HistoryUpdate::FirstMove(PreviousBoard(board.state.first_move))
-            ])
+            state: HistoryState::Single {
+                team: IndexedPreviousBoard(color, board.state.teams[color]),
+                piece: IndexedPreviousBoard(piece_type, board.state.pieces[piece_type]),
+                all_pieces: PreviousBoard(board.state.all_pieces),
+                first_move: PreviousBoard(board.state.first_move)
+            }
         };
         board.state.history.push(history_move);
 
@@ -140,23 +140,32 @@ pub trait Piece {
             }
         }
 
-        if let HistoryState::Any(history_state) = history_move.state {
-            for change in history_state {
-                match change {
-                    HistoryUpdate::AllPieces(all_pieces) => {
-                        board.state.all_pieces = all_pieces.0;
+        match history_move.state {
+            HistoryState::Any(history_state) => {
+                for change in history_state {
+                    match change {
+                        HistoryUpdate::AllPieces(all_pieces) => {
+                            board.state.all_pieces = all_pieces.0;
+                        }
+                        HistoryUpdate::FirstMove(first_move) => {
+                            board.state.first_move = first_move.0;
+                        }
+                        HistoryUpdate::Team(team) => {
+                            board.state.teams[team.0] = team.1;
+                        }
+                        HistoryUpdate::Piece(piece) => {
+                            board.state.pieces[piece.0] = piece.1;
+                        }
                     }
-                    HistoryUpdate::FirstMove(first_move) => {
-                        board.state.first_move = first_move.0;
-                    }
-                    HistoryUpdate::Team(team) => {
-                        board.state.teams[team.0] = team.1;
-                    }
-                    HistoryUpdate::Piece(piece) => {
-                        board.state.pieces[piece.0] = piece.1;
-                    }
-                }
+                }       
             }
+            HistoryState::Single { all_pieces, first_move, team, piece } => {
+                board.state.all_pieces = all_pieces.0;
+                board.state.first_move = first_move.0;
+                board.state.teams[team.0] = team.1;
+                board.state.pieces[piece.0] = piece.1;
+            }
+            HistoryState::None => {}
         }
     }
 

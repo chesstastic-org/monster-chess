@@ -236,23 +236,26 @@ impl Piece for PawnPiece {
 
         let mut history_move = HistoryMove {
             action: *action,
-            state: HistoryState::Any(vec![
-                HistoryUpdate::Team(IndexedPreviousBoard(color, board.state.teams[color])),
-                HistoryUpdate::Piece(IndexedPreviousBoard(piece_type, board.state.pieces[piece_type])),
-                HistoryUpdate::AllPieces(PreviousBoard(board.state.all_pieces)),
-                HistoryUpdate::FirstMove(PreviousBoard(board.state.first_move))
-            ]),
+            state: HistoryState::Single {
+                team: IndexedPreviousBoard(color, board.state.teams[color]),
+                piece: IndexedPreviousBoard(piece_type, board.state.pieces[piece_type]),
+                all_pieces: PreviousBoard(board.state.all_pieces),
+                first_move: PreviousBoard(board.state.first_move)
+            }
         };
 
         let mut promotion_piece_type: Option<usize> = None;
         if action.info > 3 {
             let promotion_type = action.info - 2;
             promotion_piece_type = Some(promotion_type);
-            if let HistoryState::Any(state) = &mut history_move.state {
-                state.push(HistoryUpdate::Piece(IndexedPreviousBoard(
-                    promotion_type,
-                    board.state.pieces[promotion_type],
-                )));
+            if let HistoryState::Single { .. } = &mut history_move.state {
+                history_move.state = HistoryState::Any(vec![
+                    HistoryUpdate::Team(IndexedPreviousBoard(color, board.state.teams[color])),
+                    HistoryUpdate::Piece(IndexedPreviousBoard(piece_type, board.state.pieces[piece_type])),
+                    HistoryUpdate::Piece(IndexedPreviousBoard(promotion_type, board.state.pieces[promotion_type])),
+                    HistoryUpdate::AllPieces(PreviousBoard(board.state.all_pieces)),
+                    HistoryUpdate::FirstMove(PreviousBoard(board.state.first_move))
+                ]);
             }
         }
 
