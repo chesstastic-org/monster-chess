@@ -176,7 +176,7 @@ pub trait Piece {
         let from_board = BitBoard::from_lsb(from);
 
         let bit_actions =
-            self.get_moves(board, from_board, team, mode) & &!board.state.teams[team as usize];
+            self.get_moves(board, from_board, piece_type, team, mode) & &!board.state.teams[team as usize];
 
         if bit_actions.is_empty() {
             return;
