@@ -30,11 +30,11 @@ impl<const T: usize> BitSet<T> {
     }
 
     pub fn starting_at_lsb(bit: u32, length: u32) -> BitSet<T> {
-        (BitSet::<T>::from_lsb(length) - &BitSet::<T>::from_element(1)) << bit
+        (BitSet::<T>::from_lsb(length) - BitSet::<T>::from_element(1)) << bit
     }
 
     pub fn has_bit(&self, bit: u32) -> bool {
-        (*self & &(BitSet::<T>::from_element(1) << bit)).is_set()
+        (*self & (BitSet::<T>::from_element(1) << bit)).is_set()
     }
 
     pub fn is_empty(&self) -> bool {
@@ -62,10 +62,10 @@ impl<const T: usize> BitSet<T> {
     }
 
     #[inline(always)]
-    pub fn apply(self, rhs: &BitSet<T>, apply: impl Fn((&u128, &u128)) -> u128) -> Self {
+    pub fn apply(self, rhs: BitSet<T>, apply: impl Fn((&u128, u128)) -> u128) -> Self {
         if T == 1 {
             return BitSet {
-                data: [ apply((&self.data[0], &rhs.data[0])); T ]
+                data: [ apply((&self.data[0], rhs.data[0])); T ]
             };
         }
 
@@ -73,7 +73,7 @@ impl<const T: usize> BitSet<T> {
             data: self
                 .data
                 .iter()
-                .zip(&rhs.data)
+                .zip(rhs.data)
                 .map(apply)
                 .collect::<Vec<_>>()
                 .try_into()
@@ -82,16 +82,16 @@ impl<const T: usize> BitSet<T> {
     }
 
     #[inline(always)]
-    pub fn effect(&mut self, rhs: &BitSet<T>, apply: impl Fn((&u128, &u128)) -> u128) {
+    pub fn effect(&mut self, rhs: BitSet<T>, apply: impl Fn((&u128, u128)) -> u128) {
         if T == 1 {
-            self.data = [ apply((&self.data[0], &rhs.data[0])); T ];
+            self.data = [ apply((&self.data[0], rhs.data[0])); T ];
             return;
         }
 
         self.data = self
             .data
             .iter()
-            .zip(&rhs.data)
+            .zip(rhs.data)
             .map(apply)
             .collect::<Vec<_>>()
             .try_into()
@@ -130,7 +130,7 @@ impl<const T: usize> BitSet<T> {
         while self.is_set() {
             let bit = self.bitscan_forward();
             bits.push(bit);
-            self ^= &BitSet::<T>::from_lsb(bit);
+            self ^= BitSet::<T>::from_lsb(bit);
         }
         bits
     }

@@ -9,7 +9,7 @@ pub struct ChessCastlingRights;
 impl FenArgument for ChessCastlingRights {
     fn decode(&self, board: &mut Board, arg: &str) -> Result<(), FenDecodeError> {
         if arg == "-" {
-            board.state.first_move ^= &board.state.pieces[3];
+            board.state.first_move ^= board.state.pieces[3];
             Ok(())
         } else {
             let mut lost_castling_rights = vec!['Q', 'K', 'q', 'k'];
@@ -44,10 +44,10 @@ impl FenArgument for ChessCastlingRights {
                     }
                 };
 
-                let rook = (board.state.pieces[3] & &board.state.teams[team]).bitscan(scan_dir);
+                let rook = (board.state.pieces[3] & board.state.teams[team]).bitscan(scan_dir);
                 let rook_board = BitBoard::from_lsb(rook);
 
-                board.state.first_move ^= &rook_board;
+                board.state.first_move ^= rook_board;
             }
             Ok(())
         }
@@ -56,12 +56,12 @@ impl FenArgument for ChessCastlingRights {
     fn encode(&self, board: &Board) -> String {
         let mut castling_rights: Vec<char> = Vec::with_capacity(4);
         for team in 0..board.state.teams.len() {
-            let king = board.state.pieces[5] & &board.state.teams[team] & &board.state.first_move;
+            let king = board.state.pieces[5] & board.state.teams[team] & board.state.first_move;
             if king.is_empty() {
                 continue;
             }
 
-            let rooks = board.state.pieces[3] & &board.state.teams[team] & &board.state.first_move;
+            let rooks = board.state.pieces[3] & board.state.teams[team] & board.state.first_move;
             let mut one_bits = rooks.iter_one_bits(board.state.rows * board.state.cols);
             if one_bits.len() == 1 {
                 let mut side_castling_rights = if rooks > king { 'k' } else { 'q' };
@@ -169,12 +169,12 @@ impl PostProcess for ChessPostProcess {
         let mut bottom = edges.bottom;
         let mut top = edges.top;
 
-        bottom |= &bottom.up(1, cols);
-        top |= &top.down(1, cols);
+        bottom |= bottom.up(1, cols);
+        top |= top.down(1, cols);
 
-        let first_move = (board.state.pieces[0] & &(bottom | &top))
-            | &(board.state.all_pieces ^ &board.state.pieces[0]);
-        board.state.first_move &= &first_move;
+        let first_move = (board.state.pieces[0] & (bottom | top))
+            | (board.state.all_pieces ^ board.state.pieces[0]);
+        board.state.first_move &= first_move;
     }
 
     fn duplicate(&self) -> Box<dyn PostProcess> {
@@ -187,14 +187,14 @@ impl MoveRestrictions for ChessMoveRestrictions {
     fn is_legal(&self, board: &mut Board, action: &Action) -> bool {
         let to_board = BitBoard::from_lsb(action.to);
         let kings = board.state.pieces[5];
-        if (to_board & &kings).is_set() {
+        if (to_board & kings).is_set() {
             return false;
         }
 
         let current_team = board.state.moving_team;
 
         board.make_move(action);
-        let king_board = board.state.teams[current_team as usize] & &kings;
+        let king_board = board.state.teams[current_team as usize] & kings;
         let in_check = board.is_attacking(board.state.moving_team, king_board, ATTACKS_MODE);
         board.undo_move().unwrap();
         !in_check

@@ -77,11 +77,11 @@ impl<'a> Board<'a> {
 
                 let piece_board = BitBoard::from_lsb(board_ind);
 
-                board.state.teams[team as usize] |= &piece_board;
-                board.state.pieces[piece_type] |= &piece_board;
-                board.state.all_pieces |= &piece_board;
+                board.state.teams[team as usize] |= piece_board;
+                board.state.pieces[piece_type] |= piece_board;
+                board.state.all_pieces |= piece_board;
                 if first_move {
-                    board.state.first_move |= &piece_board;
+                    board.state.first_move |= piece_board;
                 }
 
                 board_ind += 1;
@@ -114,7 +114,7 @@ impl<'a> Board<'a> {
 
             let bitboard = BitBoard::from_lsb(i);
 
-            if (self.state.all_pieces & &bitboard).is_empty() {
+            if (self.state.all_pieces & bitboard).is_empty() {
                 empty_spaces += 1;
                 continue;
             }
@@ -126,20 +126,20 @@ impl<'a> Board<'a> {
 
             let mut team = usize::MAX;
             for ind in 0..self.state.teams.len() {
-                if (self.state.teams[ind] & &bitboard).is_set() {
+                if (self.state.teams[ind] & bitboard).is_set() {
                     team = ind;
                 }
             }
 
             let mut piece_type = usize::MAX;
             for ind in 0..self.state.pieces.len() {
-                if (self.state.pieces[ind] & &bitboard).is_set() {
+                if (self.state.pieces[ind] & bitboard).is_set() {
                     piece_type = ind;
                     break;
                 }
             }
 
-            let first_move = (self.state.first_move & &bitboard).is_set();
+            let first_move = (self.state.first_move & bitboard).is_set();
 
             let mut piece_str = match self.game.pieces[piece_type].get_piece_symbol() {
                 PieceSymbol::Char(char) => {

@@ -14,14 +14,14 @@ pub fn generate_edges(buffer: EdgeBuffer, rows: Rows, cols: Cols) -> Edges {
     let top = !(BitBoard::max() << (buffer * cols) as u32);
     let bottom = BitBoard::max() << ((rows - buffer) * cols) as u32;
 
-    let mut left = BitBoard::max() & &(!(BitBoard::max() << (buffer as u32)));
+    let mut left = BitBoard::max() & (!(BitBoard::max() << (buffer as u32)));
     for _ in 1..rows {
-        left |= &(left << (cols));
+        left |= (left << (cols));
     }
 
     let right = left << (cols - buffer) as u32;
 
-    let edges = top | &bottom | &left | &right;
+    let edges = top | bottom | left | right;
 
     Edges {
         top,

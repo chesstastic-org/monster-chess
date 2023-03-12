@@ -1,18 +1,18 @@
 use super::BitSet;
 use std::ops::{Add, AddAssign, Sub, SubAssign};
 
-impl<const T: usize> Add<&BitSet<T>> for BitSet<T> {
+impl<const T: usize> Add<BitSet<T>> for BitSet<T> {
     type Output = Self;
 
-    fn add(self, rhs: &BitSet<T>) -> BitSet<T> {
+    fn add(self, rhs: BitSet<T>) -> BitSet<T> {
         let mut bitset = self.clone();
         bitset += rhs;
         bitset
     }
 }
 
-impl<const T: usize> AddAssign<&BitSet<T>> for BitSet<T> {
-    fn add_assign(&mut self, rhs: &BitSet<T>) {
+impl<const T: usize> AddAssign<BitSet<T>> for BitSet<T> {
+    fn add_assign(&mut self, rhs: BitSet<T>) {
         if T == 1 {
             self.data[0] += rhs.data[0];
             return;
@@ -22,24 +22,24 @@ impl<const T: usize> AddAssign<&BitSet<T>> for BitSet<T> {
         *self ^= rhs;
         while carry.is_set() {
             let shifted_carry = carry << 1;
-            carry = *self & &shifted_carry;
-            *self ^= &shifted_carry;
+            carry = *self & shifted_carry;
+            *self ^= shifted_carry;
         }
     }
 }
 
-impl<const T: usize> Sub<&BitSet<T>> for BitSet<T> {
+impl<const T: usize> Sub<BitSet<T>> for BitSet<T> {
     type Output = Self;
 
-    fn sub(self, rhs: &BitSet<T>) -> BitSet<T> {
+    fn sub(self, rhs: BitSet<T>) -> BitSet<T> {
         let mut bitset = self.clone();
         bitset -= rhs;
         bitset
     }
 }
 
-impl<const T: usize> SubAssign<&BitSet<T>> for BitSet<T> {
-    fn sub_assign(&mut self, rhs: &BitSet<T>) {
+impl<const T: usize> SubAssign<BitSet<T>> for BitSet<T> {
+    fn sub_assign(&mut self, rhs: BitSet<T>) {
         if T == 1 {
             self.data[0] -= rhs.data[0];
             return;
@@ -47,8 +47,8 @@ impl<const T: usize> SubAssign<&BitSet<T>> for BitSet<T> {
 
         let mut rhs = rhs.clone();
         while rhs.is_set() {
-            let borrow = !(*self) & &rhs;
-            *self ^= &rhs;
+            let borrow = !(*self) & rhs;
+            *self ^= rhs;
             rhs = borrow << 1;
         }
     }

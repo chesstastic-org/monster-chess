@@ -23,44 +23,44 @@ impl<const T: usize> ops::Not for BitSet<T> {
     }
 }
 
-impl<const T: usize> ops::BitAndAssign<&BitSet<T>> for BitSet<T> {
-    fn bitand_assign(&mut self, rhs: &BitSet<T>) {
+impl<const T: usize> ops::BitAndAssign<BitSet<T>> for BitSet<T> {
+    fn bitand_assign(&mut self, rhs: BitSet<T>) {
         self.effect(rhs, |el| el.0 & el.1)
     }
 }
 
-impl<const T: usize> ops::BitAnd<&BitSet<T>> for BitSet<T> {
+impl<const T: usize> ops::BitAnd<BitSet<T>> for BitSet<T> {
     type Output = BitSet<T>;
 
-    fn bitand(self, rhs: &BitSet<T>) -> Self::Output {
+    fn bitand(self, rhs: BitSet<T>) -> Self::Output {
         self.apply(rhs, |el| el.0 & el.1)
     }
 }
 
-impl<const T: usize> ops::BitOr<&BitSet<T>> for BitSet<T> {
+impl<const T: usize> ops::BitOr<BitSet<T>> for BitSet<T> {
     type Output = BitSet<T>;
 
-    fn bitor(self, rhs: &BitSet<T>) -> Self::Output {
+    fn bitor(self, rhs: BitSet<T>) -> Self::Output {
         self.apply(rhs, |el| el.0 | el.1)
     }
 }
 
-impl<const T: usize> ops::BitOrAssign<&BitSet<T>> for BitSet<T> {
-    fn bitor_assign(&mut self, rhs: &BitSet<T>) {
+impl<const T: usize> ops::BitOrAssign<BitSet<T>> for BitSet<T> {
+    fn bitor_assign(&mut self, rhs: BitSet<T>) {
         self.effect(rhs, |el| el.0 | el.1)
     }
 }
 
-impl<const T: usize> ops::BitXor<&BitSet<T>> for BitSet<T> {
+impl<const T: usize> ops::BitXor<BitSet<T>> for BitSet<T> {
     type Output = BitSet<T>;
 
-    fn bitxor(self, rhs: &BitSet<T>) -> Self::Output {
+    fn bitxor(self, rhs: BitSet<T>) -> Self::Output {
         self.apply(rhs, |el| el.0 ^ el.1)
     }
 }
 
-impl<const T: usize> ops::BitXorAssign<&BitSet<T>> for BitSet<T> {
-    fn bitxor_assign(&mut self, rhs: &BitSet<T>) {
+impl<const T: usize> ops::BitXorAssign<BitSet<T>> for BitSet<T> {
+    fn bitxor_assign(&mut self, rhs: BitSet<T>) {
         self.effect(rhs, |el| el.0 ^ el.1)
     }
 }
@@ -172,11 +172,11 @@ mod tests {
     #[test]
     fn and() {
         assert_eq!(
-            BitSet::from_data([1, 0]) & &BitSet::from_data([0, 1]),
+            BitSet::from_data([1, 0]) & BitSet::from_data([0, 1]),
             BitSet::from_data([0, 0])
         );
         assert_eq!(
-            BitSet::from_data([0, 1]) & &BitSet::from_data([0, 1]),
+            BitSet::from_data([0, 1]) & BitSet::from_data([0, 1]),
             BitSet::from_data([0, 1])
         );
     }
@@ -184,11 +184,11 @@ mod tests {
     #[test]
     fn or() {
         assert_eq!(
-            BitSet::from_data([1, 0]) | &BitSet::from_data([0, 1]),
+            BitSet::from_data([1, 0]) | BitSet::from_data([0, 1]),
             BitSet::from_data([1, 1])
         );
         assert_eq!(
-            BitSet::from_data([0, 1]) | &BitSet::from_data([0, 1]),
+            BitSet::from_data([0, 1]) | BitSet::from_data([0, 1]),
             BitSet::from_data([0, 1])
         );
     }
@@ -196,11 +196,11 @@ mod tests {
     #[test]
     fn xor() {
         assert_eq!(
-            BitSet::from_data([1, 0]) ^ &BitSet::from_data([0, 1]),
+            BitSet::from_data([1, 0]) ^ BitSet::from_data([0, 1]),
             BitSet::from_data([1, 1])
         );
         assert_eq!(
-            BitSet::from_data([0, 1]) ^ &BitSet::from_data([0, 1]),
+            BitSet::from_data([0, 1]) ^ BitSet::from_data([0, 1]),
             BitSet::from_data([0, 0])
         );
     }

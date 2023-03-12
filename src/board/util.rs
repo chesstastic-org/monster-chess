@@ -39,7 +39,7 @@ pub struct BoardState {
 
 impl BoardState {
     pub fn get_piece_team_board(&self, piece: usize, team: usize) -> BitBoard {
-        self.pieces[piece] & &self.teams[team]
+        self.pieces[piece] & self.teams[team]
     }
 }
 
@@ -98,11 +98,11 @@ impl<'a> Board<'a> {
         let mut bitboard = BitBoard::new();
 
         for (ind, board) in self.state.pieces.iter().enumerate() {
-            let board = *board & &self.state.teams[team as usize];
+            let board = *board & self.state.teams[team as usize];
             let piece = &self.game.pieces[ind];
 
             for bit in board.iter_one_bits(board_len as u32) {
-                bitboard |= &piece.get_moves(self, BitBoard::from_lsb(bit), ind, team, mode);
+                bitboard |= piece.get_moves(self, BitBoard::from_lsb(bit), ind, team, mode);
             }
         }
 
@@ -114,11 +114,11 @@ impl<'a> Board<'a> {
         let mut bitboard = BitBoard::new();
 
         for (ind, board) in self.state.pieces.iter().enumerate() {
-            let board = *board & &self.state.teams[team as usize];
+            let board = *board & self.state.teams[team as usize];
             let piece = &self.game.pieces[ind];
 
             for bit in board.iter_one_bits(board_len as u32) {
-                bitboard |= &piece.can_move(self, BitBoard::from_lsb(bit), ind, team, mode, to);
+                bitboard |= piece.can_move(self, BitBoard::from_lsb(bit), ind, team, mode, to);
             }
         }
 
@@ -126,7 +126,7 @@ impl<'a> Board<'a> {
     }
 
     pub fn is_attacking(&self, team: u32, target: BitBoard, mode: u32) -> bool {
-        (self.get_targeted_mask(team, mode, target) & &target).is_set()
+        (self.get_targeted_mask(team, mode, target) & target).is_set()
     }
 
     pub fn generate_moves(&self, mode: u32) -> Vec<Action> {
@@ -136,7 +136,7 @@ impl<'a> Board<'a> {
         let team = self.state.moving_team;
 
         for (ind, board) in self.state.pieces.iter().enumerate() {
-            let board = *board & &self.state.teams[team as usize];
+            let board = *board & self.state.teams[team as usize];
             let piece = &self.game.pieces[ind];
 
             for bit in board.iter_one_bits(board_len as u32) {

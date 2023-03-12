@@ -12,7 +12,7 @@ pub fn get_moves_ray(
 
     loop {
         from = slider(from);
-        moves |= &from;
+        moves |= from;
 
         if can_stop(from) {
             break;
@@ -31,7 +31,7 @@ pub fn get_ray_attacks(
     let dir_usize = dir as usize;
     let mut attacks = ray_attacks[from.bitscan_forward() as usize][dir_usize];
     let mut blocker = attacks;
-    blocker &= &board.state.all_pieces;
+    blocker &= board.state.all_pieces;
     if blocker.is_set() {
         let square = if from < blocker {
             blocker.bitscan_forward()
@@ -39,7 +39,7 @@ pub fn get_ray_attacks(
             blocker.bitscan_reverse()
         };
         
-        attacks ^= &ray_attacks[square as usize][dir_usize];
+        attacks ^= ray_attacks[square as usize][dir_usize];
     }
     return attacks;
 }
@@ -54,8 +54,8 @@ pub fn can_ray_attack(
     let dir_usize = dir as usize;
     let mut attacks = ray_attacks[from.bitscan_forward() as usize][dir_usize];
     let mut blocker = attacks;
-    blocker &= &to;
-    blocker &= &board.state.all_pieces;
+    blocker &= to;
+    blocker &= board.state.all_pieces;
     if blocker.is_empty() {
         return BitBoard::new();
     }
@@ -65,6 +65,6 @@ pub fn can_ray_attack(
         blocker.bitscan_reverse()
     };
     
-    attacks ^= &ray_attacks[square as usize][dir_usize];
+    attacks ^= ray_attacks[square as usize][dir_usize];
     return attacks;
 }

@@ -27,7 +27,7 @@ pub trait Piece {
 
     fn get_moves(&self, board: &Board, from: BitBoard, piece_type: usize, team: u32, mode: u32) -> BitBoard;
     fn can_move(&self, board: &Board, from: BitBoard, piece_type: usize, team: u32, mode: u32, to: BitBoard) -> BitBoard {
-        self.get_moves(board, from, piece_type, team, mode) & &to
+        self.get_moves(board, from, piece_type, team, mode) & to
     }
 
     #[allow(unused_variables)]
@@ -37,14 +37,14 @@ pub trait Piece {
 
     fn make_capture_move(&self, board: &mut Board, action: &Action, piece_type: usize, from: BitBoard, to: BitBoard) {
         let color: usize = action.team as usize;
-        let captured_color: usize = if (to & &board.state.teams[0]).is_set() {
+        let captured_color: usize = if (to & board.state.teams[0]).is_set() {
             0
         } else {
             1
         };
         let mut captured_piece_type: usize = 0;
         for i in 0..(board.game.pieces.len()) {
-            if (board.state.pieces[i] & &to).is_set() {
+            if (board.state.pieces[i] & to).is_set() {
                 captured_piece_type = i;
                 break;
             }
@@ -70,18 +70,18 @@ pub trait Piece {
         };
         board.state.history.push(history_move);
 
-        board.state.teams[captured_color] ^= &to;
-        board.state.teams[color] ^= &from;
-        board.state.teams[color] |= &to;
+        board.state.teams[captured_color] ^= to;
+        board.state.teams[color] ^= from;
+        board.state.teams[color] |= to;
 
-        board.state.pieces[captured_piece_type] ^= &to;
-        board.state.pieces[piece_type] ^= &from;
-        board.state.pieces[piece_type] |= &to;
+        board.state.pieces[captured_piece_type] ^= to;
+        board.state.pieces[piece_type] ^= from;
+        board.state.pieces[piece_type] |= to;
 
-        board.state.all_pieces ^= &from;
+        board.state.all_pieces ^= from;
 
-        board.state.first_move &= &!from;
-        board.state.first_move &= &!to;
+        board.state.first_move &= !from;
+        board.state.first_move &= !to;
         // We actually don't need to swap the blockers. A blocker will still exist on `to`, just not on `from`.
     }
 
@@ -102,16 +102,16 @@ pub trait Piece {
         };
         board.state.history.push(history_move);
 
-        board.state.teams[color] ^= &from;
-        board.state.teams[color] |= &to;
+        board.state.teams[color] ^= from;
+        board.state.teams[color] |= to;
 
-        board.state.pieces[piece_type] ^= &from;
-        board.state.pieces[piece_type] |= &to;
+        board.state.pieces[piece_type] ^= from;
+        board.state.pieces[piece_type] |= to;
 
-        board.state.all_pieces ^= &from;
-        board.state.all_pieces |= &to;
+        board.state.all_pieces ^= from;
+        board.state.all_pieces |= to;
 
-        board.state.first_move &= &!from;
+        board.state.first_move &= !from;
     }
 
     fn make_move(&self, board: &mut Board, action: &Action) {
@@ -176,7 +176,7 @@ pub trait Piece {
         let from_board = BitBoard::from_lsb(from);
 
         let bit_actions =
-            self.get_moves(board, from_board, piece_type, team, mode) & &!board.state.teams[team as usize];
+            self.get_moves(board, from_board, piece_type, team, mode) & !board.state.teams[team as usize];
 
         if bit_actions.is_empty() {
             return;

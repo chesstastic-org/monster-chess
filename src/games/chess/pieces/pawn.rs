@@ -80,8 +80,8 @@ impl Piece for PawnPiece {
 
         if mode == ATTACKS_MODE {
             let up_one = up(&from, 1, cols, team);
-            let mut captures = (up_one & &!edges.right).right(1);
-            captures |= &(up_one & &!edges.left).left(1);
+            let mut captures = (up_one & !edges.right).right(1);
+            captures |= (up_one & !edges.left).left(1);
 
             return captures;
         }
@@ -91,17 +91,17 @@ impl Piece for PawnPiece {
         let mut capture_requirements = board.state.all_pieces;
 
         let up_one = up(&from, 1, cols, team);
-        let mut captures = (up_one & &!edges.right).right(1);
-        captures |= &(up_one & &!edges.left).left(1);
+        let mut captures = (up_one & !edges.right).right(1);
+        captures |= (up_one & !edges.left).left(1);
 
-        let single_moves = up(&from, 1, cols, team) & &!board.state.all_pieces;
-        let first_move = (from & &board.state.first_move).is_set();
+        let single_moves = up(&from, 1, cols, team) & !board.state.all_pieces;
+        let first_move = (from & board.state.first_move).is_set();
 
-        moves |= &single_moves;
+        moves |= single_moves;
 
         if first_move {
-            let double_moves = up(&single_moves, 1, cols, team) & &!board.state.all_pieces;
-            moves |= &double_moves;
+            let double_moves = up(&single_moves, 1, cols, team) & !board.state.all_pieces;
+            moves |= double_moves;
         }
 
         if let Some(last_move) = board.state.history.last() {
@@ -109,7 +109,7 @@ impl Piece for PawnPiece {
                 && (last_move.action.to.abs_diff(last_move.action.from) == (2 * (cols)));
 
             if conditions {
-                capture_requirements |= &up(
+                capture_requirements |= up(
                     &BitBoard::from_lsb(last_move.action.from),
                     1,
                     cols,
@@ -118,23 +118,23 @@ impl Piece for PawnPiece {
             }
         }
 
-        captures &= &capture_requirements;
+        captures &= capture_requirements;
 
-        moves |= &captures;
+        moves |= captures;
 
         moves
     }
 
     fn make_capture_move(&self, board: &mut Board, action: &Action, piece_type: usize, from: BitBoard, to: BitBoard) {
         let color: usize = action.team as usize;
-        let captured_color: usize = if (to & &board.state.teams[0]).is_set() {
+        let captured_color: usize = if (to & board.state.teams[0]).is_set() {
             0
         } else {
             1
         };
         let mut captured_piece_type: usize = 0;
         for i in 0..(board.game.pieces.len()) {
-            if (board.state.pieces[i] & &to).is_set() {
+            if (board.state.pieces[i] & to).is_set() {
                 captured_piece_type = i;
                 break;
             }
@@ -171,25 +171,25 @@ impl Piece for PawnPiece {
             }
         }
 
-        board.state.teams[captured_color] ^= &to;
-        board.state.teams[color] ^= &from;
-        board.state.teams[color] |= &to;
+        board.state.teams[captured_color] ^= to;
+        board.state.teams[color] ^= from;
+        board.state.teams[color] |= to;
 
-        board.state.pieces[captured_piece_type] ^= &to;
-        board.state.pieces[piece_type] ^= &from;
+        board.state.pieces[captured_piece_type] ^= to;
+        board.state.pieces[piece_type] ^= from;
         match promotion_piece_type {
             None => {
-                board.state.pieces[piece_type] |= &to;
+                board.state.pieces[piece_type] |= to;
             }
             Some(promotion_piece_type) => {
-                board.state.pieces[promotion_piece_type] |= &to;
+                board.state.pieces[promotion_piece_type] |= to;
             }
         }
 
-        board.state.all_pieces ^= &from;
+        board.state.all_pieces ^= from;
 
-        board.state.first_move ^= &from;
-        board.state.first_move &= &!to;
+        board.state.first_move ^= from;
+        board.state.first_move &= !to;
         // We actually don't need to swap the blockers. A blocker will still exist on `to`, just not on `from`.
 
         board.state.history.push(history_move);
@@ -203,7 +203,7 @@ impl Piece for PawnPiece {
             let en_passant_target = down(&to, 1, cols, color as u32);
 
             let en_passant_target_color: usize =
-                if (en_passant_target & &board.state.teams[0]).is_set() {
+                if (en_passant_target & board.state.teams[0]).is_set() {
                     0
                 } else {
                     1
@@ -228,20 +228,20 @@ impl Piece for PawnPiece {
                 }),
             };
 
-            board.state.teams[color] ^= &from;
-            board.state.teams[color] |= &to;
-            board.state.teams[en_passant_target_color] ^= &en_passant_target;
+            board.state.teams[color] ^= from;
+            board.state.teams[color] |= to;
+            board.state.teams[en_passant_target_color] ^= en_passant_target;
 
-            board.state.pieces[piece_type] ^= &from;
-            board.state.pieces[piece_type] ^= &en_passant_target;
-            board.state.pieces[piece_type] |= &to;
+            board.state.pieces[piece_type] ^= from;
+            board.state.pieces[piece_type] ^= en_passant_target;
+            board.state.pieces[piece_type] |= to;
 
-            board.state.all_pieces ^= &from;
-            board.state.all_pieces ^= &en_passant_target;
-            board.state.all_pieces |= &to;
+            board.state.all_pieces ^= from;
+            board.state.all_pieces ^= en_passant_target;
+            board.state.all_pieces |= to;
 
-            board.state.first_move ^= &from;
-            board.state.first_move ^= &en_passant_target;
+            board.state.first_move ^= from;
+            board.state.first_move ^= en_passant_target;
 
             board.state.history.push(history_move);
             return;
@@ -274,24 +274,24 @@ impl Piece for PawnPiece {
             }
         }
 
-        board.state.teams[color] ^= &from;
-        board.state.teams[color] |= &to;
+        board.state.teams[color] ^= from;
+        board.state.teams[color] |= to;
 
-        board.state.pieces[piece_type] ^= &from;
+        board.state.pieces[piece_type] ^= from;
         match promotion_piece_type {
             None => {
-                board.state.pieces[piece_type] |= &to;
+                board.state.pieces[piece_type] |= to;
             }
             Some(promotion_piece_type) => {
-                board.state.pieces[promotion_piece_type] |= &to;
+                board.state.pieces[promotion_piece_type] |= to;
             }
         }
 
-        board.state.all_pieces ^= &from;
-        board.state.all_pieces |= &to;
+        board.state.all_pieces ^= from;
+        board.state.all_pieces |= to;
 
-        board.state.first_move ^= &from;
-        board.state.first_move &= &!to;
+        board.state.first_move ^= from;
+        board.state.first_move &= !to;
 
         board.state.history.push(history_move);
     }
@@ -305,11 +305,11 @@ impl Piece for PawnPiece {
         team: u32,
         mode: u32,
     ) {
-        let promotion_rows = board.state.edges[0].bottom | &board.state.edges[0].top;
+        let promotion_rows = board.state.edges[0].bottom | board.state.edges[0].top;
 
         let from_board = BitBoard::from_lsb(from);
         let bit_actions =
-            self.get_moves(board, from_board, piece_type, team, mode) & &!board.state.teams[team as usize];
+            self.get_moves(board, from_board, piece_type, team, mode) & !board.state.teams[team as usize];
 
         if bit_actions.is_empty() {
             return;
@@ -321,7 +321,7 @@ impl Piece for PawnPiece {
         let piece_types = board.game.pieces.len();
 
         for bit in bit_actions.iter_one_bits((rows * cols) as u32) {
-            if (BitBoard::from_lsb(bit) & &promotion_rows).is_set() {
+            if (BitBoard::from_lsb(bit) & promotion_rows).is_set() {
                 for promotion_piece_type in 0..piece_types {
                     if promotion_piece_type == 0 {
                         continue;
