@@ -79,9 +79,18 @@ impl Piece for PawnPiece {
     }
 
     fn get_moves(&self, board: &Board, from: BitBoard, piece_type: usize, team: u32, mode: u32) -> BitBoard {
-        let mut moves = BitBoard::new();
         let cols = board.state.cols;
         let edges = &board.state.edges[0];
+
+        if mode == ATTACKS_MODE {
+            let up_one = up(&from, 1, cols, team);
+            let mut captures = (up_one & &!edges.right).right(1);
+            captures |= &(up_one & &!edges.left).left(1);
+
+            return captures;
+        }
+        
+        let mut moves = BitBoard::new();
 
         let mut capture_requirements = board.state.all_pieces;
 
@@ -89,31 +98,27 @@ impl Piece for PawnPiece {
         let mut captures = (up_one & &!edges.right).right(1);
         captures |= &(up_one & &!edges.left).left(1);
 
-        if mode == ATTACKS_MODE {
-            capture_requirements = BitBoard::max();
-        } else {
-            let single_moves = up(&from, 1, cols, team) & &!board.state.all_pieces;
-            let first_move = (from & &board.state.first_move).is_set();
-    
-            moves |= &single_moves;
-    
-            if first_move {
-                let double_moves = up(&single_moves, 1, cols, team) & &!board.state.all_pieces;
-                moves |= &double_moves;
-            }
+        let single_moves = up(&from, 1, cols, team) & &!board.state.all_pieces;
+        let first_move = (from & &board.state.first_move).is_set();
 
-            if let Some(last_move) = board.state.history.last() {
-                let conditions = last_move.action.piece_type == 0
-                    && (last_move.action.to.abs_diff(last_move.action.from) == (2 * (cols)));
-    
-                if conditions {
-                    capture_requirements |= &up(
-                        &BitBoard::from_lsb(last_move.action.from),
-                        1,
-                        cols,
-                        board.get_next_team(team),
-                    );
-                }
+        moves |= &single_moves;
+
+        if first_move {
+            let double_moves = up(&single_moves, 1, cols, team) & &!board.state.all_pieces;
+            moves |= &double_moves;
+        }
+
+        if let Some(last_move) = board.state.history.last() {
+            let conditions = last_move.action.piece_type == 0
+                && (last_move.action.to.abs_diff(last_move.action.from) == (2 * (cols)));
+
+            if conditions {
+                capture_requirements |= &up(
+                    &BitBoard::from_lsb(last_move.action.from),
+                    1,
+                    cols,
+                    board.get_next_team(team),
+                );
             }
         }
 
@@ -262,7 +267,7 @@ impl Piece for PawnPiece {
         };
 
         let mut promotion_piece_type: Option<usize> = None;
-        if action.info >= 2 {
+        if action.info > 3 {
             let promotion_type = action.info - 2;
             promotion_piece_type = Some(promotion_type);
             if let Some(state) = &mut history_move.state {

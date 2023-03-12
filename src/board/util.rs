@@ -152,19 +152,14 @@ impl Board {
     */
     pub fn generate_legal_moves(&mut self, mode: u32) -> Vec<Action> {
         let moves = self.generate_moves(mode);
-        let game_restrictions = self.game.move_restrictions.duplicate();
         let mut legal_moves = Vec::with_capacity(moves.len());
+        let move_restrictions = self.game.move_restrictions.duplicate();
         for action in moves {
-            if game_restrictions.is_legal(self, &action) {
+            if move_restrictions.is_legal(self, &action) {
                 legal_moves.push(action);
             }
         }
         legal_moves
-        /*moves
-            .iter()
-            .map(|el| el.clone())
-            .filter(|el| game_restrictions.is_legal(self, el))
-            .collect::<Vec<_>>()*/
     }
 
     pub fn get_next_team(&self, mut team: u32) -> u32 {

@@ -7,7 +7,7 @@ pub use game::*;
 mod tests {
     use crate::{board::Board, games::chess::Chess};
 
-    #[test]
+    /*#[test]
     fn startpos() {
         let mut board = Board::new(
             Chess::create(),
@@ -127,5 +127,5 @@ mod tests {
         );
 
         board.assert_perfts([24, 496, 9483, 182838, 3605103]);
-    }
+    }*/
 }

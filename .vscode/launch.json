@@ -1,0 +1,83 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'monster_chess'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=monster_chess"
+                ],
+                "filter": {
+                    "name": "monster_chess",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'monster_chess'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=monster_chess",
+                    "--package=monster_chess"
+                ],
+                "filter": {
+                    "name": "monster_chess",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'monster_chess'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=monster_chess",
+                    "--package=monster_chess"
+                ],
+                "filter": {
+                    "name": "monster_chess",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug benchmark 'chess-perft'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bench=chess-perft",
+                    "--package=monster_chess"
+                ],
+                "filter": {
+                    "name": "chess-perft",
+                    "kind": "bench"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}

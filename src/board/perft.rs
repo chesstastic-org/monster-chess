@@ -27,7 +27,7 @@ impl Board {
         }
 
         let mut nodes = 0;
-        for node in self.generate_legal_moves(0) {
+        for node in self.generate_moves(0) {
             self.make_move(&node);
             nodes += self.sub_perft(depth - 1);
             self.undo_move().unwrap();
