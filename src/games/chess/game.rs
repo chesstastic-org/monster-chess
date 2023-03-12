@@ -186,14 +186,15 @@ pub struct ChessMoveRestrictions;
 impl MoveRestrictions for ChessMoveRestrictions {
     fn is_legal(&self, board: &mut Board, action: &Action) -> bool {
         let to_board = BitBoard::from_lsb(action.to);
-        if (to_board & &board.state.pieces[5]).is_set() {
+        let kings = board.state.pieces[5];
+        if (to_board & &kings).is_set() {
             return false;
         }
 
         let current_team = board.state.moving_team;
 
         board.make_move(action);
-        let king_board = board.state.teams[current_team as usize] & &board.state.pieces[5];
+        let king_board = board.state.teams[current_team as usize] & &kings;
         let in_check = board.is_attacking(board.state.moving_team, king_board, ATTACKS_MODE);
         board.undo_move().unwrap();
         !in_check
