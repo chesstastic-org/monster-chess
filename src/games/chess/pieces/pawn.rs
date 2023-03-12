@@ -142,22 +142,24 @@ impl Piece for PawnPiece {
 
         let mut history_move = HistoryMove {
             action: *action,
-            state: HistoryState::Any(vec![
-                HistoryUpdate::Team(IndexedPreviousBoard(color, board.state.teams[color])),
-                HistoryUpdate::Team(IndexedPreviousBoard(captured_color, board.state.teams[captured_color])),
-                HistoryUpdate::Piece(IndexedPreviousBoard(piece_type, board.state.pieces[piece_type])),
-                HistoryUpdate::Piece(IndexedPreviousBoard(captured_piece_type, board.state.pieces[captured_piece_type])),
-                HistoryUpdate::AllPieces(PreviousBoard(board.state.all_pieces)),
-                HistoryUpdate::FirstMove(PreviousBoard(board.state.first_move))
-            ])
+            state: HistoryState::Any {
+                all_pieces: PreviousBoard(board.state.all_pieces),
+                first_move: PreviousBoard(board.state.first_move),
+                updates: vec![                    
+                    HistoryUpdate::Team(IndexedPreviousBoard(color, board.state.teams[color])),
+                    HistoryUpdate::Team(IndexedPreviousBoard(captured_color, board.state.teams[captured_color])),
+                    HistoryUpdate::Piece(IndexedPreviousBoard(piece_type, board.state.pieces[piece_type])),
+                    HistoryUpdate::Piece(IndexedPreviousBoard(captured_piece_type, board.state.pieces[captured_piece_type])),
+                ]
+            }
         };
 
         let mut promotion_piece_type: Option<usize> = None;
         if action.info >= 2 {
             let promotion_type = action.info - 2;
             promotion_piece_type = Some(promotion_type);
-            if let HistoryState::Any(state) = &mut history_move.state {
-                state.push(HistoryUpdate::Piece(IndexedPreviousBoard(
+            if let HistoryState::Any { updates, .. } = &mut history_move.state {
+                updates.push(HistoryUpdate::Piece(IndexedPreviousBoard(
                     promotion_type,
                     board.state.pieces[promotion_type],
                 )));
@@ -204,13 +206,15 @@ impl Piece for PawnPiece {
 
             let history_move = HistoryMove {
                 action: *action,
-                state: HistoryState::Any(vec![
-                    HistoryUpdate::Team(IndexedPreviousBoard(color, board.state.teams[color])),
-                    HistoryUpdate::Team(IndexedPreviousBoard(en_passant_target_color, board.state.teams[en_passant_target_color])),
-                    HistoryUpdate::Piece(IndexedPreviousBoard(piece_type, board.state.pieces[piece_type])),
-                    HistoryUpdate::AllPieces(PreviousBoard(board.state.all_pieces)),
-                    HistoryUpdate::FirstMove(PreviousBoard(board.state.first_move))
-                ])
+                state: HistoryState::Any {
+                    all_pieces: PreviousBoard(board.state.all_pieces),
+                    first_move: PreviousBoard(board.state.first_move),
+                    updates: vec![                    
+                        HistoryUpdate::Team(IndexedPreviousBoard(color, board.state.teams[color])),
+                        HistoryUpdate::Team(IndexedPreviousBoard(en_passant_target_color, board.state.teams[en_passant_target_color])),
+                        HistoryUpdate::Piece(IndexedPreviousBoard(piece_type, board.state.pieces[piece_type])),
+                    ]
+                }
             };
 
             board.state.teams[color] ^= from;
@@ -249,13 +253,15 @@ impl Piece for PawnPiece {
             let promotion_type = action.info - 2;
             promotion_piece_type = Some(promotion_type);
             if let HistoryState::Single { .. } = history_move.state {
-                history_move.state = HistoryState::Any(vec![
-                    HistoryUpdate::Team(IndexedPreviousBoard(color, board.state.teams[color])),
-                    HistoryUpdate::Piece(IndexedPreviousBoard(piece_type, board.state.pieces[piece_type])),
-                    HistoryUpdate::Piece(IndexedPreviousBoard(promotion_type, board.state.pieces[promotion_type])),
-                    HistoryUpdate::AllPieces(PreviousBoard(board.state.all_pieces)),
-                    HistoryUpdate::FirstMove(PreviousBoard(board.state.first_move))
-                ]);
+                history_move.state = HistoryState::Any {
+                    first_move: PreviousBoard(board.state.all_pieces),
+                    all_pieces: PreviousBoard(board.state.all_pieces),
+                    updates: vec![
+                        HistoryUpdate::Team(IndexedPreviousBoard(color, board.state.teams[color])),
+                        HistoryUpdate::Piece(IndexedPreviousBoard(piece_type, board.state.pieces[piece_type])),
+                        HistoryUpdate::Piece(IndexedPreviousBoard(promotion_type, board.state.pieces[promotion_type]))
+                    ]
+                }
             }
         }
 

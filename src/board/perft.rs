@@ -30,7 +30,7 @@ impl<'a> Board<'a> {
         for node in self.generate_moves(0) {
             self.make_move(&node);
             nodes += self.sub_perft(depth - 1);
-            self.undo_move().unwrap();
+            self.undo_move();
         }
 
         nodes
@@ -73,7 +73,7 @@ impl<'a> Board<'a> {
                 ),
                 results,
             ));
-            self.undo_move().unwrap();
+            self.undo_move();
         }
 
         PerftResults { nodes, branches }

@@ -186,14 +186,11 @@ impl<'a> Board<'a> {
     }
 
     pub fn undo_move(&mut self) -> Result<(), UndoMoveError> {
-        let history_move = self.state.history.pop();
-        match history_move {
-            Some(history_move) => {
-                self.game.pieces[history_move.action.piece_type].undo_move(self, history_move);
-            }
-            None => return Err(UndoMoveError::NoHistoryMoves),
+        if let Some(history_move) = self.state.history.pop() {
+            self.game.pieces[history_move.action.piece_type].undo_move(self, history_move);
+            Ok(())
+        } else {
+            Err(UndoMoveError::NoHistoryMoves)
         }
-
-        Ok(())
     }
 }

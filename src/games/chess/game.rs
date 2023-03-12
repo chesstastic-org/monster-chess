@@ -196,7 +196,7 @@ impl MoveRestrictions for ChessMoveRestrictions {
         board.make_move(action);
         let king_board = board.state.teams[current_team as usize] & kings;
         let in_check = board.is_attacking(board.state.moving_team, king_board, ATTACKS_MODE);
-        board.undo_move().unwrap();
+        board.undo_move();
         !in_check
     }
 

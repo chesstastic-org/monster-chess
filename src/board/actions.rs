@@ -29,8 +29,6 @@ pub struct IndexedPreviousBoard(pub usize, pub BitBoard);
 
 #[derive(Clone, Copy, Debug)]
 pub enum HistoryUpdate {
-    AllPieces(PreviousBoard),
-    FirstMove(PreviousBoard),
     Team(IndexedPreviousBoard),
     Piece(IndexedPreviousBoard)
 }
@@ -40,7 +38,11 @@ pub enum HistoryState {
     /*
         This is when we want to a less common change where we effect many more bitboards then can be predicted. Avoid this when possible. 
     */
-    Any(Vec<HistoryUpdate>),
+    Any {
+        all_pieces: PreviousBoard,
+        first_move: PreviousBoard,
+        updates: Vec<HistoryUpdate>
+    },
     /*
         This is a change that only applies to one piece of one specific team, like moving a piece to a new square without capturing. Use this when possible for performancce.
     */

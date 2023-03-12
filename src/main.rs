@@ -24,7 +24,7 @@ fn main() {
     );
 
     let start = get_time_ms();
-    let nodes = board.sub_perft(6);
+    let nodes = board.sub_perft(5);
     let end = get_time_ms();
     println!("{}: {nodes}", end - start);
 }
