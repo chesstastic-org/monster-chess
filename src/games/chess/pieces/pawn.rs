@@ -238,7 +238,7 @@ impl Piece for PawnPiece {
 
         let color: usize = action.team as usize;
 
-        let mut history_move = HistoryMove {
+        board.state.history.push(HistoryMove {
             action: *action,
             state: HistoryState::Single {
                 team: IndexedPreviousBoard(color, board.state.teams[color]),
@@ -246,45 +246,35 @@ impl Piece for PawnPiece {
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 first_move: PreviousBoard(board.state.first_move)
             }
-        };
+        });
 
-        let mut promotion_piece_type: Option<usize> = None;
         if action.info > 3 {
             let promotion_type = action.info - 2;
-            promotion_piece_type = Some(promotion_type);
-            if let HistoryState::Single { .. } = history_move.state {
-                history_move.state = HistoryState::Any {
-                    first_move: PreviousBoard(board.state.all_pieces),
-                    all_pieces: PreviousBoard(board.state.all_pieces),
-                    updates: vec![
-                        HistoryUpdate::Team(IndexedPreviousBoard(color, board.state.teams[color])),
-                        HistoryUpdate::Piece(IndexedPreviousBoard(piece_type, board.state.pieces[piece_type])),
-                        HistoryUpdate::Piece(IndexedPreviousBoard(promotion_type, board.state.pieces[promotion_type]))
-                    ]
-                }
-            }
+            let history_state = &mut board.state.history.last_mut().unwrap().state;
+            *history_state = HistoryState::Any {
+                first_move: PreviousBoard(board.state.all_pieces),
+                all_pieces: PreviousBoard(board.state.all_pieces),
+                updates: vec![
+                    HistoryUpdate::Team(IndexedPreviousBoard(color, board.state.teams[color])),
+                    HistoryUpdate::Piece(IndexedPreviousBoard(piece_type, board.state.pieces[piece_type])),
+                    HistoryUpdate::Piece(IndexedPreviousBoard(promotion_type, board.state.pieces[promotion_type]))
+                ]
+            };
+            board.state.pieces[promotion_type] |= to;
+        } else {
+            board.state.pieces[piece_type] |= to;
         }
 
         board.state.teams[color] ^= from;
         board.state.teams[color] |= to;
 
         board.state.pieces[piece_type] ^= from;
-        match promotion_piece_type {
-            None => {
-                board.state.pieces[piece_type] |= to;
-            }
-            Some(promotion_piece_type) => {
-                board.state.pieces[promotion_piece_type] |= to;
-            }
-        }
 
         board.state.all_pieces ^= from;
         board.state.all_pieces |= to;
 
         board.state.first_move ^= from;
         board.state.first_move &= !to;
-
-        board.state.history.push(history_move);
     }
 
     fn add_actions(
