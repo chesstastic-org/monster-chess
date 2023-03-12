@@ -10,7 +10,6 @@ const NORMAL_MOVE: usize = 0;
 pub trait Piece {
     fn duplicate(&self) -> Box<dyn Piece>;
 
-    fn get_piece_type(&self) -> PieceType;
     fn get_piece_symbol(&self) -> PieceSymbol;
 
     fn format_info(&self, board: &Board, info: u32) -> String {
@@ -22,13 +21,13 @@ pub trait Piece {
 
     fn can_lookup(&self) -> bool;
 
-    fn get_attack_lookup<'a>(&self, board: &'a Board) -> Option<&'a AttackLookup> {
-        board.attack_lookup.get(self.get_piece_type())
+    fn get_attack_lookup<'a>(&self, board: &'a Board, piece_type: usize) -> Option<&'a AttackLookup> {
+        board.attack_lookup.get(piece_type)
     }
 
-    fn get_moves(&self, board: &Board, from: BitBoard, team: u32, mode: u32) -> BitBoard;
-    fn can_move(&self, board: &Board, from: BitBoard, team: u32, mode: u32, to: BitBoard) -> BitBoard {
-        self.get_moves(board, from, team, mode) & &to
+    fn get_moves(&self, board: &Board, from: BitBoard, piece_type: usize, team: u32, mode: u32) -> BitBoard;
+    fn can_move(&self, board: &Board, from: BitBoard, piece_type: usize, team: u32, mode: u32, to: BitBoard) -> BitBoard {
+        self.get_moves(board, from, piece_type, team, mode) & &to
     }
 
     #[allow(unused_variables)]
@@ -36,14 +35,13 @@ pub trait Piece {
         Vec::new()
     }
 
-    fn make_capture_move(&self, board: &mut Board, action: &Action, from: BitBoard, to: BitBoard) {
+    fn make_capture_move(&self, board: &mut Board, action: &Action, piece_type: usize, from: BitBoard, to: BitBoard) {
         let color: usize = action.team as usize;
         let captured_color: usize = if (to & &board.state.teams[0]).is_set() {
             0
         } else {
             1
         };
-        let piece_type = self.get_piece_type();
         let mut captured_piece_type: usize = 0;
         for i in 0..(board.game.pieces.len()) {
             if (board.state.pieces[i] & &to).is_set() {
@@ -87,9 +85,8 @@ pub trait Piece {
         // We actually don't need to swap the blockers. A blocker will still exist on `to`, just not on `from`.
     }
 
-    fn make_normal_move(&self, board: &mut Board, action: &Action, from: BitBoard, to: BitBoard) {
+    fn make_normal_move(&self, board: &mut Board, action: &Action, piece_type: usize, from: BitBoard, to: BitBoard) {
         let color: usize = action.team as usize;
-        let piece_type = self.get_piece_type();
 
         let history_move = HistoryMove {
             action: *action,
@@ -122,9 +119,9 @@ pub trait Piece {
         let to = BitBoard::from_lsb(action.to);
 
         if board.state.all_pieces.has_bit(action.to) {
-            self.make_capture_move(board, action, from, to);
+            self.make_capture_move(board, action, action.piece_type, from, to);
         } else {
-            self.make_normal_move(board, action, from, to);
+            self.make_normal_move(board, action, action.piece_type, from, to);
         }
 
         board.state.current_turn += 1;
@@ -170,12 +167,12 @@ pub trait Piece {
     fn add_actions(
         &self,
         actions: &mut Vec<Action>,
-        board: &Board,
+        board: &Board, 
+        piece_type: usize,
         from: u32,
         team: u32,
-        mode: u32,
+        mode: u32
     ) {
-        let piece_type = self.get_piece_type();
         let from_board = BitBoard::from_lsb(from);
 
         let bit_actions =

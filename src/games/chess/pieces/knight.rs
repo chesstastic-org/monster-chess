@@ -76,13 +76,9 @@ impl Piece for KnightPiece {
         true
     }
 
-    fn get_piece_type(&self) -> PieceType {
-        self.piece_type
-    }
-
     #[allow(unused_variables)]
-    fn get_moves(&self, board: &Board, from: BitBoard, team: u32, mode: u32) -> BitBoard {
-        let lookup = self.get_attack_lookup(board);
+    fn get_moves(&self, board: &Board, from: BitBoard, piece_type: usize, team: u32, mode: u32) -> BitBoard {
+        let lookup = self.get_attack_lookup(board, piece_type);
         match lookup {
             Some(lookup) => lookup[from.bitscan_reverse() as usize][0],
             None => self.generate_lookup_moves(board, from)[0],

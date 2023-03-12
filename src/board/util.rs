@@ -102,7 +102,7 @@ impl Board {
             let piece = &self.game.pieces[ind];
 
             for bit in board.iter_one_bits(board_len as u32) {
-                bitboard |= &piece.get_moves(self, BitBoard::from_lsb(bit), team, mode);
+                bitboard |= &piece.get_moves(self, BitBoard::from_lsb(bit), ind, team, mode);
             }
         }
 
@@ -118,7 +118,7 @@ impl Board {
             let piece = &self.game.pieces[ind];
 
             for bit in board.iter_one_bits(board_len as u32) {
-                bitboard |= &piece.can_move(self, BitBoard::from_lsb(bit), team, mode, to);
+                bitboard |= &piece.can_move(self, BitBoard::from_lsb(bit), ind, team, mode, to);
             }
         }
 
@@ -140,7 +140,7 @@ impl Board {
             let piece = &self.game.pieces[ind];
 
             for bit in board.iter_one_bits(board_len as u32) {
-                piece.add_actions(&mut actions, self, bit, team, mode);
+                piece.add_actions(&mut actions, self, ind, bit, team, mode);
             }
         }
 

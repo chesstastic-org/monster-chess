@@ -50,7 +50,7 @@ impl KingPiece {
         };
 
         let color: usize = action.team as usize;
-        let piece_type = self.get_piece_type();
+        let piece_type = action.piece_type;
 
         let history_move = HistoryMove {
             action: *action,
@@ -128,20 +128,16 @@ impl Piece for KingPiece {
         true
     }
 
-    fn get_piece_type(&self) -> PieceType {
-        self.piece_type
-    }
-
     #[allow(unused_variables)]
-    fn get_moves(&self, board: &Board, from: BitBoard, team: u32, mode: u32) -> BitBoard {
-        let lookup = self.get_attack_lookup(board);
+    fn get_moves(&self, board: &Board, from: BitBoard, piece_type: usize, team: u32, mode: u32) -> BitBoard {
+        let lookup = self.get_attack_lookup(board, piece_type);
         match lookup {
             Some(lookup) => lookup[from.bitscan_reverse() as usize][0],
             None => self.generate_lookup_moves(board, from)[0],
         }
     }
 
-    fn make_capture_move(&self, board: &mut Board, action: &Action, from: BitBoard, to: BitBoard) {
+    fn make_capture_move(&self, board: &mut Board, action: &Action, piece_type: usize, from: BitBoard, to: BitBoard) {
         if action.info == CASTLING_MOVE {
             self.make_castling_move(board, action, from, to);
 
@@ -154,7 +150,6 @@ impl Piece for KingPiece {
         } else {
             1
         };
-        let piece_type = self.get_piece_type();
         let mut captured_piece_type: usize = 0;
         for i in 0..(board.game.pieces.len()) {
             if (board.state.pieces[i] & &to).is_set() {
@@ -201,7 +196,8 @@ impl Piece for KingPiece {
     fn add_actions(
         &self,
         actions: &mut Vec<Action>,
-        board: &Board,
+        board: &Board, 
+        piece_type: usize,
         from: u32,
         team: u32,
         mode: u32,
@@ -210,10 +206,9 @@ impl Piece for KingPiece {
         let cols = board.state.cols;
         let board_len = rows * cols;
 
-        let piece_type = self.get_piece_type();
         let from_board = BitBoard::from_lsb(from);
         let bit_actions =
-            self.get_moves(board, from_board, team, mode) & &!board.state.teams[team as usize];
+            self.get_moves(board, from_board, piece_type, team, mode) & &!board.state.teams[team as usize];
 
         if bit_actions.is_empty() {
             return;

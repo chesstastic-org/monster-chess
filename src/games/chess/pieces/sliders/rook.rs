@@ -48,14 +48,10 @@ impl Piece for RookPiece {
         true
     }
 
-    fn get_piece_type(&self) -> PieceType {
-        self.piece_type
-    }
-
     #[allow(unused_variables)]
-    fn can_move(&self, board: &Board, from: BitBoard, team: u32, mode: u32, to: BitBoard) -> BitBoard {
+    fn can_move(&self, board: &Board, from: BitBoard, piece_type: usize, team: u32, mode: u32, to: BitBoard) -> BitBoard {
         let lookup = self
-            .get_attack_lookup(board)
+            .get_attack_lookup(board, piece_type)
             .expect("Could not find the queen attack lookup.");
         let mut attacks = BitBoard::new();
 
@@ -67,9 +63,9 @@ impl Piece for RookPiece {
     }
 
     #[allow(unused_variables)]
-    fn get_moves(&self, board: &Board, from: BitBoard, team: u32, mode: u32) -> BitBoard {
+    fn get_moves(&self, board: &Board, from: BitBoard, piece_type: usize, team: u32, mode: u32) -> BitBoard {
         let lookup = self
-            .get_attack_lookup(board)
+            .get_attack_lookup(board, piece_type)
             .expect("Could not find the queen attack lookup.");
         let mut attacks = BitBoard::new();
 

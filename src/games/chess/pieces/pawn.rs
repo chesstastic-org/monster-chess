@@ -65,10 +65,6 @@ impl Piece for PawnPiece {
         }
     }
 
-    fn get_piece_type(&self) -> PieceType {
-        self.piece_type
-    }
-
     fn format_info(&self, board: &Board, info: u32) -> String {
         if info > 1 {
             let piece_trait = &board.game.pieces[(info as usize) - 2];
@@ -82,7 +78,7 @@ impl Piece for PawnPiece {
         }
     }
 
-    fn get_moves(&self, board: &Board, from: BitBoard, team: u32, mode: u32) -> BitBoard {
+    fn get_moves(&self, board: &Board, from: BitBoard, piece_type: usize, team: u32, mode: u32) -> BitBoard {
         let mut moves = BitBoard::new();
         let cols = board.state.cols;
         let edges = &board.state.edges[0];
@@ -128,14 +124,13 @@ impl Piece for PawnPiece {
         moves
     }
 
-    fn make_capture_move(&self, board: &mut Board, action: &Action, from: BitBoard, to: BitBoard) {
+    fn make_capture_move(&self, board: &mut Board, action: &Action, piece_type: usize, from: BitBoard, to: BitBoard) {
         let color: usize = action.team as usize;
         let captured_color: usize = if (to & &board.state.teams[0]).is_set() {
             0
         } else {
             1
         };
-        let piece_type = self.get_piece_type();
         let mut captured_piece_type: usize = 0;
         for i in 0..(board.game.pieces.len()) {
             if (board.state.pieces[i] & &to).is_set() {
@@ -199,12 +194,11 @@ impl Piece for PawnPiece {
         board.state.history.push(history_move);
     }
 
-    fn make_normal_move(&self, board: &mut Board, action: &Action, from: BitBoard, to: BitBoard) {
+    fn make_normal_move(&self, board: &mut Board, action: &Action, piece_type: usize, from: BitBoard, to: BitBoard) {
         if action.info == EN_PASSANT_MOVE {
             let cols = board.state.cols;
 
             let color: usize = action.team as usize;
-            let piece_type = self.get_piece_type();
             let en_passant_target = down(&to, 1, cols, color as u32);
 
             let en_passant_target_color: usize =
@@ -253,7 +247,6 @@ impl Piece for PawnPiece {
         }
 
         let color: usize = action.team as usize;
-        let piece_type = self.get_piece_type();
 
         let mut history_move = HistoryMove {
             action: *action,
@@ -306,16 +299,16 @@ impl Piece for PawnPiece {
         &self,
         actions: &mut Vec<Action>,
         board: &Board,
-        from: u32,
+        piece_type: usize,
+        from: u32, 
         team: u32,
         mode: u32,
     ) {
-        let piece_type = self.get_piece_type();
         let promotion_rows = board.state.edges[0].bottom | &board.state.edges[0].top;
 
         let from_board = BitBoard::from_lsb(from);
         let bit_actions =
-            self.get_moves(board, from_board, team, mode) & &!board.state.teams[team as usize];
+            self.get_moves(board, from_board, piece_type, team, mode) & &!board.state.teams[team as usize];
 
         if bit_actions.is_empty() {
             return;
