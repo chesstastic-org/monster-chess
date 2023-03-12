@@ -79,7 +79,7 @@ impl<'a> Board<'a> {
                 edges: generate_edge_list(rows, cols),
                 cols,
                 rows,
-                history: vec![],
+                history: Vec::with_capacity(1000),
                 moving_team: 0,
                 current_turn: 0,
                 full_moves: 0,

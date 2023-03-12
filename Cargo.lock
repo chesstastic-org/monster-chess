@@ -538,6 +538,7 @@ dependencies = [
  "criterion",
  "flamegraph",
  "shell-words",
+ "smallvec",
 ]
 
 [[package]]
