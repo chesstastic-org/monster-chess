@@ -261,14 +261,12 @@ impl Piece for PawnPiece {
                 ]
             };
             board.state.pieces[promotion_type] |= to;
+            board.state.pieces[piece_type] ^= from;
         } else {
-            board.state.pieces[piece_type] |= to;
+            board.state.pieces[piece_type] = (board.state.pieces[piece_type] ^ from) | to;
         }
 
-        board.state.teams[color] ^= from;
-        board.state.teams[color] |= to;
-
-        board.state.pieces[piece_type] ^= from;
+        board.state.teams[color] = (board.state.teams[color] ^ from) | to;
 
         board.state.all_pieces ^= from;
         board.state.all_pieces |= to;
@@ -296,7 +294,6 @@ impl Piece for PawnPiece {
             return;
         }
 
-        let rows = board.state.rows;
         let cols = board.state.cols;
 
         let piece_types = board.game.pieces.len();
