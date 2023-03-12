@@ -6,12 +6,12 @@ impl<const T: usize> ops::Not for BitSet<T> {
 
     fn not(self) -> Self::Output {
         if T == 1 {
-            return BitSet { data: [ !self.data[0]; T ] };
+            return BitSet { bits: [ !self.bits[0]; T ] };
         }
 
         BitSet::<T> {
-            data: self
-                .data
+            bits: self
+                .bits
                 .iter()
                 .map(|el| !el)
                 .collect::<Vec<_>>()
@@ -71,7 +71,7 @@ impl<const T: usize> ops::Shl<u32> for BitSet<T> {
     fn shl(self, rhs: u32) -> Self::Output {
         if T == 1 {
             return BitSet {
-                data: [self.data[0] << rhs; T],
+                bits: [self.bits[0] << rhs; T],
             };
         }
 
@@ -85,7 +85,7 @@ impl<const T: usize> ops::Shl<u32> for BitSet<T> {
 impl<const T: usize> ops::ShlAssign<u32> for BitSet<T> {
     fn shl_assign(&mut self, mut rhs: u32) {
         if T == 1 {
-            self.data = [self.data[0] << rhs; T];
+            self.bits = [self.bits[0] << rhs; T];
             return;
         }
 
@@ -96,13 +96,13 @@ impl<const T: usize> ops::ShlAssign<u32> for BitSet<T> {
 
         let mask: u128 = u128::MAX - ((1 << (128 - rhs)) - 1); // Mask to get last `rhs` bits of integer (starting from LSB)
         for i in 0..T {
-            let bits = (self.data[i] & mask) >> (128 - rhs); // Apply mask and shift the bits over to be the first bits of the integer
-            self.data[i] = self.data[i] << rhs;
+            let bits = (self.bits[i] & mask) >> (128 - rhs); // Apply mask and shift the bits over to be the first bits of the integer
+            self.bits[i] = self.bits[i] << rhs;
             if i == 0 {
                 continue;
             }
 
-            self.data[i - 1] |= bits;
+            self.bits[i - 1] |= bits;
         }
     }
 }
@@ -113,7 +113,7 @@ impl<const T: usize> ops::Shr<u32> for BitSet<T> {
     fn shr(self, rhs: u32) -> Self::Output {
         if T == 1 {
             return BitSet {
-                data: [self.data[0] >> rhs; T],
+                bits: [self.bits[0] >> rhs; T],
             };
         }
 
@@ -127,7 +127,7 @@ impl<const T: usize> ops::Shr<u32> for BitSet<T> {
 impl<const T: usize> ops::ShrAssign<u32> for BitSet<T> {
     fn shr_assign(&mut self, mut rhs: u32) {
         if T == 1 {
-            self.data = [self.data[0] >> rhs; T];
+            self.bits = [self.bits[0] >> rhs; T];
             return;
         }
 
@@ -138,13 +138,13 @@ impl<const T: usize> ops::ShrAssign<u32> for BitSet<T> {
 
         let mask: u128 = (1 << rhs) - 1; // Mask to get first `rhs` bits of integer (starting from LSB)
         for i in (0..T).rev() {
-            let bits = (self.data[i] & mask) << (128 - rhs); // Apply mask and shift the bits over to be the last bits of the integer
-            self.data[i] = self.data[i] >> rhs;
+            let bits = (self.bits[i] & mask) << (128 - rhs); // Apply mask and shift the bits over to be the last bits of the integer
+            self.bits[i] = self.bits[i] >> rhs;
             if i == T - 1 {
                 continue;
             }
 
-            self.data[i + 1] |= bits;
+            self.bits[i + 1] |= bits;
         }
     }
 }

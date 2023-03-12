@@ -2,8 +2,9 @@ use monster_chess::{games::chess::Chess, board::Board};
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
 fn startpos(depth: u32) {
+    let game = Chess::create();
     let mut board = Board::new(
-        Chess::create(),
+        &game,
         2,
         (8, 8),
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",

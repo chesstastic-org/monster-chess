@@ -15,11 +15,11 @@ impl<const T: usize> BitSet<T> {
         );
 
         if T == 1 {
-            self.data[0].trailing_zeros()
+            self.bits[0].trailing_zeros()
         } else {
             let mut zeros: u32 = 0;
             for i in (0..T).rev() {
-                let data = self.data[i];
+                let data = self.bits[i];
                 if data != 0 {
                     zeros += data.trailing_zeros();
                     break;
@@ -39,11 +39,11 @@ impl<const T: usize> BitSet<T> {
         );
 
         if T == 1 {
-            127 - self.data[0].leading_zeros()
+            127 - self.bits[0].leading_zeros()
         } else {
             let mut zeros: u32 = 0;
             for i in 0..T {
-                let data = self.data[i];
+                let data = self.bits[i];
                 if data != 0 {
                     zeros += data.leading_zeros();
                     break;

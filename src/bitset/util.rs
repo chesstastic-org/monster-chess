@@ -7,18 +7,18 @@ use crate::board::BitBoard;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Ord)]
 pub struct BitSet<const T: usize> {
-    pub data: [u128; T],
+    pub bits: [u128; T],
 }
 
 impl<const T: usize> BitSet<T> {
     pub fn from_data(data: [u128; T]) -> BitSet<T> {
-        BitSet { data }
+        BitSet { bits: data }
     }
 
     pub fn from_element(el: u128) -> BitSet<T> {
         let mut arr = [0; T];
         arr[T - 1] = el;
-        BitSet { data: arr }
+        BitSet { bits: arr }
     }
 
     pub fn from_lsb(bit: u32) -> BitSet<T> {
@@ -39,17 +39,17 @@ impl<const T: usize> BitSet<T> {
 
     pub fn is_empty(&self) -> bool {
         if T == 1 {
-            self.data[0] == 0
+            self.bits[0] == 0
         } else {
-            self.data.iter().all(|el| *el == 0)
+            self.bits.iter().all(|el| *el == 0)
         }
     }
 
     pub fn is_set(&self) -> bool {
         if T == 1 {
-            self.data[0] != 0
+            self.bits[0] != 0
         } else {
-            self.data.iter().any(|el| *el != 0)
+            self.bits.iter().any(|el| *el != 0)
         }
     }
 
@@ -65,15 +65,15 @@ impl<const T: usize> BitSet<T> {
     pub fn apply(self, rhs: BitSet<T>, apply: impl Fn((&u128, u128)) -> u128) -> Self {
         if T == 1 {
             return BitSet {
-                data: [ apply((&self.data[0], rhs.data[0])); T ]
+                bits: [ apply((&self.bits[0], rhs.bits[0])); T ]
             };
         }
 
         BitSet {
-            data: self
-                .data
+            bits: self
+                .bits
                 .iter()
-                .zip(rhs.data)
+                .zip(rhs.bits)
                 .map(apply)
                 .collect::<Vec<_>>()
                 .try_into()
@@ -84,14 +84,14 @@ impl<const T: usize> BitSet<T> {
     #[inline(always)]
     pub fn effect(&mut self, rhs: BitSet<T>, apply: impl Fn((&u128, u128)) -> u128) {
         if T == 1 {
-            self.data = [ apply((&self.data[0], rhs.data[0])); T ];
+            self.bits = [ apply((&self.bits[0], rhs.bits[0])); T ];
             return;
         }
 
-        self.data = self
-            .data
+        self.bits = self
+            .bits
             .iter()
-            .zip(rhs.data)
+            .zip(rhs.bits)
             .map(apply)
             .collect::<Vec<_>>()
             .try_into()
@@ -100,24 +100,24 @@ impl<const T: usize> BitSet<T> {
 
     pub fn count_zeros(&self) -> u32 {
         if T == 1 {
-            self.data[0].count_zeros()
+            self.bits[0].count_zeros()
         } else {
-            self.data.iter().map(|el| el.count_zeros()).sum()
+            self.bits.iter().map(|el| el.count_zeros()).sum()
         }
     }
 
     pub fn count_ones(&self) -> u32 {
         if T == 1 {
-            self.data[0].count_ones()
+            self.bits[0].count_ones()
         } else {
-            self.data.iter().map(|el| el.count_ones()).sum()
+            self.bits.iter().map(|el| el.count_ones()).sum()
         }
     }
 
     /// Not a well optimized method; avoid using in hot loops.
     pub fn get_bits(&self) -> Vec<u128> {
         let mut bits: Vec<u128> = Vec::with_capacity(128 * T);
-        for container in self.data {
+        for container in self.bits {
             for i in 0..128 {
                 bits.push((container >> i) & 1); // Get `i`th bit of `container` and check if it is toggled on (equal to 1)
             }

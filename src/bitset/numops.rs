@@ -14,7 +14,7 @@ impl<const T: usize> Add<BitSet<T>> for BitSet<T> {
 impl<const T: usize> AddAssign<BitSet<T>> for BitSet<T> {
     fn add_assign(&mut self, rhs: BitSet<T>) {
         if T == 1 {
-            self.data[0] += rhs.data[0];
+            self.bits[0] += rhs.bits[0];
             return;
         }
 
@@ -41,7 +41,7 @@ impl<const T: usize> Sub<BitSet<T>> for BitSet<T> {
 impl<const T: usize> SubAssign<BitSet<T>> for BitSet<T> {
     fn sub_assign(&mut self, rhs: BitSet<T>) {
         if T == 1 {
-            self.data[0] -= rhs.data[0];
+            self.bits[0] -= rhs.bits[0];
             return;
         }
 
@@ -61,11 +61,11 @@ mod tests {
     #[test]
     fn add() {
         assert_eq!(
-            BitSet::from_data([2, 13]) + &BitSet::from_data([4, 19]),
+            BitSet::from_data([2, 13]) + BitSet::from_data([4, 19]),
             BitSet::from_data([6, 32])
         );
         assert_eq!(
-            BitSet::from_data([0, u128::MAX]) + &BitSet::from_data([0, 1]),
+            BitSet::from_data([0, u128::MAX]) + BitSet::from_data([0, 1]),
             BitSet::from_data([1, 0])
         );
     }
@@ -73,11 +73,11 @@ mod tests {
     #[test]
     fn sub() {
         assert_eq!(
-            BitSet::from_data([6, 32]) - &BitSet::from_data([4, 19]),
+            BitSet::from_data([6, 32]) - BitSet::from_data([4, 19]),
             BitSet::from_data([2, 13])
         );
         assert_eq!(
-            BitSet::from_data([1, 0]) - &BitSet::from_data([0, 1]),
+            BitSet::from_data([1, 0]) - BitSet::from_data([0, 1]),
             BitSet::from_data([0, u128::MAX])
         );
     }
