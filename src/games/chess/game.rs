@@ -62,7 +62,7 @@ impl FenArgument for ChessCastlingRights {
             }
 
             let rooks = board.state.pieces[3] & board.state.teams[team] & board.state.first_move;
-            let mut one_bits = rooks.iter_one_bits(board.state.rows * board.state.cols);
+            let mut one_bits = rooks.iter_one_bits(board.state.rows * board.state.cols).collect::<Vec<_>>();
             if one_bits.len() == 1 {
                 let mut side_castling_rights = if rooks > king { 'k' } else { 'q' };
 
