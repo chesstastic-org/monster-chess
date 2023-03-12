@@ -83,7 +83,7 @@ pub trait Piece {
     fn make_normal_move(&self, board: &mut Board, action: &Action, piece_type: usize, from: BitBoard, to: BitBoard) {
         let color: usize = action.team as usize;
 
-        let history_move = HistoryMove {
+        board.state.history.push(HistoryMove {
             action: *action,
             state: HistoryState::Single {
                 team: IndexedPreviousBoard(color, board.state.teams[color]),
@@ -91,8 +91,7 @@ pub trait Piece {
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 first_move: PreviousBoard(board.state.first_move)
             }
-        };
-        board.state.history.push(history_move);
+        });
 
         board.state.teams[color] ^= from;
         board.state.teams[color] |= to;
