@@ -189,7 +189,7 @@ impl<'a> Board<'a> {
         let history_move = self.state.history.pop();
         match history_move {
             Some(history_move) => {
-                self.game.pieces[history_move.action.piece_type].undo_move(self, &history_move);
+                self.game.pieces[history_move.action.piece_type].undo_move(self, history_move);
             }
             None => return Err(UndoMoveError::NoHistoryMoves),
         }

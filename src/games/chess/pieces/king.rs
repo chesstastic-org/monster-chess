@@ -1,4 +1,4 @@
-use crate::{board::{BitBoard, PieceType, Cols, Board, AttackDirections, edges::Edges, actions::{Action, HistoryMove, IndexedPreviousBoard, HistoryState, PreviousBoard}, pieces::{PieceSymbol, Piece}}, bitset::Direction, games::chess::game::ATTACKS_MODE};
+use crate::{board::{BitBoard, PieceType, Cols, Board, AttackDirections, edges::Edges, actions::{Action, HistoryMove, IndexedPreviousBoard, HistoryState, HistoryUpdate, PreviousBoard}, pieces::{PieceSymbol, Piece}}, bitset::Direction, games::chess::game::ATTACKS_MODE};
 
 const NORMAL_KING_MOVE: usize = 0;
 const CASTLING_MOVE: usize = 1;
@@ -52,15 +52,13 @@ impl KingPiece {
 
         let history_move = HistoryMove {
             action: *action,
-            state: Some(HistoryState {
-                teams: vec![IndexedPreviousBoard(color, board.state.teams[color])],
-                pieces: vec![
-                    IndexedPreviousBoard(piece_type, board.state.pieces[piece_type]),
-                    IndexedPreviousBoard(ROOK_PIECE_TYPE, board.state.pieces[ROOK_PIECE_TYPE]),
-                ],
-                all_pieces: PreviousBoard(board.state.all_pieces),
-                first_move: PreviousBoard(board.state.first_move),
-            }),
+            state: Some(HistoryState(vec![
+                HistoryUpdate::Team(IndexedPreviousBoard(color, board.state.teams[color])),
+                HistoryUpdate::Piece(IndexedPreviousBoard(piece_type, board.state.pieces[piece_type])),
+                HistoryUpdate::Piece(IndexedPreviousBoard(ROOK_PIECE_TYPE, board.state.pieces[ROOK_PIECE_TYPE])),
+                HistoryUpdate::AllPieces(PreviousBoard(board.state.all_pieces)),
+                HistoryUpdate::FirstMove(PreviousBoard(board.state.first_move))
+            ]))
         };
         board.state.history.push(history_move);
 
@@ -156,21 +154,14 @@ impl Piece for KingPiece {
 
         let history_move = HistoryMove {
             action: *action,
-            state: Some(HistoryState {
-                teams: vec![
-                    IndexedPreviousBoard(color, board.state.teams[color]),
-                    IndexedPreviousBoard(captured_color, board.state.teams[captured_color]),
-                ],
-                pieces: vec![
-                    IndexedPreviousBoard(piece_type, board.state.pieces[piece_type]),
-                    IndexedPreviousBoard(
-                        captured_piece_type,
-                        board.state.pieces[captured_piece_type],
-                    ),
-                ],
-                all_pieces: PreviousBoard(board.state.all_pieces),
-                first_move: PreviousBoard(board.state.first_move),
-            }),
+            state: Some(HistoryState(vec![
+                HistoryUpdate::Team(IndexedPreviousBoard(color, board.state.teams[color])),
+                HistoryUpdate::Team(IndexedPreviousBoard(captured_color, board.state.teams[captured_color])),
+                HistoryUpdate::Piece(IndexedPreviousBoard(piece_type, board.state.pieces[piece_type])),
+                HistoryUpdate::Piece(IndexedPreviousBoard(captured_piece_type, board.state.pieces[captured_piece_type])),
+                HistoryUpdate::AllPieces(PreviousBoard(board.state.all_pieces)),
+                HistoryUpdate::FirstMove(PreviousBoard(board.state.first_move))
+            ]))
         };
         board.state.history.push(history_move);
 

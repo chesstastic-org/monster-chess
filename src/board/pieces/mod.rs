@@ -1,4 +1,4 @@
-use super::{actions::{HistoryMove, Action, UndoMoveError, IndexedPreviousBoard, HistoryState, PreviousBoard}, game::Game, Board, BitBoard, Rows, Cols, PieceType, AttackLookup, AttackDirections};
+use super::{actions::{HistoryMove, HistoryUpdate, Action, UndoMoveError, IndexedPreviousBoard, HistoryState, PreviousBoard}, game::Game, Board, BitBoard, Rows, Cols, PieceType, AttackLookup, AttackDirections};
 
 pub enum PieceSymbol {
     Char(char),
@@ -52,21 +52,14 @@ pub trait Piece {
 
         let history_move = HistoryMove {
             action: *action,
-            state: Some(HistoryState {
-                teams: vec![
-                    IndexedPreviousBoard(color, board.state.teams[color]),
-                    IndexedPreviousBoard(captured_color, board.state.teams[captured_color]),
-                ],
-                pieces: vec![
-                    IndexedPreviousBoard(piece_type, board.state.pieces[piece_type]),
-                    IndexedPreviousBoard(
-                        captured_piece_type,
-                        board.state.pieces[captured_piece_type],
-                    ),
-                ],
-                all_pieces: PreviousBoard(board.state.all_pieces),
-                first_move: PreviousBoard(board.state.first_move),
-            }),
+            state: Some(HistoryState(vec![
+                HistoryUpdate::Team(IndexedPreviousBoard(color, board.state.teams[color])),
+                HistoryUpdate::Team(IndexedPreviousBoard(captured_color, board.state.teams[captured_color])),
+                HistoryUpdate::Piece(IndexedPreviousBoard(piece_type, board.state.pieces[piece_type])),
+                HistoryUpdate::Piece(IndexedPreviousBoard(captured_piece_type, board.state.pieces[captured_piece_type])),
+                HistoryUpdate::AllPieces(PreviousBoard(board.state.all_pieces)),
+                HistoryUpdate::FirstMove(PreviousBoard(board.state.first_move))
+            ]))
         };
         board.state.history.push(history_move);
 
@@ -90,15 +83,12 @@ pub trait Piece {
 
         let history_move = HistoryMove {
             action: *action,
-            state: Some(HistoryState {
-                teams: vec![IndexedPreviousBoard(color, board.state.teams[color])],
-                pieces: vec![IndexedPreviousBoard(
-                    piece_type,
-                    board.state.pieces[piece_type],
-                )],
-                all_pieces: PreviousBoard(board.state.all_pieces),
-                first_move: PreviousBoard(board.state.first_move),
-            }),
+            state: Some(HistoryState(vec![
+                HistoryUpdate::Team(IndexedPreviousBoard(color, board.state.teams[color])),
+                HistoryUpdate::Piece(IndexedPreviousBoard(piece_type, board.state.pieces[piece_type])),
+                HistoryUpdate::AllPieces(PreviousBoard(board.state.all_pieces)),
+                HistoryUpdate::FirstMove(PreviousBoard(board.state.first_move))
+            ]))
         };
         board.state.history.push(history_move);
 
@@ -137,7 +127,7 @@ pub trait Piece {
         }
     }
 
-    fn undo_move(&self, board: &mut Board, history_move: &HistoryMove) {
+    fn undo_move(&self, board: &mut Board, history_move: HistoryMove) {
         board.state.current_turn -= 1;
         board.state.turns -= 1;
         if board.state.current_turn == u32::MAX {
@@ -150,17 +140,23 @@ pub trait Piece {
             }
         }
 
-        if let Some(history_state) = &history_move.state {
-            for IndexedPreviousBoard(index, bitboard) in &history_state.teams {
-                board.state.teams[*index] = *bitboard;
+        if let Some(history_state) = history_move.state {
+            for change in history_state.0 {
+                match change {
+                    HistoryUpdate::AllPieces(all_pieces) => {
+                        board.state.all_pieces = all_pieces.0;
+                    }
+                    HistoryUpdate::FirstMove(first_move) => {
+                        board.state.first_move = first_move.0;
+                    }
+                    HistoryUpdate::Team(team) => {
+                        board.state.teams[team.0] = team.1;
+                    }
+                    HistoryUpdate::Piece(piece) => {
+                        board.state.pieces[piece.0] = piece.1;
+                    }
+                }
             }
-
-            for IndexedPreviousBoard(index, bitboard) in &history_state.pieces {
-                board.state.pieces[*index] = *bitboard;
-            }
-
-            board.state.all_pieces = history_state.all_pieces.0;
-            board.state.first_move = history_state.first_move.0;
         }
     }
 

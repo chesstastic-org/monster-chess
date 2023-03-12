@@ -26,13 +26,17 @@ pub struct PreviousBoard(pub BitBoard);
 #[derive(Copy, Clone, Debug)]
 pub struct IndexedPreviousBoard(pub usize, pub BitBoard);
 
-#[derive(Clone, Debug)]
-pub struct HistoryState {
-    pub pieces: Vec<IndexedPreviousBoard>,
-    pub teams: Vec<IndexedPreviousBoard>,
-    pub all_pieces: PreviousBoard,
-    pub first_move: PreviousBoard,
+
+#[derive(Clone, Copy, Debug)]
+pub enum HistoryUpdate {
+    AllPieces(PreviousBoard),
+    FirstMove(PreviousBoard),
+    Team(IndexedPreviousBoard),
+    Piece(IndexedPreviousBoard)
 }
+
+#[derive(Clone, Debug)]
+pub struct HistoryState(pub Vec<HistoryUpdate>);
 
 #[derive(Clone, Debug)]
 pub struct HistoryMove {
