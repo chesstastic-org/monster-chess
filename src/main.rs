@@ -1,5 +1,16 @@
 use std::env;
+use std::time::Duration;
 use monster_chess::{games::chess::Chess, board::Board};
+
+use std::time::{SystemTime, UNIX_EPOCH};
+
+fn get_time_ms() -> u128  {
+    let start = SystemTime::now();
+    let since_the_epoch = start
+        .duration_since(UNIX_EPOCH)
+        .expect("Time went backwards");
+    since_the_epoch.as_millis()
+}
 
 fn main() {
     env::set_var("RUST_BACKTRACE", "1000");
@@ -11,8 +22,8 @@ fn main() {
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
     );
 
-    for i in 0..200 {
-        let nodes = board.sub_perft(3);
-        println!("{i}: {}", nodes);
-    }
+    let start = get_time_ms();
+    board.sub_perft(5);
+    let end = get_time_ms();
+    println!("{}", end - start);
 }
