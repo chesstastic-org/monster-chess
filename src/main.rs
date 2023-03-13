@@ -25,6 +25,8 @@ fn main() {
     let action = board.decode_action("f7f8n", 0).unwrap();
     board.make_move(&action);
 
+    println!("{}", board.state.pieces[1].display(8, 8));
+
     let lines = r#"
     f8d7 - 1
     f8e6 - 1

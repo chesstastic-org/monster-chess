@@ -262,7 +262,7 @@ impl Piece for PawnPiece {
             }
         });
 
-        if action.info > 3 {
+        if action.info >= 2 {
             let promotion_type = action.info - 2;
             let history_state = &mut board.history.last_mut().unwrap().state;
             *history_state = HistoryState::Any {
