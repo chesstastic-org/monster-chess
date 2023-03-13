@@ -19,25 +19,22 @@ fn main() {
     let mut board = Board::new(
         &chess,
         (8, 8),
-        "rnbqkbnr/pppp1ppp/8/4p3/8/BP6/P1PPPPPP/RN1QKBNR b KQkq - 1 2",
+        "rnbqkbnr/pppp1ppp/8/1B2p3/4P3/8/PPPP1PPP/RNBQK1NR b KQkq - 1 2",
     );
 
     let lines = r#"
     a7a5 - 1
     a7a6 - 1
-    b7b5 - 1
     b7b6 - 1
     b8a6 - 1
     b8c6 - 1
     c7c5 - 1
     c7c6 - 1
-    d7d5 - 1
-    d7d6 - 1
     d8e7 - 1
     d8f6 - 1
     d8g5 - 1
     d8h4 - 1
-    e5e4 - 1
+    e8e7 - 1
     f7f5 - 1
     f7f6 - 1
     f8a3 - 1

@@ -58,7 +58,7 @@ impl Piece for BishopPiece {
 
         for dir in 0..4 {
             let ray = get_ray_attacks(board, from, from_bit, dir, &lookup);
-            if ray.is_set() {
+            if (ray & to).is_set() {
                 return ray;
             }
         }
