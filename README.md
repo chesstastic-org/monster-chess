@@ -198,14 +198,9 @@ If your game needs an argument to represent which side has to move (which it alm
 ```rust
 pub struct Game {
     pub pieces: Vec<&'static dyn Piece>,
-    pub move_restrictions: Box<dyn MoveRestrictions>,
-    pub win_conditions: Box<dyn WinConditions> // TODO
+    pub move_restrictions: Box<dyn MoveRestrictions>, // Psuedo-legal Move Generation
 }
 ```
-
-The way `monster-chess` handles restricting moves (like walking into check being illegal in chess) is through psuedolegal move generation. When writing a chess engine, you'll typically only look at a fraction of the moves of any given position, because you'll end up pruning a substantial amount of them. Checking for legality will be faster the more moves you prune at a given position.
-
-The only thing to note here is that `chess` is initialized as a variable so that it has a long enough lifetime to be preserved alongside the board.
 
 ## License
 
