@@ -205,13 +205,6 @@ pub struct Game {
 
 The way `monster-chess` handles restricting moves (like walking into check being illegal in chess) is through psuedolegal move generation. When writing a chess engine, you'll typically only look at a fraction of the moves of any given position, because you'll end up pruning a substantial amount of them. Checking for legality will be faster the more moves you prune at a given position.
 
-The games that `monster-chess` certainly plans to support out of the box are as follows:
-- [Chess](https://en.wikipedia.org/wiki/Chess)
-- [Fischer Random Chess](https://en.wikipedia.org/wiki/Fischer_random_chess)
-
-In addition, it's likely that we will also support the following out of the box:
-- [Ataxx](https://en.wikipedia.org/wiki/Ataxx)
-
 The only thing to note here is that `chess` is initialized as a variable so that it has a long enough lifetime to be preserved alongside the board.
 
 ## License
