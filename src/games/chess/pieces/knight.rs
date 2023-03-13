@@ -43,10 +43,6 @@ fn down_left2(b: BitBoard, cols: Cols, edges: &Edges, deep_edges: &Edges) -> Bit
 }
 
 impl Piece for KnightPiece {
-    fn duplicate(&self) -> Box<dyn Piece> {
-        Box::new(Self)
-    }
-
     fn get_piece_symbol(&self) -> PieceSymbol {
         PieceSymbol::Char('n')
     }

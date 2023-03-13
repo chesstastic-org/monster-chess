@@ -69,10 +69,6 @@ impl PawnPiece {
 }
 
 impl Piece for PawnPiece {
-    fn duplicate(&self) -> Box<dyn Piece> {
-        Box::new(Self)
-    }
-
     fn can_lookup(&self) -> bool {
         false
     }
@@ -276,7 +272,6 @@ impl Piece for PawnPiece {
         board.state.all_pieces |= to;
 
         board.state.first_move ^= from;
-        board.state.first_move &= !to;
     }
 
     fn add_actions(

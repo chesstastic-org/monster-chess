@@ -144,7 +144,7 @@ If your game needs an argument to represent which side has to move (which it alm
 
 ```rust
 pub struct Game {
-    pub pieces: Vec<Box<dyn Piece>>,
+    pub pieces: Vec<&'static dyn Piece>,
     pub move_restrictions: Box<dyn MoveRestrictions>,
     pub win_conditions: Box<dyn WinConditions> // TODO
 }
@@ -179,7 +179,7 @@ The only thing to note here is that `chess` is initialized as a variable so that
 
 ### Indirection
 
-As of right now, we store `Piece` as a `Box<dyn Piece>`, which introduces a layer of indirection. However, since we can guarantee the size of `Piece`, and we just want `Piece`'s functionality, we can optimize by writing our own vtable that removes the indirection.
+As of right now, we store `Piece` as a `&'static dyn Piece`, which introduces a layer of indirection. However, since we can guarantee the size of `Piece`, and we just want `Piece`'s functionality, we can optimize by writing our own vtable that removes the indirection.
 
 _(Example provided by the very kind quicknir#3667 on the Rust Programming Language Community Server.)_
 ```rust

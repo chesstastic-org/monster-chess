@@ -2,7 +2,7 @@ use super::{AttackLookup, Cols, Rows, Board, BitBoard, pieces::Piece};
 
 pub fn generate_lookups(
     board: &Board,
-    piece: &Box<dyn Piece>,
+    piece: &&'static dyn Piece,
     rows: Rows,
     cols: Cols,
 ) -> AttackLookup {

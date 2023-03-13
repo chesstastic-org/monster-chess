@@ -205,6 +205,13 @@ impl MoveRestrictions for ChessMoveRestrictions {
     }
 }
 
+const PAWN: &dyn Piece = &PawnPiece;
+const KNIGHT: &dyn Piece = &KnightPiece;
+const BISHOP: &dyn Piece = &BishopPiece;
+const ROOK: &dyn Piece = &RookPiece;
+const QUEEN: &dyn Piece = &QueenPiece;
+const KING: &dyn Piece = &KingPiece;
+
 pub struct Chess;
 
 impl Chess {
@@ -213,12 +220,12 @@ impl Chess {
             teams: 2,
             turns: 1,
             pieces: vec![
-                Box::new(PawnPiece),
-                Box::new(KnightPiece),
-                Box::new(BishopPiece),
-                Box::new(RookPiece),
-                Box::new(QueenPiece),
-                Box::new(KingPiece)
+                PAWN,
+                KNIGHT,
+                BISHOP,
+                ROOK,
+                QUEEN,
+                KING
             ],
             move_restrictions: Box::new(ChessMoveRestrictions),
             fen_options: FenOptions {

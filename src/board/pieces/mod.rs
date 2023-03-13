@@ -8,8 +8,6 @@ pub enum PieceSymbol {
 const NORMAL_MOVE: usize = 0;
 
 pub trait Piece {
-    fn duplicate(&self) -> Box<dyn Piece>;
-
     fn get_piece_symbol(&self) -> PieceSymbol;
 
     fn format_info(&self, board: &Board, info: u32) -> String {

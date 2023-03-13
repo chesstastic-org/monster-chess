@@ -5,10 +5,6 @@ use super::{get_moves_ray, get_ray_attacks, can_ray_attack};
 pub struct BishopPiece;
 
 impl Piece for BishopPiece {
-    fn duplicate(&self) -> Box<dyn Piece> {
-        Box::new(Self)
-    }
-
     fn get_piece_symbol(&self) -> PieceSymbol {
         PieceSymbol::Char('b')
     }

@@ -102,10 +102,6 @@ impl KingPiece {
 }
 
 impl Piece for KingPiece {
-    fn duplicate(&self) -> Box<dyn Piece> {
-        Box::new(Self)
-    }
-
     fn get_piece_symbol(&self) -> PieceSymbol {
         PieceSymbol::Char('k')
     }
