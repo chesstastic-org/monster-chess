@@ -152,23 +152,22 @@ impl<'a> Board<'a> {
         bitboard
     }
 
-    pub fn is_attacking(&self, team: u32, target: BitBoard, mode: u32) -> bool {
+    pub fn can_move(&self, team: u32, target: BitBoard, mode: u32) -> bool {
         let board_len = self.state.squares;
 
         let team = self.state.moving_team;
+        let mut mask: BitBoard = BitBoard::new();
 
         for (ind, board) in self.state.pieces.iter().enumerate() {
             let board = *board & self.state.teams[team as usize];
             let piece = &self.game.pieces[ind];
 
             for bit in board.iter_one_bits(board_len as u32) {
-                if piece.can_move(self, BitBoard::from_lsb(bit), ind, team, mode, target) {
-                    return true;
-                }  
+                mask |= piece.can_move_mask(self, BitBoard::from_lsb(bit), bit, ind, team, mode, target);
             }
         }
 
-        false
+        (mask & target).is_set()
     }
 
 

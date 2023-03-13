@@ -24,8 +24,8 @@ pub trait Piece {
     }
 
     fn get_moves(&self, board: &Board, from: BitBoard, piece_type: usize, team: u32, mode: u32) -> BitBoard;
-    fn can_move(&self, board: &Board, from: BitBoard, piece_type: usize, team: u32, mode: u32, to: BitBoard) -> bool {
-        (self.get_moves(board, from, piece_type, team, mode) & to).is_set()
+    fn can_move_mask(&self, board: &Board, from: BitBoard, from_bit: u32, piece_type: usize, team: u32, mode: u32, to: BitBoard) -> BitBoard {
+        self.get_moves(board, from, piece_type, team, mode)
     }
 
     #[allow(unused_variables)]

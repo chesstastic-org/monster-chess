@@ -120,6 +120,10 @@ impl Piece for KingPiece {
         true
     }
 
+    fn can_move_mask(&self, board: &Board, from: BitBoard, from_bit: u32, piece_type: usize, team: u32, mode: u32, to: BitBoard) -> BitBoard {
+        self.get_attack_lookup(board, piece_type).unwrap()[from_bit as usize][0]
+    }
+
     #[allow(unused_variables)]
     fn get_moves(&self, board: &Board, from: BitBoard, piece_type: usize, team: u32, mode: u32) -> BitBoard {
         let lookup = self.get_attack_lookup(board, piece_type);

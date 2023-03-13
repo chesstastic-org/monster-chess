@@ -70,7 +70,18 @@ impl PawnPiece {
 
 impl Piece for PawnPiece {
     fn can_lookup(&self) -> bool {
-        false
+        true
+    }
+
+    fn generate_lookup_moves(&self, board: &Board, from: BitBoard) -> AttackDirections {
+        let mut attack_dirs: AttackDirections = vec![];
+        for team in 0..board.game.teams {
+            let up_one = up(&from, 1, board.state.cols, team);
+            let mut captures = (up_one & !board.state.edges[0].right).right(1);
+            captures |= (up_one & !board.state.edges[0].left).left(1);
+            attack_dirs.push(captures);
+        }
+        attack_dirs
     }
 
     fn get_piece_symbol(&self) -> PieceSymbol {
@@ -114,12 +125,8 @@ impl Piece for PawnPiece {
         }
     }
 
-    fn can_move(&self, board: &Board, from: BitBoard, piece_type: usize, team: u32, mode: u32, to: BitBoard) -> bool {
-        let up_one = up(&from, 1, board.state.cols, team);
-        let mut captures = (up_one & !board.state.edges[0].right).right(1);
-        captures |= (up_one & !board.state.edges[0].left).left(1);
-
-        return (captures & to).is_set();  
+    fn can_move_mask(&self, board: &Board, from: BitBoard, from_bit: u32, piece_type: usize, team: u32, mode: u32, to: BitBoard) -> BitBoard {
+        self.get_attack_lookup(board, piece_type).unwrap()[from_bit as usize][team as usize]
     }
 
     fn get_moves(&self, board: &Board, from: BitBoard, piece_type: usize, team: u32, mode: u32) -> BitBoard {
@@ -127,20 +134,13 @@ impl Piece for PawnPiece {
         let edges = &board.state.edges[0];
 
         if mode == ATTACKS_MODE {
-            let up_one = up(&from, 1, cols, team);
-            let mut captures = (up_one & !edges.right).right(1);
-            captures |= (up_one & !edges.left).left(1);
-
-            return captures;
+            return self.get_attack_lookup(board, piece_type).unwrap()[from.bitscan_forward() as usize][team as usize];
         }
         
         let mut moves = BitBoard::new();
 
         let mut capture_requirements = board.state.all_pieces;
-
-        let up_one = up(&from, 1, cols, team);
-        let mut captures = (up_one & !edges.right).right(1);
-        captures |= (up_one & !edges.left).left(1);
+        let mut captures = self.get_attack_lookup(board, piece_type).unwrap()[from.bitscan_forward() as usize][team as usize];
 
         let single_moves = up(&from, 1, cols, team) & !board.state.all_pieces;
         let first_move = (from & board.state.first_move).is_set();

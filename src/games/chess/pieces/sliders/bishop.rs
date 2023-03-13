@@ -1,6 +1,6 @@
 use crate::board::{pieces::{PieceSymbol, Piece}, PieceType, BitBoard, Board, AttackDirections};
 
-use super::{get_moves_ray, get_ray_attacks, can_ray_attack};
+use super::{get_moves_ray, get_ray_attacks};
 
 pub struct BishopPiece;
 
@@ -46,34 +46,36 @@ impl Piece for BishopPiece {
         true
     }
 
-    fn can_move(&self, board: &Board, from: BitBoard, piece_type: usize, team: u32, mode: u32, to: BitBoard) -> bool {
+    fn can_move_mask(&self, board: &Board, from: BitBoard, from_bit: u32, piece_type: usize, team: u32, mode: u32, to: BitBoard) -> BitBoard {
         let lookup = self
             .get_attack_lookup(board, piece_type)
             .expect("Could not find the queen attack lookup.");
 
-        let from_bit = from.bitscan_forward() as usize;
+        let from_bit = from_bit as usize;
         if (lookup[from_bit][4] & to).is_empty() {
-            return false;
+            return BitBoard::new();
         }
 
         for dir in 0..4 {
-            if can_ray_attack(board, from, from_bit, dir, &lookup, to) {
-                return true;
+            let ray = get_ray_attacks(board, from, from_bit, dir, &lookup);
+            if ray.is_set() {
+                return ray;
             }
         }
 
-        false
+        return BitBoard::new();
     }
 
     #[allow(unused_variables)]
     fn get_moves(&self, board: &Board, from: BitBoard, piece_type: usize, team: u32, mode: u32) -> BitBoard {
         let lookup = self
             .get_attack_lookup(board, piece_type)
-            .expect("Could not find the bishop attack lookup.");
+            .expect("Could not find the queen attack lookup.");
         let mut attacks = BitBoard::new();
 
+        let from_bit = from.bitscan_forward() as usize;
         for dir in 0..4 {
-            attacks |= get_ray_attacks(board, from, dir, &lookup);
+            attacks |= get_ray_attacks(board, from, from_bit, dir, &lookup);
         }
 
         attacks
