@@ -1,9 +1,18 @@
 use super::BitSet;
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum Direction {
     LEFT,
     RIGHT,
+}
+
+impl Direction {
+    pub fn opposite(&self) -> Direction {
+        match self {
+            Direction::RIGHT => Direction::LEFT,
+            Direction::LEFT => Direction::LEFT
+        }
+    }
 }
 
 impl<const T: usize> BitSet<T> {

@@ -59,10 +59,21 @@ impl FenArgument for ChessCastlingRights {
                     }
                 };
 
-                let rook = (board.state.pieces[3] & board.state.teams[team]).bitscan(scan_dir);
+                let rook_board = board.state.pieces[3] & board.state.teams[team];
+                if rook_board.is_empty() {
+                    continue;
+                }
+
+                let rook = rook_board.bitscan(scan_dir);
                 let rook_board = BitBoard::from_lsb(rook);
 
-                board.state.first_move &= !rook_board;
+                let king_board = board.state.pieces[5] & board.state.teams[team];
+                let king = king_board.bitscan_forward();
+
+                if (rook < king && scan_dir == Direction::LEFT) || (rook > king && scan_dir == Direction::RIGHT) {
+                    board.state.first_move &= !rook_board;
+
+                }
             }
             Ok(())
         }

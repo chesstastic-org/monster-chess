@@ -10,7 +10,7 @@ pub type PerftBranch = (String, PerftResults);
 
 #[derive(Debug, Clone)]
 pub struct PerftResults {
-    pub nodes: u32,
+    pub nodes: u64,
     pub branches: Vec<PerftBranch>,
 }
 
@@ -26,7 +26,7 @@ impl PerftResults {
 }
 
 impl<'a> Board<'a> {
-    pub fn sub_perft(&mut self, depth: u32, legality: bool) -> u32 {
+    pub fn sub_perft(&mut self, depth: u32, legality: bool) -> u64 {
         if depth == 0 {
             return 1;
         }
@@ -46,19 +46,23 @@ impl<'a> Board<'a> {
         nodes
     }
 
-    pub fn assert_perfts<const T: usize>(&mut self, nodes: [u32; T]) {
+    pub fn assert_perft(&mut self, depth: u32, true_nodes: u64) {
+        let nodes = self.sub_perft(depth, true);
+        assert_eq!(
+            nodes,
+            true_nodes,
+            "Perft of {} for FEN {} is {} (not {}, the expected result)",
+            depth,
+            self.to_fen(),
+            nodes,
+            true_nodes
+        );
+    }
+
+    pub fn assert_perfts<const T: usize>(&mut self, nodes: [u64; T]) {
         for (ind, true_nodes) in nodes.iter().enumerate() {
             let depth = (ind + 1) as u32;
-            let nodes = self.sub_perft(depth, true);
-            assert_eq!(
-                &nodes,
-                true_nodes,
-                "Perft of {} for FEN {} is {} (not {}, the expected result)",
-                depth,
-                self.to_fen(),
-                nodes,
-                true_nodes
-            );
+            self.assert_perft(depth, *true_nodes);
         }
     }
 

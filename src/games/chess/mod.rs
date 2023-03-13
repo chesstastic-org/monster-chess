@@ -1,4 +1,5 @@
 mod game;
+mod suite;
 pub mod pieces;
 
 pub use game::*;
