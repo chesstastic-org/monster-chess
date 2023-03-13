@@ -26,15 +26,20 @@ impl PerftResults {
 }
 
 impl<'a> Board<'a> {
-    pub fn sub_perft(&mut self, depth: u32) -> u32 {
+    pub fn sub_perft(&mut self, depth: u32, legality: bool) -> u32 {
         if depth == 0 {
             return 1;
         }
 
         let mut nodes = 0;
-        for node in self.generate_legal_moves(0) {
+        let moves = if legality {
+            self.generate_legal_moves(0)
+        } else {
+            self.generate_moves(0)
+        };
+        for node in moves {
             self.make_move(&node);
-            nodes += self.sub_perft(depth - 1);
+            nodes += self.sub_perft(depth - 1, legality);
             self.undo_move();
         }
 
@@ -44,7 +49,7 @@ impl<'a> Board<'a> {
     pub fn assert_perfts<const T: usize>(&mut self, nodes: [u32; T]) {
         for (ind, true_nodes) in nodes.iter().enumerate() {
             let depth = (ind + 1) as u32;
-            let nodes = self.sub_perft(depth);
+            let nodes = self.sub_perft(depth, true);
             assert_eq!(
                 &nodes,
                 true_nodes,

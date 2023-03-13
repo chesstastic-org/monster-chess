@@ -1,5 +1,4 @@
 use arrayvec::ArrayVec;
-use smallvec::{smallvec, SmallVec};
 
 use crate::bitset::BitSet;
 

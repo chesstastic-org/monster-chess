@@ -8,9 +8,7 @@ debug = true
 
 [dependencies]
 arrayvec = "0.7.2"
-flamegraph = "0.6.2"
 shell-words = "1.1.0"
-smallvec = "1.10.0"
 
 [dev-dependencies]
 criterion = "0.4"
