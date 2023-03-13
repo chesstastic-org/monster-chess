@@ -1,6 +1,11 @@
 use shell_words::split;
 
-use super::{super::{actions::{HistoryMove, Action, UndoMoveError}, pieces::Piece, game::Game, Board, BitBoard, Rows, Cols}};
+use super::super::{
+    actions::{Action, HistoryMove, UndoMoveError},
+    game::Game,
+    pieces::Piece,
+    BitBoard, Board, Cols, Rows,
+};
 
 impl<'a> Board<'a> {
     pub fn new(game: &'a Game, (rows, cols): (Rows, Cols), fen: &str) -> Board<'a> {

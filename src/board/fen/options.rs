@@ -1,5 +1,12 @@
-use super::{super::{actions::{HistoryMove, Action, UndoMoveError}, pieces::Piece, game::Game, Board, BitBoard, Rows, Cols}, FenArgument};
-
+use super::{
+    super::{
+        actions::{Action, HistoryMove, UndoMoveError},
+        game::Game,
+        pieces::Piece,
+        BitBoard, Board, Cols, Rows,
+    },
+    FenArgument,
+};
 
 pub enum FenStateTeams {
     Number,

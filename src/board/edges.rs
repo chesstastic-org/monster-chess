@@ -1,4 +1,9 @@
-use super::{actions::{HistoryMove, Action, UndoMoveError}, pieces::Piece, game::Game, Board, BitBoard, Rows, Cols};
+use super::{
+    actions::{Action, HistoryMove, UndoMoveError},
+    game::Game,
+    pieces::Piece,
+    BitBoard, Board, Cols, Rows,
+};
 
 pub type EdgeBuffer = u32;
 

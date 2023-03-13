@@ -1,4 +1,7 @@
-use crate::board::{pieces::{PieceSymbol, Piece}, PieceType, BitBoard, Board, AttackDirections};
+use crate::board::{
+    pieces::{Piece, PieceSymbol},
+    AttackDirections, BitBoard, Board, PieceType,
+};
 
 use super::{get_moves_ray, get_ray_attacks};
 
@@ -46,7 +49,16 @@ impl Piece for BishopPiece {
         true
     }
 
-    fn can_move_mask(&self, board: &Board, from: BitBoard, from_bit: u32, piece_type: usize, team: u32, mode: u32, to: BitBoard) -> BitBoard {
+    fn can_move_mask(
+        &self,
+        board: &Board,
+        from: BitBoard,
+        from_bit: u32,
+        piece_type: usize,
+        team: u32,
+        mode: u32,
+        to: BitBoard,
+    ) -> BitBoard {
         let lookup = self
             .get_attack_lookup(board, piece_type)
             .expect("Could not find the queen attack lookup.");
@@ -67,7 +79,14 @@ impl Piece for BishopPiece {
     }
 
     #[allow(unused_variables)]
-    fn get_moves(&self, board: &Board, from: BitBoard, piece_type: usize, team: u32, mode: u32) -> BitBoard {
+    fn get_moves(
+        &self,
+        board: &Board,
+        from: BitBoard,
+        piece_type: usize,
+        team: u32,
+        mode: u32,
+    ) -> BitBoard {
         let lookup = self
             .get_attack_lookup(board, piece_type)
             .expect("Could not find the queen attack lookup.");

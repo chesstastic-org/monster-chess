@@ -1,4 +1,13 @@
-use crate::{board::{BitBoard, PieceType, Cols, Board, AttackDirections, edges::Edges, actions::{Action, HistoryMove, IndexedPreviousBoard, HistoryState, PreviousBoard}, pieces::{PieceSymbol, Piece}}, bitset::Direction, games::chess::game::ATTACKS_MODE};
+use crate::{
+    bitset::Direction,
+    board::{
+        actions::{Action, HistoryMove, HistoryState, IndexedPreviousBoard, PreviousBoard},
+        edges::Edges,
+        pieces::{Piece, PieceSymbol},
+        AttackDirections, BitBoard, Board, Cols, PieceType,
+    },
+    games::chess::game::ATTACKS_MODE,
+};
 
 pub struct KnightPiece;
 
@@ -31,15 +40,11 @@ fn up_left2(b: BitBoard, cols: Cols, edges: &Edges, deep_edges: &Edges) -> BitBo
 }
 
 fn down2_left(b: BitBoard, cols: Cols, edges: &Edges, deep_edges: &Edges) -> BitBoard {
-    (b & !deep_edges.bottom & !edges.left)
-        .down(2, cols)
-        .left(1)
+    (b & !deep_edges.bottom & !edges.left).down(2, cols).left(1)
 }
 
 fn down_left2(b: BitBoard, cols: Cols, edges: &Edges, deep_edges: &Edges) -> BitBoard {
-    (b & !edges.bottom & !deep_edges.left)
-        .down(1, cols)
-        .left(2)
+    (b & !edges.bottom & !deep_edges.left).down(1, cols).left(2)
 }
 
 impl Piece for KnightPiece {
@@ -68,12 +73,28 @@ impl Piece for KnightPiece {
         true
     }
 
-    fn can_move_mask(&self, board: &Board, from: BitBoard, from_bit: u32, piece_type: usize, team: u32, mode: u32, to: BitBoard) -> BitBoard{
+    fn can_move_mask(
+        &self,
+        board: &Board,
+        from: BitBoard,
+        from_bit: u32,
+        piece_type: usize,
+        team: u32,
+        mode: u32,
+        to: BitBoard,
+    ) -> BitBoard {
         self.get_attack_lookup(board, piece_type).unwrap()[from_bit as usize][0]
     }
 
     #[allow(unused_variables)]
-    fn get_moves(&self, board: &Board, from: BitBoard, piece_type: usize, team: u32, mode: u32) -> BitBoard {
+    fn get_moves(
+        &self,
+        board: &Board,
+        from: BitBoard,
+        piece_type: usize,
+        team: u32,
+        mode: u32,
+    ) -> BitBoard {
         let lookup = self.get_attack_lookup(board, piece_type);
         match lookup {
             Some(lookup) => lookup[from.bitscan_reverse() as usize][0],

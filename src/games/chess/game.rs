@@ -1,6 +1,21 @@
-use crate::{board::{BitBoard, PieceType, Cols, Board, AttackDirections, edges::Edges, actions::{Action, HistoryMove, IndexedPreviousBoard, HistoryState, PreviousBoard}, pieces::{PieceSymbol, Piece}, fen::{FenDecodeError, FenArgument, FenFullMoves, FenTeamArgument, FenState, FenSubMoves, FenOptions, PostProcess}, game::{Game, MoveRestrictions}}, bitset::Direction};
+use crate::{
+    bitset::Direction,
+    board::{
+        actions::{Action, HistoryMove, HistoryState, IndexedPreviousBoard, PreviousBoard},
+        edges::Edges,
+        fen::{
+            FenArgument, FenDecodeError, FenFullMoves, FenOptions, FenState, FenSubMoves,
+            FenTeamArgument, PostProcess,
+        },
+        game::{Game, MoveRestrictions},
+        pieces::{Piece, PieceSymbol},
+        AttackDirections, BitBoard, Board, Cols, PieceType,
+    },
+};
 
-use super::pieces::{KingPiece, QueenPiece, RookPiece, BishopPiece, KnightPiece, PawnPiece, down, up};
+use super::pieces::{
+    down, up, BishopPiece, KingPiece, KnightPiece, PawnPiece, QueenPiece, RookPiece,
+};
 
 pub const NORMAL_MODE: u32 = 0;
 pub const ATTACKS_MODE: u32 = 1;
@@ -62,7 +77,9 @@ impl FenArgument for ChessCastlingRights {
             }
 
             let rooks = board.state.pieces[3] & board.state.teams[team] & board.state.first_move;
-            let mut one_bits = rooks.iter_one_bits(board.state.rows * board.state.cols).collect::<Vec<_>>();
+            let mut one_bits = rooks
+                .iter_one_bits(board.state.rows * board.state.cols)
+                .collect::<Vec<_>>();
             if one_bits.len() == 1 {
                 let mut side_castling_rights = if rooks > king { 'k' } else { 'q' };
 
@@ -172,8 +189,7 @@ impl PostProcess for ChessPostProcess {
         bottom |= bottom.up(1, cols);
         top |= top.down(1, cols);
 
-        let first_move = 
-            (board.state.pieces[0] & board.state.teams[0] & bottom)
+        let first_move = (board.state.pieces[0] & board.state.teams[0] & bottom)
             | (board.state.pieces[0] & board.state.teams[1] & top)
             | (board.state.all_pieces ^ board.state.pieces[0]);
         board.state.first_move &= first_move;
@@ -222,14 +238,7 @@ impl Chess {
         Game {
             teams: 2,
             turns: 1,
-            pieces: vec![
-                PAWN,
-                KNIGHT,
-                BISHOP,
-                ROOK,
-                QUEEN,
-                KING
-            ],
+            pieces: vec![PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING],
             move_restrictions: Box::new(ChessMoveRestrictions),
             fen_options: FenOptions {
                 state: FenState { first_moves: false },

@@ -1,4 +1,15 @@
-use crate::{board::{BitBoard, PieceType, Cols, Board, AttackDirections, edges::Edges, actions::{Action, HistoryMove, HistoryUpdate, IndexedPreviousBoard, HistoryState, PreviousBoard}, pieces::{PieceSymbol, Piece}}, bitset::Direction, games::chess::game::ATTACKS_MODE};
+use crate::{
+    bitset::Direction,
+    board::{
+        actions::{
+            Action, HistoryMove, HistoryState, HistoryUpdate, IndexedPreviousBoard, PreviousBoard,
+        },
+        edges::Edges,
+        pieces::{Piece, PieceSymbol},
+        AttackDirections, BitBoard, Board, Cols, PieceType,
+    },
+    games::chess::game::ATTACKS_MODE,
+};
 
 const NORMAL_PAWN_MOVE: usize = 0;
 const EN_PASSANT_MOVE: usize = 1;
@@ -25,30 +36,43 @@ pub fn down(bitboard: &BitBoard, shift: u32, cols: Cols, team: u32) -> BitBoard 
 }
 
 impl PawnPiece {
-    fn make_en_passant_move(&self, board: &mut Board, action: &Action, piece_type: usize, from: BitBoard, to: BitBoard) {
+    fn make_en_passant_move(
+        &self,
+        board: &mut Board,
+        action: &Action,
+        piece_type: usize,
+        from: BitBoard,
+        to: BitBoard,
+    ) {
         let cols = board.state.cols;
 
         let color: usize = action.team as usize;
         let en_passant_target = down(&to, 1, cols, color as u32);
 
-        let en_passant_target_color: usize =
-            if (en_passant_target & board.state.teams[0]).is_set() {
-                0
-            } else {
-                1
-            };
+        let en_passant_target_color: usize = if (en_passant_target & board.state.teams[0]).is_set()
+        {
+            0
+        } else {
+            1
+        };
 
         board.history.push(HistoryMove {
             action: *action,
             state: HistoryState::Any {
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 first_move: PreviousBoard(board.state.first_move),
-                updates: vec![                    
+                updates: vec![
                     HistoryUpdate::Team(IndexedPreviousBoard(color, board.state.teams[color])),
-                    HistoryUpdate::Team(IndexedPreviousBoard(en_passant_target_color, board.state.teams[en_passant_target_color])),
-                    HistoryUpdate::Piece(IndexedPreviousBoard(piece_type, board.state.pieces[piece_type])),
-                ]
-            }
+                    HistoryUpdate::Team(IndexedPreviousBoard(
+                        en_passant_target_color,
+                        board.state.teams[en_passant_target_color],
+                    )),
+                    HistoryUpdate::Piece(IndexedPreviousBoard(
+                        piece_type,
+                        board.state.pieces[piece_type],
+                    )),
+                ],
+            },
         });
 
         board.state.teams[color] ^= from;
@@ -80,7 +104,7 @@ impl Piece for PawnPiece {
             let from = match team {
                 0 => from & !edges.top,
                 1 => from & !edges.bottom,
-                _ => from & !edges.top
+                _ => from & !edges.top,
             };
             let up_one = up(&from, 1, board.state.cols, team);
             let mut captures = (up_one & !edges.right).right(1);
@@ -131,22 +155,40 @@ impl Piece for PawnPiece {
         }
     }
 
-    fn can_move_mask(&self, board: &Board, from: BitBoard, from_bit: u32, piece_type: usize, team: u32, mode: u32, to: BitBoard) -> BitBoard {
+    fn can_move_mask(
+        &self,
+        board: &Board,
+        from: BitBoard,
+        from_bit: u32,
+        piece_type: usize,
+        team: u32,
+        mode: u32,
+        to: BitBoard,
+    ) -> BitBoard {
         self.get_attack_lookup(board, piece_type).unwrap()[from_bit as usize][team as usize]
     }
 
-    fn get_moves(&self, board: &Board, from: BitBoard, piece_type: usize, team: u32, mode: u32) -> BitBoard {
+    fn get_moves(
+        &self,
+        board: &Board,
+        from: BitBoard,
+        piece_type: usize,
+        team: u32,
+        mode: u32,
+    ) -> BitBoard {
         let cols = board.state.cols;
         let edges = &board.state.edges[0];
 
         if mode == ATTACKS_MODE {
-            return self.get_attack_lookup(board, piece_type).unwrap()[from.bitscan_forward() as usize][team as usize];
+            return self.get_attack_lookup(board, piece_type).unwrap()
+                [from.bitscan_forward() as usize][team as usize];
         }
-        
+
         let mut moves = BitBoard::new();
 
         let mut capture_requirements = board.state.all_pieces;
-        let mut captures = self.get_attack_lookup(board, piece_type).unwrap()[from.bitscan_forward() as usize][team as usize];
+        let mut captures = self.get_attack_lookup(board, piece_type).unwrap()
+            [from.bitscan_forward() as usize][team as usize];
 
         let single_moves = up(&from, 1, cols, team) & !board.state.all_pieces;
         let first_move = (from & board.state.first_move).is_set();
@@ -179,7 +221,14 @@ impl Piece for PawnPiece {
         moves
     }
 
-    fn make_capture_move(&self, board: &mut Board, action: &Action, piece_type: usize, from: BitBoard, to: BitBoard) {
+    fn make_capture_move(
+        &self,
+        board: &mut Board,
+        action: &Action,
+        piece_type: usize,
+        from: BitBoard,
+        to: BitBoard,
+    ) {
         let color: usize = action.team as usize;
         let captured_color: usize = if (to & board.state.teams[0]).is_set() {
             0
@@ -199,13 +248,22 @@ impl Piece for PawnPiece {
             state: HistoryState::Any {
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 first_move: PreviousBoard(board.state.first_move),
-                updates: vec![                    
+                updates: vec![
                     HistoryUpdate::Team(IndexedPreviousBoard(color, board.state.teams[color])),
-                    HistoryUpdate::Team(IndexedPreviousBoard(captured_color, board.state.teams[captured_color])),
-                    HistoryUpdate::Piece(IndexedPreviousBoard(piece_type, board.state.pieces[piece_type])),
-                    HistoryUpdate::Piece(IndexedPreviousBoard(captured_piece_type, board.state.pieces[captured_piece_type])),
-                ]
-            }
+                    HistoryUpdate::Team(IndexedPreviousBoard(
+                        captured_color,
+                        board.state.teams[captured_color],
+                    )),
+                    HistoryUpdate::Piece(IndexedPreviousBoard(
+                        piece_type,
+                        board.state.pieces[piece_type],
+                    )),
+                    HistoryUpdate::Piece(IndexedPreviousBoard(
+                        captured_piece_type,
+                        board.state.pieces[captured_piece_type],
+                    )),
+                ],
+            },
         };
 
         let mut promotion_piece_type: Option<usize> = None;
@@ -244,7 +302,14 @@ impl Piece for PawnPiece {
         board.history.push(history_move);
     }
 
-    fn make_normal_move(&self, board: &mut Board, action: &Action, piece_type: usize, from: BitBoard, to: BitBoard) {
+    fn make_normal_move(
+        &self,
+        board: &mut Board,
+        action: &Action,
+        piece_type: usize,
+        from: BitBoard,
+        to: BitBoard,
+    ) {
         if action.info == EN_PASSANT_MOVE {
             self.make_en_passant_move(board, action, piece_type, from, to);
             return;
@@ -258,21 +323,27 @@ impl Piece for PawnPiece {
                 team: IndexedPreviousBoard(color, board.state.teams[color]),
                 piece: IndexedPreviousBoard(piece_type, board.state.pieces[piece_type]),
                 all_pieces: PreviousBoard(board.state.all_pieces),
-                first_move: PreviousBoard(board.state.first_move)
-            }
+                first_move: PreviousBoard(board.state.first_move),
+            },
         });
 
         if action.info >= 2 {
             let promotion_type = action.info - 2;
             let history_state = &mut board.history.last_mut().unwrap().state;
             *history_state = HistoryState::Any {
-                first_move: PreviousBoard(board.state.all_pieces),
+                first_move: PreviousBoard(board.state.first_move),
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 updates: vec![
                     HistoryUpdate::Team(IndexedPreviousBoard(color, board.state.teams[color])),
-                    HistoryUpdate::Piece(IndexedPreviousBoard(piece_type, board.state.pieces[piece_type])),
-                    HistoryUpdate::Piece(IndexedPreviousBoard(promotion_type, board.state.pieces[promotion_type]))
-                ]
+                    HistoryUpdate::Piece(IndexedPreviousBoard(
+                        piece_type,
+                        board.state.pieces[piece_type],
+                    )),
+                    HistoryUpdate::Piece(IndexedPreviousBoard(
+                        promotion_type,
+                        board.state.pieces[promotion_type],
+                    )),
+                ],
             };
             board.state.pieces[promotion_type] |= to;
             board.state.pieces[piece_type] ^= from;
@@ -285,7 +356,7 @@ impl Piece for PawnPiece {
         board.state.all_pieces ^= from;
         board.state.all_pieces |= to;
 
-        board.state.first_move &= !from;
+        //board.state.first_move &= !from;
     }
 
     fn add_actions(
@@ -293,15 +364,15 @@ impl Piece for PawnPiece {
         actions: &mut Vec<Action>,
         board: &Board,
         piece_type: usize,
-        from: u32, 
+        from: u32,
         team: u32,
         mode: u32,
     ) {
         let promotion_rows = board.state.edges[0].bottom | board.state.edges[0].top;
 
         let from_board = BitBoard::from_lsb(from);
-        let bit_actions =
-            self.get_moves(board, from_board, piece_type, team, mode) & !board.state.teams[team as usize];
+        let bit_actions = self.get_moves(board, from_board, piece_type, team, mode)
+            & !board.state.teams[team as usize];
 
         if bit_actions.is_empty() {
             return;

@@ -1,3 +1,3 @@
-pub mod games;
-pub mod board;
 pub mod bitset;
+pub mod board;
+pub mod games;

@@ -1,4 +1,7 @@
-use crate::board::{pieces::{PieceSymbol, Piece}, PieceType, BitBoard, Board, AttackDirections, AttackLookup};
+use crate::board::{
+    pieces::{Piece, PieceSymbol},
+    AttackDirections, AttackLookup, BitBoard, Board, PieceType,
+};
 
 pub fn get_moves_ray(
     mut from: BitBoard,
@@ -39,7 +42,7 @@ pub fn get_ray_attacks(
         } else {
             blocker.bitscan_reverse()
         };
-        
+
         attacks ^= ray_attacks[square as usize][dir_usize];
     }
     return attacks;

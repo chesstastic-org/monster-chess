@@ -1,6 +1,11 @@
 use crate::board::pieces::PieceSymbol;
 
-use super::{super::{actions::{HistoryMove, Action, UndoMoveError}, pieces::Piece, game::Game, Board, BitBoard, Rows, Cols}};
+use super::super::{
+    actions::{Action, HistoryMove, UndoMoveError},
+    game::Game,
+    pieces::Piece,
+    BitBoard, Board, Cols, Rows,
+};
 
 impl<'a> Board<'a> {
     pub(crate) fn from_fen_state(
@@ -8,10 +13,7 @@ impl<'a> Board<'a> {
         (rows, cols): (Rows, Cols),
         fen: &str,
     ) -> Board<'a> {
-        let pieces = game
-            .pieces
-            .iter()
-            .collect::<Vec<_>>();
+        let pieces = game.pieces.iter().collect::<Vec<_>>();
 
         let mut board = Board::empty(game, (rows, cols));
 

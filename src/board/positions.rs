@@ -1,4 +1,10 @@
-use super::{actions::{HistoryMove, Action, UndoMoveError}, edges::Edges, pieces::Piece, game::Game, Board};
+use super::{
+    actions::{Action, HistoryMove, UndoMoveError},
+    edges::Edges,
+    game::Game,
+    pieces::Piece,
+    Board,
+};
 
 const COLS: [char; 52] = [
     'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
@@ -34,7 +40,8 @@ impl<'a> Board<'a> {
     }
 
     pub fn encode_action(&self, action: &Action) -> String {
-        return format!("{}{}{}",
+        return format!(
+            "{}{}{}",
             self.encode_position(action.from),
             self.encode_position(action.to),
             self.game.pieces[action.piece_type].format_info(self, action.info)

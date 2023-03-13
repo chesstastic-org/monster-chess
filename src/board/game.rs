@@ -1,4 +1,4 @@
-use super::{Board, pieces::Piece, fen::FenOptions, actions::Action};
+use super::{actions::Action, fen::FenOptions, pieces::Piece, Board};
 
 pub trait MoveRestrictions {
     fn is_legal(&self, board: &mut Board, action: &Action) -> bool;
@@ -10,5 +10,5 @@ pub struct Game {
     pub move_restrictions: Box<dyn MoveRestrictions>,
     pub fen_options: FenOptions,
     pub teams: u32,
-    pub turns: u32
+    pub turns: u32,
 }

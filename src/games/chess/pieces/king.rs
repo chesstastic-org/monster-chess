@@ -1,4 +1,15 @@
-use crate::{board::{BitBoard, PieceType, Cols, Board, AttackDirections, edges::Edges, actions::{Action, HistoryMove, IndexedPreviousBoard, HistoryState, HistoryUpdate, PreviousBoard}, pieces::{PieceSymbol, Piece}}, bitset::Direction, games::chess::game::ATTACKS_MODE};
+use crate::{
+    bitset::Direction,
+    board::{
+        actions::{
+            Action, HistoryMove, HistoryState, HistoryUpdate, IndexedPreviousBoard, PreviousBoard,
+        },
+        edges::Edges,
+        pieces::{Piece, PieceSymbol},
+        AttackDirections, BitBoard, Board, Cols, PieceType,
+    },
+    games::chess::game::ATTACKS_MODE,
+};
 
 const NORMAL_KING_MOVE: usize = 0;
 const CASTLING_MOVE: usize = 1;
@@ -55,12 +66,18 @@ impl KingPiece {
             state: HistoryState::Any {
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 first_move: PreviousBoard(board.state.first_move),
-                updates: vec![                    
+                updates: vec![
                     HistoryUpdate::Team(IndexedPreviousBoard(color, board.state.teams[color])),
-                    HistoryUpdate::Piece(IndexedPreviousBoard(piece_type, board.state.pieces[piece_type])),
-                    HistoryUpdate::Piece(IndexedPreviousBoard(ROOK_PIECE_TYPE, board.state.pieces[ROOK_PIECE_TYPE])),
-                ]
-            }
+                    HistoryUpdate::Piece(IndexedPreviousBoard(
+                        piece_type,
+                        board.state.pieces[piece_type],
+                    )),
+                    HistoryUpdate::Piece(IndexedPreviousBoard(
+                        ROOK_PIECE_TYPE,
+                        board.state.pieces[ROOK_PIECE_TYPE],
+                    )),
+                ],
+            },
         };
         board.history.push(history_move);
 
@@ -120,12 +137,28 @@ impl Piece for KingPiece {
         true
     }
 
-    fn can_move_mask(&self, board: &Board, from: BitBoard, from_bit: u32, piece_type: usize, team: u32, mode: u32, to: BitBoard) -> BitBoard {
+    fn can_move_mask(
+        &self,
+        board: &Board,
+        from: BitBoard,
+        from_bit: u32,
+        piece_type: usize,
+        team: u32,
+        mode: u32,
+        to: BitBoard,
+    ) -> BitBoard {
         self.get_attack_lookup(board, piece_type).unwrap()[from_bit as usize][0]
     }
 
     #[allow(unused_variables)]
-    fn get_moves(&self, board: &Board, from: BitBoard, piece_type: usize, team: u32, mode: u32) -> BitBoard {
+    fn get_moves(
+        &self,
+        board: &Board,
+        from: BitBoard,
+        piece_type: usize,
+        team: u32,
+        mode: u32,
+    ) -> BitBoard {
         let lookup = self.get_attack_lookup(board, piece_type);
         match lookup {
             Some(lookup) => lookup[from.bitscan_reverse() as usize][0],
@@ -133,7 +166,14 @@ impl Piece for KingPiece {
         }
     }
 
-    fn make_capture_move(&self, board: &mut Board, action: &Action, piece_type: usize, from: BitBoard, to: BitBoard) {
+    fn make_capture_move(
+        &self,
+        board: &mut Board,
+        action: &Action,
+        piece_type: usize,
+        from: BitBoard,
+        to: BitBoard,
+    ) {
         if action.info == CASTLING_MOVE {
             self.make_castling_move(board, action, from, to);
 
@@ -159,13 +199,22 @@ impl Piece for KingPiece {
             state: HistoryState::Any {
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 first_move: PreviousBoard(board.state.first_move),
-                updates: vec![                    
+                updates: vec![
                     HistoryUpdate::Team(IndexedPreviousBoard(color, board.state.teams[color])),
-                    HistoryUpdate::Team(IndexedPreviousBoard(captured_color, board.state.teams[captured_color])),
-                    HistoryUpdate::Piece(IndexedPreviousBoard(piece_type, board.state.pieces[piece_type])),
-                    HistoryUpdate::Piece(IndexedPreviousBoard(captured_piece_type, board.state.pieces[captured_piece_type]))
-                ]
-            }
+                    HistoryUpdate::Team(IndexedPreviousBoard(
+                        captured_color,
+                        board.state.teams[captured_color],
+                    )),
+                    HistoryUpdate::Piece(IndexedPreviousBoard(
+                        piece_type,
+                        board.state.pieces[piece_type],
+                    )),
+                    HistoryUpdate::Piece(IndexedPreviousBoard(
+                        captured_piece_type,
+                        board.state.pieces[captured_piece_type],
+                    )),
+                ],
+            },
         };
         board.history.push(history_move);
 
@@ -187,7 +236,7 @@ impl Piece for KingPiece {
     fn add_actions(
         &self,
         actions: &mut Vec<Action>,
-        board: &Board, 
+        board: &Board,
         piece_type: usize,
         from: u32,
         team: u32,
@@ -198,8 +247,8 @@ impl Piece for KingPiece {
         let board_len = board.state.squares;
 
         let from_board = BitBoard::from_lsb(from);
-        let bit_actions =
-            self.get_moves(board, from_board, piece_type, team, mode) & !board.state.teams[team as usize];
+        let bit_actions = self.get_moves(board, from_board, piece_type, team, mode)
+            & !board.state.teams[team as usize];
 
         if bit_actions.is_empty() {
             return;

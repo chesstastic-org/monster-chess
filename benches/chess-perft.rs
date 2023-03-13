@@ -1,5 +1,5 @@
-use monster_chess::{games::chess::Chess, board::Board};
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use monster_chess::{board::Board, games::chess::Chess};
 
 fn startpos(depth: u32) {
     let game = Chess::create();

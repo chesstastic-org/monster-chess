@@ -5,7 +5,11 @@ pub use game::*;
 
 #[cfg(test)]
 mod tests {
-    use crate::{board::Board, games::chess::Chess, board::{actions::HistoryMove, game::Game}};
+    use crate::{
+        board::Board,
+        board::{actions::HistoryMove, game::Game},
+        games::chess::Chess,
+    };
 
     #[test]
     fn startpos() {
@@ -22,11 +26,7 @@ mod tests {
     #[test]
     fn white_promotion() {
         let chess = Chess::create();
-        let mut board = Board::new(
-            &chess,
-            (8, 8),
-            "8/5P2/8/8/8/7K/8/n6k w - - 0 1"
-        );
+        let mut board = Board::new(&chess, (8, 8), "8/5P2/8/8/8/7K/8/n6k w - - 0 1");
 
         board.assert_perfts([7, 25, 299, 1931]);
     }
@@ -34,10 +34,7 @@ mod tests {
     #[test]
     fn black_promotion() {
         let chess = Chess::create();
-        let mut board = Board::new(
-            &chess,
-            (8, 8),
-            "N6K/8/8/7k/8/8/5p2/8 b - - 0 1");
+        let mut board = Board::new(&chess, (8, 8), "N6K/8/8/7k/8/8/5p2/8 b - - 0 1");
 
         board.assert_perfts([9, 41, 524, 3674]);
     }
@@ -69,11 +66,7 @@ mod tests {
     #[test]
     fn position_three() {
         let chess = Chess::create();
-        let mut board = Board::new(
-            &chess,
-            (8, 8),
-            "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1",
-        );
+        let mut board = Board::new(&chess, (8, 8), "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1");
 
         board.assert_perfts([14, 191, 2812, 43238, 674624]);
     }
@@ -117,11 +110,7 @@ mod tests {
     #[test]
     fn multiple_pawns_promoting() {
         let chess = Chess::create();
-        let mut board = Board::new(
-            &chess,
-            (8, 8),
-            "n1n5/PPPk4/8/8/8/8/4Kppp/5N1N b - - 0 1",
-        );
+        let mut board = Board::new(&chess, (8, 8), "n1n5/PPPk4/8/8/8/8/4Kppp/5N1N b - - 0 1");
 
         board.assert_perfts([24, 496, 9483, 182838, 3605103]);
     }

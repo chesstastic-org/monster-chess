@@ -1,4 +1,10 @@
-use super::{actions::{HistoryMove, Action, UndoMoveError}, edges::Edges, pieces::Piece, game::Game, Board};
+use super::{
+    actions::{Action, HistoryMove, UndoMoveError},
+    edges::Edges,
+    game::Game,
+    pieces::Piece,
+    Board,
+};
 
 pub type PerftBranch = (String, PerftResults);
 
@@ -65,10 +71,7 @@ impl<'a> Board<'a> {
             self.make_move(&node);
             let results = self.perft(depth - 1);
             nodes += results.nodes;
-            branches.push((
-                self.encode_action(&node),
-                results,
-            ));
+            branches.push((self.encode_action(&node), results));
             self.undo_move();
         }
 

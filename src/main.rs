@@ -1,10 +1,10 @@
+use monster_chess::{board::Board, games::chess::Chess};
 use std::env;
 use std::time::Duration;
-use monster_chess::{games::chess::Chess, board::Board};
 
 use std::time::{SystemTime, UNIX_EPOCH};
 
-fn get_time_ms() -> u128  {
+fn get_time_ms() -> u128 {
     let start = SystemTime::now();
     let since_the_epoch = start
         .duration_since(UNIX_EPOCH)
@@ -19,74 +19,68 @@ fn main() {
     let mut board = Board::new(
         &chess,
         (8, 8),
-        "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1",
+        "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1",
     );
 
-    println!("-");
+    println!("team0: {}", board.state.moving_team);
+    let action = board.decode_action("c4c5", 0).unwrap();
+    println!("{}", board.state.first_move.display(8, 8));
+    board.make_move(&action);
+    println!("team1: {}", board.state.moving_team);
     println!("{}", board.state.first_move.display(8, 8));
 
-    let action = board.decode_action("d5e6", 0).unwrap();
+    let action = board.decode_action("a3a4", 0).unwrap();
     board.make_move(&action);
-    
-    println!("-");
-    println!("{}", board.state.first_move.display(8, 8));
-
-    let action = board.decode_action("d7d5", 0).unwrap();
-    board.make_move(&action);
-
-    println!("-");
+    println!("team2: {}", board.state.moving_team);
     println!("{}", board.state.first_move.display(8, 8));
 
     return;
 
     let lines = r#"
-    a6b5 - 1
-    a6b7 - 1
-    a6c4 - 1
-    a6c8 - 1
-    a6d3 - 1
-    a6e2 - 1
-    a8b8 - 1
-    a8c8 - 1
-    a8d8 - 1
-    b4b3 - 1
+    a1b1 - 1
+    a1c1 - 1
+    a2a3 - 1
+    b4a3 - 1
+    b4a5 - 1
     b4c3 - 1
-    b6a4 - 1
-    b6c4 - 1
-    b6c8 - 1
-    b6d7 - 1
-    c7c5 - 1
-    c7c6 - 1
-    d5d4 - 1
-    d5e4 - 1
-    e7c5 - 1
-    e7d6 - 1
-    e7d7 - 1
-    e7d8 - 1
-    e7e6 - 1
-    e7f6 - 1
-    e7f8 - 1
-    e8c8 - 1
-    e8d8 - 1
-    e8f8 - 1
-    e8g8 - 1
-    f7e6 - 1
-    g6g5 - 1
-    g7f6 - 1
-    g7f8 - 1
-    g7h6 - 1
-    h3g2 - 1
-    h8f8 - 1
-    h8g8 - 1
-    h8h4 - 1
-    h8h5 - 1
-    h8h6 - 1
-    h8h7 - 1
-    "#.split("\n").map(|el| el.trim().to_string()).filter(|el| el.len() > 0).collect::<Vec<_>>();
+    c5b6 - 1
+    d1a4 - 1
+    d1b1 - 1
+    d1b3 - 1
+    d1c1 - 1
+    d1c2 - 1
+    d1e1 - 1
+    d1e2 - 1
+    d2d3 - 1
+    d2d4 - 1
+    e4e5 - 1
+    f1e1 - 1
+    f1f2 - 1
+    f3d4 - 1
+    f3e1 - 1
+    f3e5 - 1
+    f3g5 - 1
+    f3h4 - 1
+    g1f2 - 1
+    g1h1 - 1
+    g2g3 - 1
+    g2g4 - 1
+    h2h3 - 1
+    h2h4 - 1
+    h6f5 - 1
+    h6f7 - 1
+    h6g4 - 1
+    h6g8 - 1
+    
+    "#
+    .split("\n")
+    .map(|el| el.trim().to_string())
+    .filter(|el| el.len() > 0)
+    .collect::<Vec<_>>();
+
+    let perft = board.perft(1);
 
     let start = get_time_ms();
-    let perft = board.perft(2)
-        .get_branch_results("f3f6");
     let end = get_time_ms();
     for (action, subperft) in perft.branches {
         let line = format!("{action} - {}", subperft.nodes);

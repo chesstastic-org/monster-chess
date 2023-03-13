@@ -1,4 +1,4 @@
-use super::{AttackLookup, Cols, Rows, Board, BitBoard, pieces::Piece};
+use super::{pieces::Piece, AttackLookup, BitBoard, Board, Cols, Rows};
 
 pub fn generate_lookups(
     board: &Board,

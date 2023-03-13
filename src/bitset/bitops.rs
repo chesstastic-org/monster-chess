@@ -6,7 +6,9 @@ impl<const T: usize> ops::Not for BitSet<T> {
 
     fn not(self) -> Self::Output {
         if T == 1 {
-            return BitSet { bits: [ !self.bits[0]; T ] };
+            return BitSet {
+                bits: [!self.bits[0]; T],
+            };
         }
 
         BitSet::<T> {

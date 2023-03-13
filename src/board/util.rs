@@ -1,9 +1,14 @@
 use arrayvec::ArrayVec;
-use smallvec::{SmallVec, smallvec};
+use smallvec::{smallvec, SmallVec};
 
 use crate::bitset::BitSet;
 
-use super::{actions::{HistoryMove, Action, UndoMoveError}, edges::{Edges, generate_edge_list}, pieces::Piece, game::Game};
+use super::{
+    actions::{Action, HistoryMove, UndoMoveError},
+    edges::{generate_edge_list, Edges},
+    game::Game,
+    pieces::Piece,
+};
 
 pub type BitBoard = BitSet<1>;
 pub type PieceType = usize;
@@ -41,7 +46,7 @@ pub struct BoardState {
     pub turn_lookup: ArrayVec<u32, 16>,
     pub team_lookup: ArrayVec<u32, 16>,
     pub turn_reverse_lookup: ArrayVec<u32, 16>,
-    pub team_reverse_lookup: ArrayVec<u32, 16>
+    pub team_reverse_lookup: ArrayVec<u32, 16>,
 }
 
 impl BoardState {
@@ -127,7 +132,7 @@ impl<'a> Board<'a> {
                 team_lookup,
                 team_reverse_lookup,
                 turn_lookup,
-                turn_reverse_lookup
+                turn_reverse_lookup,
             },
         };
 
@@ -163,13 +168,20 @@ impl<'a> Board<'a> {
             let piece = &self.game.pieces[ind];
 
             for bit in board.iter_one_bits(board_len) {
-                mask |= piece.can_move_mask(self, BitBoard::from_lsb(bit), bit, ind, team, mode, target);
+                mask |= piece.can_move_mask(
+                    self,
+                    BitBoard::from_lsb(bit),
+                    bit,
+                    ind,
+                    team,
+                    mode,
+                    target,
+                );
             }
         }
 
         (mask & target).is_set()
     }
-
 
     pub fn generate_moves(&self, mode: u32) -> Vec<Action> {
         let board_len = self.state.squares;
@@ -231,11 +243,15 @@ impl<'a> Board<'a> {
     pub fn undo_move(&mut self) -> Result<(), UndoMoveError> {
         match self.history.last() {
             Some(history_move) => {
-                self.game.pieces[history_move.action.piece_type].undo_move(&mut self.state, self.game, history_move);
+                self.game.pieces[history_move.action.piece_type].undo_move(
+                    &mut self.state,
+                    self.game,
+                    history_move,
+                );
                 self.history.pop();
                 Ok(())
             }
-            None => Err(UndoMoveError::NoHistoryMoves)
+            None => Err(UndoMoveError::NoHistoryMoves),
         }
     }
 }

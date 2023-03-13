@@ -65,7 +65,7 @@ impl<const T: usize> BitSet<T> {
     pub fn apply(self, rhs: BitSet<T>, apply: impl Fn((&u128, u128)) -> u128) -> Self {
         if T == 1 {
             return BitSet {
-                bits: [ apply((&self.bits[0], rhs.bits[0])); T ]
+                bits: [apply((&self.bits[0], rhs.bits[0])); T],
             };
         }
 
@@ -84,7 +84,7 @@ impl<const T: usize> BitSet<T> {
     #[inline(always)]
     pub fn effect(&mut self, rhs: BitSet<T>, apply: impl Fn((&u128, u128)) -> u128) {
         if T == 1 {
-            self.bits = [ apply((&self.bits[0], rhs.bits[0])); T ];
+            self.bits = [apply((&self.bits[0], rhs.bits[0])); T];
             return;
         }
 

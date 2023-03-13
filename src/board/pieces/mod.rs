@@ -1,4 +1,11 @@
-use super::{actions::{HistoryMove, HistoryUpdate, Action, UndoMoveError, IndexedPreviousBoard, HistoryState, PreviousBoard}, game::Game, Board, BitBoard, Rows, Cols, PieceType, AttackLookup, AttackDirections, BoardState};
+use super::{
+    actions::{
+        Action, HistoryMove, HistoryState, HistoryUpdate, IndexedPreviousBoard, PreviousBoard,
+        UndoMoveError,
+    },
+    game::Game,
+    AttackDirections, AttackLookup, BitBoard, Board, BoardState, Cols, PieceType, Rows,
+};
 
 pub enum PieceSymbol {
     Char(char),
@@ -19,12 +26,32 @@ pub trait Piece {
 
     fn can_lookup(&self) -> bool;
 
-    fn get_attack_lookup<'a>(&self, board: &'a Board, piece_type: usize) -> Option<&'a AttackLookup> {
+    fn get_attack_lookup<'a>(
+        &self,
+        board: &'a Board,
+        piece_type: usize,
+    ) -> Option<&'a AttackLookup> {
         board.attack_lookup.get(piece_type)
     }
 
-    fn get_moves(&self, board: &Board, from: BitBoard, piece_type: usize, team: u32, mode: u32) -> BitBoard;
-    fn can_move_mask(&self, board: &Board, from: BitBoard, from_bit: u32, piece_type: usize, team: u32, mode: u32, to: BitBoard) -> BitBoard {
+    fn get_moves(
+        &self,
+        board: &Board,
+        from: BitBoard,
+        piece_type: usize,
+        team: u32,
+        mode: u32,
+    ) -> BitBoard;
+    fn can_move_mask(
+        &self,
+        board: &Board,
+        from: BitBoard,
+        from_bit: u32,
+        piece_type: usize,
+        team: u32,
+        mode: u32,
+        to: BitBoard,
+    ) -> BitBoard {
         self.get_moves(board, from, piece_type, team, mode)
     }
 
@@ -33,7 +60,14 @@ pub trait Piece {
         Vec::new()
     }
 
-    fn make_capture_move(&self, board: &mut Board, action: &Action, piece_type: usize, from: BitBoard, to: BitBoard) {
+    fn make_capture_move(
+        &self,
+        board: &mut Board,
+        action: &Action,
+        piece_type: usize,
+        from: BitBoard,
+        to: BitBoard,
+    ) {
         let color: usize = action.team as usize;
         let captured_color: usize = if (to & board.state.teams[0]).is_set() {
             0
@@ -53,13 +87,22 @@ pub trait Piece {
             state: HistoryState::Any {
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 first_move: PreviousBoard(board.state.first_move),
-                updates: vec![                    
+                updates: vec![
                     HistoryUpdate::Team(IndexedPreviousBoard(color, board.state.teams[color])),
-                    HistoryUpdate::Team(IndexedPreviousBoard(captured_color, board.state.teams[captured_color])),
-                    HistoryUpdate::Piece(IndexedPreviousBoard(piece_type, board.state.pieces[piece_type])),
-                    HistoryUpdate::Piece(IndexedPreviousBoard(captured_piece_type, board.state.pieces[captured_piece_type]))
-                ]
-            }
+                    HistoryUpdate::Team(IndexedPreviousBoard(
+                        captured_color,
+                        board.state.teams[captured_color],
+                    )),
+                    HistoryUpdate::Piece(IndexedPreviousBoard(
+                        piece_type,
+                        board.state.pieces[piece_type],
+                    )),
+                    HistoryUpdate::Piece(IndexedPreviousBoard(
+                        captured_piece_type,
+                        board.state.pieces[captured_piece_type],
+                    )),
+                ],
+            },
         };
         board.history.push(history_move);
 
@@ -78,7 +121,14 @@ pub trait Piece {
         // We actually don't need to swap the blockers. A blocker will still exist on `to`, just not on `from`.
     }
 
-    fn make_normal_move(&self, board: &mut Board, action: &Action, piece_type: usize, from: BitBoard, to: BitBoard) {
+    fn make_normal_move(
+        &self,
+        board: &mut Board,
+        action: &Action,
+        piece_type: usize,
+        from: BitBoard,
+        to: BitBoard,
+    ) {
         let color: usize = action.team as usize;
 
         board.history.push(HistoryMove {
@@ -87,8 +137,8 @@ pub trait Piece {
                 team: IndexedPreviousBoard(color, board.state.teams[color]),
                 piece: IndexedPreviousBoard(piece_type, board.state.pieces[piece_type]),
                 all_pieces: PreviousBoard(board.state.all_pieces),
-                first_move: PreviousBoard(board.state.first_move)
-            }
+                first_move: PreviousBoard(board.state.first_move),
+            },
         });
 
         board.state.teams[color] ^= from;
@@ -135,20 +185,29 @@ pub trait Piece {
         if state.current_turn == game.turns - 1 {
             state.moving_team = state.team_reverse_lookup[state.moving_team as usize];
             state.sub_moves -= 1;
-    
+
             if state.moving_team == 0 {
                 state.full_moves -= 1;
             }
         }
-    
+
         match &history_move.state {
-            HistoryState::Single { all_pieces, first_move, team, piece } => {
+            HistoryState::Single {
+                all_pieces,
+                first_move,
+                team,
+                piece,
+            } => {
                 state.all_pieces = all_pieces.0;
                 state.first_move = first_move.0;
                 state.teams[team.0] = team.1;
                 state.pieces[piece.0] = piece.1;
             }
-            HistoryState::Any { first_move, all_pieces, updates } => {
+            HistoryState::Any {
+                first_move,
+                all_pieces,
+                updates,
+            } => {
                 state.all_pieces = all_pieces.0;
                 state.first_move = first_move.0;
                 for change in updates {
@@ -160,7 +219,7 @@ pub trait Piece {
                             state.pieces[piece.0] = piece.1;
                         }
                     }
-                }    
+                }
             }
             HistoryState::None => {}
         }
@@ -169,16 +228,16 @@ pub trait Piece {
     fn add_actions(
         &self,
         actions: &mut Vec<Action>,
-        board: &Board, 
+        board: &Board,
         piece_type: usize,
         from: u32,
         team: u32,
-        mode: u32
+        mode: u32,
     ) {
         let from_board = BitBoard::from_lsb(from);
 
-        let bit_actions =
-            self.get_moves(board, from_board, piece_type, team, mode) & !board.state.teams[team as usize];
+        let bit_actions = self.get_moves(board, from_board, piece_type, team, mode)
+            & !board.state.teams[team as usize];
 
         if bit_actions.is_empty() {
             return;
