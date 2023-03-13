@@ -1,4 +1,4 @@
-use super::{actions::{HistoryMove, HistoryUpdate, Action, UndoMoveError, IndexedPreviousBoard, HistoryState, PreviousBoard}, game::Game, Board, BitBoard, Rows, Cols, PieceType, AttackLookup, AttackDirections};
+use super::{actions::{HistoryMove, HistoryUpdate, Action, UndoMoveError, IndexedPreviousBoard, HistoryState, PreviousBoard}, game::Game, Board, BitBoard, Rows, Cols, PieceType, AttackLookup, AttackDirections, BoardState};
 
 pub enum PieceSymbol {
     Char(char),
@@ -61,7 +61,7 @@ pub trait Piece {
                 ]
             }
         };
-        board.state.history.push(history_move);
+        board.history.push(history_move);
 
         board.state.teams[captured_color] ^= to;
         board.state.teams[color] ^= from;
@@ -81,7 +81,7 @@ pub trait Piece {
     fn make_normal_move(&self, board: &mut Board, action: &Action, piece_type: usize, from: BitBoard, to: BitBoard) {
         let color: usize = action.team as usize;
 
-        board.state.history.push(HistoryMove {
+        board.history.push(HistoryMove {
             action: *action,
             state: HistoryState::Single {
                 team: IndexedPreviousBoard(color, board.state.teams[color]),
@@ -125,35 +125,35 @@ pub trait Piece {
         }
     }
 
-    fn undo_move(&self, board: &mut Board, history_move: HistoryMove) {
-        board.state.turns -= 1;
-        board.state.current_turn = board.state.turn_reverse_lookup[board.state.current_turn as usize];
-        if board.state.current_turn == board.game.turns - 1 {
-            board.state.moving_team = board.state.team_reverse_lookup[board.state.moving_team as usize];
-            board.state.sub_moves -= 1;
-
-            if board.state.moving_team == 0 {
-                board.state.full_moves -= 1;
+    fn undo_move(&self, state: &mut BoardState, game: &Game, history_move: &HistoryMove) {
+        state.turns -= 1;
+        state.current_turn = state.turn_reverse_lookup[state.current_turn as usize];
+        if state.current_turn == game.turns - 1 {
+            state.moving_team = state.team_reverse_lookup[state.moving_team as usize];
+            state.sub_moves -= 1;
+    
+            if state.moving_team == 0 {
+                state.full_moves -= 1;
             }
         }
-
-        match history_move.state {
+    
+        match &history_move.state {
             HistoryState::Single { all_pieces, first_move, team, piece } => {
-                board.state.all_pieces = all_pieces.0;
-                board.state.first_move = first_move.0;
-                board.state.teams[team.0] = team.1;
-                board.state.pieces[piece.0] = piece.1;
+                state.all_pieces = all_pieces.0;
+                state.first_move = first_move.0;
+                state.teams[team.0] = team.1;
+                state.pieces[piece.0] = piece.1;
             }
             HistoryState::Any { first_move, all_pieces, updates } => {
-                board.state.all_pieces = all_pieces.0;
-                board.state.first_move = first_move.0;
+                state.all_pieces = all_pieces.0;
+                state.first_move = first_move.0;
                 for change in updates {
                     match change {
                         HistoryUpdate::Team(team) => {
-                            board.state.teams[team.0] = team.1;
+                            state.teams[team.0] = team.1;
                         }
                         HistoryUpdate::Piece(piece) => {
-                            board.state.pieces[piece.0] = piece.1;
+                            state.pieces[piece.0] = piece.1;
                         }
                     }
                 }    

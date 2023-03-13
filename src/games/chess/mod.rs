@@ -5,7 +5,12 @@ pub use game::*;
 
 #[cfg(test)]
 mod tests {
-    use crate::{board::Board, games::chess::Chess};
+    use crate::{board::Board, games::chess::Chess, board::actions::HistoryMove};
+
+    #[test]
+fn temp() {
+    assert_eq!(0, std::mem::size_of::<HistoryMove>());
+}
 
     /*#[test]
     fn startpos() {

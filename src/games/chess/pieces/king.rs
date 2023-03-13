@@ -62,7 +62,7 @@ impl KingPiece {
                 ]
             }
         };
-        board.state.history.push(history_move);
+        board.history.push(history_move);
 
         board.state.teams[color] ^= from;
         board.state.teams[color] ^= to;
@@ -163,7 +163,7 @@ impl Piece for KingPiece {
                 ]
             }
         };
-        board.state.history.push(history_move);
+        board.history.push(history_move);
 
         board.state.teams[captured_color] ^= to;
         board.state.teams[color] ^= from;

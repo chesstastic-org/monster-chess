@@ -38,8 +38,6 @@ pub struct BoardState {
     pub cols: Cols,
     pub squares: u32,
 
-    pub history: ArrayVec<HistoryMove, 2048>,
-
     pub turn_lookup: ArrayVec<u32, 16>,
     pub team_lookup: ArrayVec<u32, 16>,
     pub turn_reverse_lookup: ArrayVec<u32, 16>,
@@ -65,7 +63,8 @@ pub type AttackLookup = Vec<AttackDirections>;
 pub struct Board<'a> {
     pub state: BoardState,
     pub game: &'a Game,
-    pub attack_lookup: Vec<AttackLookup>
+    pub attack_lookup: Vec<AttackLookup>,
+    pub history: ArrayVec<HistoryMove, 2048>,
 }
 
 fn generate_forward_lookup(count: u32) -> ArrayVec<u32, 16> {
@@ -110,6 +109,7 @@ impl<'a> Board<'a> {
         let mut board = Board {
             attack_lookup: vec![],
             game,
+            history: ArrayVec::new(),
             state: BoardState {
                 all_pieces: BitBoard::new(),
                 first_move: BitBoard::new(),
@@ -119,7 +119,6 @@ impl<'a> Board<'a> {
                 cols,
                 rows,
                 squares: rows * cols,
-                history: ArrayVec::new(),
                 moving_team: 0,
                 current_turn: 0,
                 full_moves: 0,
@@ -229,12 +228,15 @@ impl<'a> Board<'a> {
         self.game.pieces[action.piece_type].make_move(self, action);
     }
 
+    #[inline(never)]
     pub fn undo_move(&mut self) -> Result<(), UndoMoveError> {
-        if let Some(history_move) = self.state.history.pop() {
-            self.game.pieces[history_move.action.piece_type].undo_move(self, history_move);
-            Ok(())
-        } else {
-            Err(UndoMoveError::NoHistoryMoves)
+        match self.history.last() {
+            Some(history_move) => {
+                self.game.pieces[history_move.action.piece_type].undo_move(&mut self.state, self.game, history_move);
+                self.history.pop();
+                Ok(())
+            }
+            None => Err(UndoMoveError::NoHistoryMoves)
         }
     }
 }

@@ -26,10 +26,11 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'monster_chess'",
+            "name": "Debug executable 'monster_chess' in --release",
             "cargo": {
                 "args": [
                     "build",
+                    "--release",
                     "--bin=monster_chess",
                     "--package=monster_chess"
                 ],

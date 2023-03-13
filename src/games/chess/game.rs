@@ -123,7 +123,7 @@ impl FenArgument for ChessEnPassant {
         let to = up(&BitBoard::from_lsb(en_passant_target), 1, cols, 1);
         let from = down(&to, 2, cols, previous_team);
 
-        board.state.history.push(HistoryMove {
+        board.history.push(HistoryMove {
             action: Action {
                 from: from.bitscan_forward(),
                 to: to.bitscan_forward(),
@@ -138,7 +138,7 @@ impl FenArgument for ChessEnPassant {
     }
 
     fn encode(&self, board: &Board) -> String {
-        let last_move = (&board.state.history).last();
+        let last_move = (&board.history).last();
         if let None = last_move {
             return "-".to_string();
         }

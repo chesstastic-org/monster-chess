@@ -38,7 +38,7 @@ impl PawnPiece {
                 1
             };
 
-        board.state.history.push(HistoryMove {
+        board.history.push(HistoryMove {
             action: *action,
             state: HistoryState::Any {
                 all_pieces: PreviousBoard(board.state.all_pieces),
@@ -144,7 +144,7 @@ impl Piece for PawnPiece {
             moves |= double_moves;
         }
 
-        if let Some(last_move) = board.state.history.last() {
+        if let Some(last_move) = board.history.last() {
             let conditions = last_move.action.piece_type == 0
                 && (last_move.action.to.abs_diff(last_move.action.from) == (2 * (cols)));
 
@@ -227,7 +227,7 @@ impl Piece for PawnPiece {
         board.state.first_move &= !to;
         // We actually don't need to swap the blockers. A blocker will still exist on `to`, just not on `from`.
 
-        board.state.history.push(history_move);
+        board.history.push(history_move);
     }
 
     fn make_normal_move(&self, board: &mut Board, action: &Action, piece_type: usize, from: BitBoard, to: BitBoard) {
@@ -238,7 +238,7 @@ impl Piece for PawnPiece {
 
         let color: usize = action.team as usize;
 
-        board.state.history.push(HistoryMove {
+        board.history.push(HistoryMove {
             action: *action,
             state: HistoryState::Single {
                 team: IndexedPreviousBoard(color, board.state.teams[color]),
@@ -250,7 +250,7 @@ impl Piece for PawnPiece {
 
         if action.info > 3 {
             let promotion_type = action.info - 2;
-            let history_state = &mut board.state.history.last_mut().unwrap().state;
+            let history_state = &mut board.history.last_mut().unwrap().state;
             *history_state = HistoryState::Any {
                 first_move: PreviousBoard(board.state.all_pieces),
                 all_pieces: PreviousBoard(board.state.all_pieces),
@@ -316,7 +316,7 @@ impl Piece for PawnPiece {
                 }
             } else {
                 let mut en_passant = false;
-                if let Some(last_move) = board.state.history.last() {
+                if let Some(last_move) = board.history.last() {
                     let conditions = last_move.action.piece_type == 0
                         && (last_move.action.to.abs_diff(last_move.action.from) == (2 * (cols)))
                         && (last_move.action.to.abs_diff(bit) == (cols))
