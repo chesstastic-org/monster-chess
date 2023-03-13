@@ -162,7 +162,7 @@ impl<'a> Board<'a> {
             let board = *board & self.state.teams[team as usize];
             let piece = &self.game.pieces[ind];
 
-            for bit in board.iter_one_bits(board_len as u32) {
+            for bit in board.iter_one_bits(board_len) {
                 mask |= piece.can_move_mask(self, BitBoard::from_lsb(bit), bit, ind, team, mode, target);
             }
         }

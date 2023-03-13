@@ -73,12 +73,18 @@ impl Piece for PawnPiece {
         true
     }
 
-    fn generate_lookup_moves(&self, board: &Board, from: BitBoard) -> AttackDirections {
+    fn generate_lookup_moves(&self, board: &Board, mut from: BitBoard) -> AttackDirections {
         let mut attack_dirs: AttackDirections = vec![];
+        let edges = board.state.edges[0];
         for team in 0..board.game.teams {
+            let from = match team {
+                0 => from & !edges.top,
+                1 => from & !edges.bottom,
+                _ => from & !edges.top
+            };
             let up_one = up(&from, 1, board.state.cols, team);
-            let mut captures = (up_one & !board.state.edges[0].right).right(1);
-            captures |= (up_one & !board.state.edges[0].left).left(1);
+            let mut captures = (up_one & !edges.right).right(1);
+            captures |= (up_one & !edges.left).left(1);
             attack_dirs.push(captures);
         }
         attack_dirs

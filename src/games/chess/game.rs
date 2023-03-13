@@ -172,7 +172,9 @@ impl PostProcess for ChessPostProcess {
         bottom |= bottom.up(1, cols);
         top |= top.down(1, cols);
 
-        let first_move = (board.state.pieces[0] & (bottom | top))
+        let first_move = 
+            (board.state.pieces[0] & board.state.teams[0] & bottom)
+            | (board.state.pieces[0] & board.state.teams[1] & top)
             | (board.state.all_pieces ^ board.state.pieces[0]);
         board.state.first_move &= first_move;
     }

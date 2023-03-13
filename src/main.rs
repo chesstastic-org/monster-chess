@@ -19,7 +19,7 @@ fn main() {
     let mut board = Board::new(
         &chess,
         (8, 8),
-        "rnbqkbnr/pppp1ppp/8/1B2p3/4P3/8/PPPP1PPP/RNBQK1NR b KQkq - 1 2",
+        "N6K/8/8/7k/8/8/5p2/8 b - - 0 1",
     );
 
     let lines = r#"
@@ -52,7 +52,7 @@ fn main() {
     "#.split("\n").map(|el| el.trim().to_string()).filter(|el| el.len() > 0).collect::<Vec<_>>();
 
     let start = get_time_ms();
-    let perft = board.perft(1);
+    let perft = board.perft(4);
     let end = get_time_ms();
     for ((from, to), subperft) in perft.branches {
         let line = format!("{from}{to} - {}", subperft.nodes);

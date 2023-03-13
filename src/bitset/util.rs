@@ -126,7 +126,7 @@ impl<const T: usize> BitSet<T> {
     }
 
     pub fn iter_one_bits(mut self, end: u32) -> BitIterator<T> {
-        BitIterator(self)
+        BitIterator(self, end)
     }
 
     pub fn display(&self, rows: usize, cols: usize) -> String {
@@ -148,7 +148,7 @@ impl<const T: usize> BitSet<T> {
     }
 }
 
-pub struct BitIterator<const T: usize>(pub BitSet<T>);
+pub struct BitIterator<const T: usize>(pub BitSet<T>, u32);
 
 impl<const T: usize> Iterator for BitIterator<T> {
     type Item = u32;
@@ -156,6 +156,9 @@ impl<const T: usize> Iterator for BitIterator<T> {
     fn next(&mut self) -> Option<Self::Item> {
         if self.0.is_set() {
             let bit = self.0.bitscan_forward();
+            if bit >= self.1 {
+                return None;
+            }
             self.0 &= self.0 - BitSet::from_element(1);
             Some(bit)
         } else {
