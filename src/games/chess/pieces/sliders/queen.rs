@@ -72,8 +72,13 @@ impl Piece for QueenPiece {
             .get_attack_lookup(board, piece_type)
             .expect("Could not find the queen attack lookup.");
 
-        for dir in 0..4 {
-            if can_ray_attack(board, from, dir, &lookup, to).is_set() {
+        let from_bit = from.bitscan_forward() as usize;
+        if (lookup[from_bit][8] & to).is_empty() {
+            return false;
+        }
+
+        for dir in 0..8 {
+            if can_ray_attack(board, from, from_bit, dir, &lookup, to).is_set() {
                 return true;
             }
         }
