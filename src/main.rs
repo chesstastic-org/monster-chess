@@ -19,11 +19,48 @@ fn main() {
     let mut board = Board::new(
         &chess,
         (8, 8),
-        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+        "rnbqkbnr/pppp1ppp/8/4p3/8/BP6/P1PPPPPP/RN1QKBNR b KQkq - 1 2",
     );
 
+    let lines = r#"
+    a7a5 - 1
+    a7a6 - 1
+    b7b5 - 1
+    b7b6 - 1
+    b8a6 - 1
+    b8c6 - 1
+    c7c5 - 1
+    c7c6 - 1
+    d7d5 - 1
+    d7d6 - 1
+    d8e7 - 1
+    d8f6 - 1
+    d8g5 - 1
+    d8h4 - 1
+    e5e4 - 1
+    f7f5 - 1
+    f7f6 - 1
+    f8a3 - 1
+    f8b4 - 1
+    f8c5 - 1
+    f8d6 - 1
+    f8e7 - 1
+    g7g5 - 1
+    g7g6 - 1
+    g8e7 - 1
+    g8f6 - 1
+    g8h6 - 1
+    h7h5 - 1
+    h7h6 - 1
+    "#.split("\n").map(|el| el.trim().to_string()).filter(|el| el.len() > 0).collect::<Vec<_>>();
+
     let start = get_time_ms();
-    let nodes = board.sub_perft(5);
+    let perft = board.perft(1);
     let end = get_time_ms();
-    println!("{}: {nodes}", end - start);
+    for ((from, to), subperft) in perft.branches {
+        let line = format!("{from}{to} - {}", subperft.nodes);
+        if !lines.contains(&line) {
+            println!("{line}");
+        }
+    }
 }
