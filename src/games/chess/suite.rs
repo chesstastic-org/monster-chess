@@ -1,3 +1,5 @@
+use std::time::{SystemTime, UNIX_EPOCH};
+
 use crate::board::Board;
 
 use super::Chess;
@@ -134,6 +136,14 @@ n1n5/1Pk5/8/8/8/8/5Kp1/5N1N b - - 0 1 ;D1 24 ;D2 421 ;D3 7421 ;D4 124608 ;D5 219
 8/PPPk4/8/8/8/8/4Kppp/8 b - - 0 1 ;D1 18 ;D2 270 ;D3 4699 ;D4 79355 ;D5 1533145 ;D6 28859283
 n1n5/PPPk4/8/8/8/8/4Kppp/5N1N b - - 0 1 ;D1 24 ;D2 496 ;D3 9483 ;D4 182838 ;D5 3605103 ;D6 71179139"#;
 
+fn get_time_ms() -> u128 {
+    let start = SystemTime::now();
+    let since_the_epoch = start
+        .duration_since(UNIX_EPOCH)
+        .expect("Time went backwards");
+    since_the_epoch.as_millis()
+}
+
 fn generate_tests<'a>() -> Vec<FENTest<'a>> {
     TEST_STR.split("\n").map(|test| {
         let strs = test.split(";").collect::<Vec<_>>();
@@ -149,11 +159,18 @@ fn generate_tests<'a>() -> Vec<FENTest<'a>> {
 #[test]
 fn perft_suite() {
     let tests = generate_tests();
+    let test_count = tests.len();
 
     for depth in 1..100 {
-        println!("Testing depth {depth}...");
+        if depth == 1 {
+            println!("Testing depth {depth}...");
+        } else {
+            println!("Testing depth {depth}...");
+        }
         let mut tests_completed = 0;
-        for test in &tests {
+        let mut start = get_time_ms();
+        let mut nodes = 0;
+        for (ind, test) in tests.iter().enumerate() {
             if depth > test.perft_counts.len() {
                 continue;
             }
@@ -166,11 +183,19 @@ fn perft_suite() {
             );
             board.assert_perft(depth as u32, test.perft_counts[depth - 1]);
             tests_completed += 1;
+
+            nodes += test.perft_counts[depth - 1];
+
+            let end = get_time_ms();
+            if (end - start) > 400 {
+                println!("  {}% complete ({nodes} nodes so far)", (((ind as f64) / (test_count as f64)) * 100.0) as u64);
+                start = get_time_ms();
+            }
         }
         if tests_completed == 0 {
             println!("No tests found for depth {depth}, ending!");
             return;
         }
-        println!("All tests for depth {depth} have passed.");
+        print!("All tests for depth {depth} have completed ({nodes} nodes searched.) ");
     }
 }
