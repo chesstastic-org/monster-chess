@@ -1,6 +1,6 @@
 use super::{actions::{HistoryMove, Action, UndoMoveError}, edges::Edges, pieces::Piece, game::Game, Board};
 
-pub type PerftBranch = ((String, String), PerftResults);
+pub type PerftBranch = (String, PerftResults);
 
 #[derive(Debug, Clone)]
 pub struct PerftResults {
@@ -9,8 +9,7 @@ pub struct PerftResults {
 }
 
 impl PerftResults {
-    pub fn get_branch_results(&self, branch: (&str, &str)) -> PerftResults {
-        let branch = (branch.0.to_string(), branch.1.to_string());
+    pub fn get_branch_results(&self, branch: &str) -> PerftResults {
         self.branches
             .iter()
             .find(|el| el.0 == branch)
@@ -67,10 +66,7 @@ impl<'a> Board<'a> {
             let results = self.perft(depth - 1);
             nodes += results.nodes;
             branches.push((
-                (
-                    self.encode_position(node.from),
-                    self.encode_position(node.to),
-                ),
+                self.encode_action(&node),
                 results,
             ));
             self.undo_move();

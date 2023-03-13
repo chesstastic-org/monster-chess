@@ -32,4 +32,19 @@ impl<'a> Board<'a> {
 
         Ok(col + (self.state.cols * row))
     }
+
+    pub fn encode_action(&self, action: &Action) -> String {
+        return format!("{}{}{}",
+            self.encode_position(action.from),
+            self.encode_position(action.to),
+            self.game.pieces[action.piece_type].format_info(self, action.info)
+        );
+    }
+
+    pub fn decode_action(&mut self, action: &str, mode: u32) -> Option<Action> {
+        self.generate_legal_moves(mode)
+            .iter()
+            .find(|el| self.encode_action(el) == action)
+            .map(|el| el.clone())
+    }
 }

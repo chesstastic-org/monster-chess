@@ -19,44 +19,29 @@ fn main() {
     let mut board = Board::new(
         &chess,
         (8, 8),
-        "N6K/8/8/7k/8/8/5p2/8 b - - 0 1",
+        "8/5P2/8/8/8/7K/8/n6k w - - 0 1",
     );
 
+    let action = board.decode_action("f7f8n", 0).unwrap();
+    board.make_move(&action);
+
     let lines = r#"
-    a7a5 - 1
-    a7a6 - 1
-    b7b6 - 1
-    b8a6 - 1
-    b8c6 - 1
-    c7c5 - 1
-    c7c6 - 1
-    d8e7 - 1
-    d8f6 - 1
-    d8g5 - 1
-    d8h4 - 1
-    e8e7 - 1
-    f7f5 - 1
-    f7f6 - 1
-    f8a3 - 1
-    f8b4 - 1
-    f8c5 - 1
-    f8d6 - 1
-    f8e7 - 1
-    g7g5 - 1
-    g7g6 - 1
-    g8e7 - 1
-    g8f6 - 1
-    g8h6 - 1
-    h7h5 - 1
-    h7h6 - 1
+    f8d7 - 1
+    f8e6 - 1
+    f8g6 - 1
+    f8h7 - 1
+    h3g3 - 1
+    h3g4 - 1
+    h3h4 - 1
     "#.split("\n").map(|el| el.trim().to_string()).filter(|el| el.len() > 0).collect::<Vec<_>>();
 
     let start = get_time_ms();
-    let perft = board.perft(4);
+    let perft = board.perft(2)
+        .get_branch_results("a1b3");
     let end = get_time_ms();
-    for ((from, to), subperft) in perft.branches {
-        let line = format!("{from}{to} - {}", subperft.nodes);
-        if !lines.contains(&line) {
+    for (action, subperft) in perft.branches {
+        let line = format!("{action} - {}", subperft.nodes);
+        if true {
             println!("{line}");
         }
     }

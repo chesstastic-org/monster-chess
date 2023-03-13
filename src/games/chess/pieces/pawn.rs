@@ -118,9 +118,9 @@ impl Piece for PawnPiece {
         }
     }
 
-    fn format_info(&self, board: &Board, info: u32) -> String {
+    fn format_info(&self, board: &Board, info: usize) -> String {
         if info > 1 {
-            let piece_trait = &board.game.pieces[(info as usize) - 2];
+            let piece_trait = &board.game.pieces[info - 2];
             if let PieceSymbol::Char(char) = piece_trait.get_piece_symbol() {
                 char.to_string()
             } else {
