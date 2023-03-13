@@ -45,26 +45,24 @@ impl Piece for BishopPiece {
     fn can_lookup(&self) -> bool {
         true
     }
-    
-    #[allow(unused_variables)]
+
     fn can_move(&self, board: &Board, from: BitBoard, piece_type: usize, team: u32, mode: u32, to: BitBoard) -> bool {
         let lookup = self
             .get_attack_lookup(board, piece_type)
             .expect("Could not find the queen attack lookup.");
 
         let from_bit = from.bitscan_forward() as usize;
-        let from_bit = from.bitscan_forward() as usize;
         if (lookup[from_bit][4] & to).is_empty() {
             return false;
         }
 
         for dir in 0..4 {
-            if can_ray_attack(board, from, from_bit, dir, &lookup, to).is_set() {
+            if can_ray_attack(board, from, from_bit, dir, &lookup, to) {
                 return true;
             }
         }
-        
-        return false;
+
+        false
     }
 
     #[allow(unused_variables)]

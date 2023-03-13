@@ -51,21 +51,19 @@ pub fn can_ray_attack(
     dir: u32,
     ray_attacks: &AttackLookup,
     to: BitBoard
-) -> BitBoard {
+) -> bool {
     let dir_usize = dir as usize;
-    let mut attacks = ray_attacks[from_bit][dir_usize];
+    let mut attacks = ray_attacks[from.bitscan_forward() as usize][dir_usize];
     let mut blocker = attacks;
-    blocker &= to;
     blocker &= board.state.all_pieces;
-    if blocker.is_empty() {
-        return BitBoard::new();
+    if blocker.is_set() {
+        let square = if from < blocker {
+            blocker.bitscan_forward()
+        } else {
+            blocker.bitscan_reverse()
+        };
+        
+        attacks ^= ray_attacks[square as usize][dir_usize];
     }
-    let square = if from < blocker {
-        blocker.bitscan_forward()
-    } else {
-        blocker.bitscan_reverse()
-    };
-    
-    attacks ^= ray_attacks[square as usize][dir_usize];
-    return attacks;
+    return (attacks & to).is_set();
 }

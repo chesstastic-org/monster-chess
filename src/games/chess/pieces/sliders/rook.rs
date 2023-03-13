@@ -42,11 +42,6 @@ impl Piece for RookPiece {
         lookups
     }
 
-    fn can_lookup(&self) -> bool {
-        true
-    }
-
-    #[allow(unused_variables)]
     fn can_move(&self, board: &Board, from: BitBoard, piece_type: usize, team: u32, mode: u32, to: BitBoard) -> bool {
         let lookup = self
             .get_attack_lookup(board, piece_type)
@@ -56,14 +51,18 @@ impl Piece for RookPiece {
         if (lookup[from_bit][4] & to).is_empty() {
             return false;
         }
-        
+
         for dir in 0..4 {
-            if can_ray_attack(board, from, from_bit, dir, &lookup, to).is_set() {
+            if can_ray_attack(board, from, from_bit, dir, &lookup, to) {
                 return true;
             }
         }
-        
-        return false;
+
+        false
+    }
+
+    fn can_lookup(&self) -> bool {
+        true
     }
 
     #[allow(unused_variables)]

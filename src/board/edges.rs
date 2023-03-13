@@ -2,6 +2,7 @@ use super::{actions::{HistoryMove, Action, UndoMoveError}, pieces::Piece, game::
 
 pub type EdgeBuffer = u32;
 
+#[derive(Copy, Clone, Debug)]
 pub struct Edges {
     pub top: BitBoard,
     pub bottom: BitBoard,

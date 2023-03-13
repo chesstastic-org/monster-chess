@@ -39,18 +39,18 @@ impl<const T: usize> BitSet<T> {
 
     pub fn is_empty(&self) -> bool {
         if T == 1 {
-            self.bits[0] == 0
-        } else {
-            self.bits.iter().all(|el| *el == 0)
+            return self.bits[0] == 0;
         }
+
+        self.bits.iter().any(|el| *el == 0)
     }
 
     pub fn is_set(&self) -> bool {
         if T == 1 {
-            self.bits[0] != 0
-        } else {
-            self.bits.iter().any(|el| *el != 0)
+            return self.bits[0] != 0;
         }
+
+        self.bits.iter().any(|el| *el != 0)
     }
 
     pub fn max() -> BitSet<T> {

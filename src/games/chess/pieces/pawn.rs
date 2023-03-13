@@ -115,18 +115,11 @@ impl Piece for PawnPiece {
     }
 
     fn can_move(&self, board: &Board, from: BitBoard, piece_type: usize, team: u32, mode: u32, to: BitBoard) -> bool {
-        if mode == ATTACKS_MODE {
-            let cols = board.state.cols;
-            let edges = &board.state.edges[0];
+        let up_one = up(&from, 1, board.state.cols, team);
+        let mut captures = (up_one & !board.state.edges[0].right).right(1);
+        captures |= (up_one & !board.state.edges[0].left).left(1);
 
-            let up_one = up(&from, 1, cols, team);
-            let mut captures = (up_one & !edges.right).right(1);
-            captures |= (up_one & !edges.left).left(1);
-
-            (captures & to).is_set()
-        } else {
-            (self.get_moves(board, from, piece_type, team, mode) & to).is_set()
-        }
+        return (captures & to).is_set();  
     }
 
     fn get_moves(&self, board: &Board, from: BitBoard, piece_type: usize, team: u32, mode: u32) -> BitBoard {

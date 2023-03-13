@@ -66,7 +66,6 @@ impl Piece for QueenPiece {
         true
     }
 
-    #[allow(unused_variables)]
     fn can_move(&self, board: &Board, from: BitBoard, piece_type: usize, team: u32, mode: u32, to: BitBoard) -> bool {
         let lookup = self
             .get_attack_lookup(board, piece_type)
@@ -78,12 +77,12 @@ impl Piece for QueenPiece {
         }
 
         for dir in 0..8 {
-            if can_ray_attack(board, from, from_bit, dir, &lookup, to).is_set() {
+            if can_ray_attack(board, from, from_bit, dir, &lookup, to) {
                 return true;
             }
         }
-        
-        return false;
+
+        false
     }
 
     #[allow(unused_variables)]
