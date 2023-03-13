@@ -83,7 +83,7 @@ For testing and benchmarking purposes, `monster-chess` provides a method named `
     let perft_psuedolegal = board.perft(5, false);
 ```
 
-From the benchmarks I've done, `monster-chess` can reach about 20,000,000 psuedo-legal moves per second, and 5,000,000 legal moves per second. This isn't ideal and if you're only interested in performance, I recommend using the [cozy-chess](https://github.com/analog-hors/cozy-chess/) trait, which is sure to have much more optimized move generation then anything `monster-chess` can provide. However, `monster-chess` is a sound option for chess given you also want the ability to support chess variants or even other games.
+From the benchmarks I've done, `monster-chess` can reach about 20,000,000 psuedo-legal moves per second, and 5,000,000 legal moves per second. This isn't ideal and if you're only interested in performance, I recommend using the [cozy-chess](https://github.com/analog-hors/cozy-chess/) crate which is at least 25x faster then the implementation of chess in `monster-chess`. However, `monster-chess` is a sound option for chess given you also want the ability to support chess variants or even other games.
 
 It may be noted that `monster-chess` also aims to support [Fischer Random Chess](https://www.chess.com/terms/chess960). As of now, Fischer Random Chess is theoretically supported in the implementation of `monster-chess`'s Chess implementation, but as of now, it isn't tested, and FENs for the variant aren't supported. It would be trivial to add it in the framework of `monster-chess` as an extension of the existing Chess implementation, though.
 
