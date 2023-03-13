@@ -9,7 +9,7 @@ pub struct ChessCastlingRights;
 impl FenArgument for ChessCastlingRights {
     fn decode(&self, board: &mut Board, arg: &str) -> Result<(), FenDecodeError> {
         if arg == "-" {
-            board.state.first_move ^= board.state.pieces[3];
+            board.state.first_move &= !board.state.pieces[3];
             Ok(())
         } else {
             let mut lost_castling_rights = vec!['Q', 'K', 'q', 'k'];
@@ -47,7 +47,7 @@ impl FenArgument for ChessCastlingRights {
                 let rook = (board.state.pieces[3] & board.state.teams[team]).bitscan(scan_dir);
                 let rook_board = BitBoard::from_lsb(rook);
 
-                board.state.first_move ^= rook_board;
+                board.state.first_move &= !rook_board;
             }
             Ok(())
         }

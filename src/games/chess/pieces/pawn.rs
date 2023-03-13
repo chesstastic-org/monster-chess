@@ -63,8 +63,8 @@ impl PawnPiece {
         board.state.all_pieces ^= en_passant_target;
         board.state.all_pieces |= to;
 
-        board.state.first_move ^= from;
-        board.state.first_move ^= en_passant_target;
+        board.state.first_move &= !from;
+        board.state.first_move &= !en_passant_target;
     }
 }
 
@@ -237,7 +237,7 @@ impl Piece for PawnPiece {
 
         board.state.all_pieces ^= from;
 
-        board.state.first_move ^= from;
+        board.state.first_move &= !from;
         board.state.first_move &= !to;
         // We actually don't need to swap the blockers. A blocker will still exist on `to`, just not on `from`.
 
@@ -285,7 +285,7 @@ impl Piece for PawnPiece {
         board.state.all_pieces ^= from;
         board.state.all_pieces |= to;
 
-        board.state.first_move ^= from;
+        board.state.first_move &= !from;
     }
 
     fn add_actions(

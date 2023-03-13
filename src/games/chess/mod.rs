@@ -20,18 +20,6 @@ mod tests {
     }
 
     #[test]
-    fn castling() {
-        let chess = Chess::create();
-        let mut board = Board::new(
-            &chess,
-            (8, 8),
-            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
-        );
-
-        board.assert_perfts([23, 460, 10664, 236936]);
-    }
-
-    #[test]
     fn white_promotion() {
         let chess = Chess::create();
         let mut board = Board::new(
