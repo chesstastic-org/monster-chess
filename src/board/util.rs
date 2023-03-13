@@ -152,25 +152,25 @@ impl<'a> Board<'a> {
         bitboard
     }
 
-    pub fn get_targeted_mask(&self, team: u32, mode: u32, to: BitBoard) -> BitBoard {
+    pub fn is_attacking(&self, team: u32, target: BitBoard, mode: u32) -> bool {
         let board_len = self.state.squares;
-        let mut bitboard = BitBoard::new();
+
+        let team = self.state.moving_team;
 
         for (ind, board) in self.state.pieces.iter().enumerate() {
             let board = *board & self.state.teams[team as usize];
             let piece = &self.game.pieces[ind];
 
             for bit in board.iter_one_bits(board_len as u32) {
-                bitboard |= piece.can_move(self, BitBoard::from_lsb(bit), ind, team, mode, to);
+                if piece.can_move(self, BitBoard::from_lsb(bit), ind, team, mode, target) {
+                    return true;
+                }  
             }
         }
 
-        bitboard
+        false
     }
 
-    pub fn is_attacking(&self, team: u32, target: BitBoard, mode: u32) -> bool {
-        (self.get_targeted_mask(team, mode, target) & target).is_set()
-    }
 
     pub fn generate_moves(&self, mode: u32) -> Vec<Action> {
         let board_len = self.state.squares;

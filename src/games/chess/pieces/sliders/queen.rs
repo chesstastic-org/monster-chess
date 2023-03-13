@@ -12,7 +12,7 @@ impl Piece for QueenPiece {
     fn generate_lookup_moves(&self, board: &Board, from: BitBoard) -> AttackDirections {
         let edges = &board.state.edges[0];
         let cols = board.state.cols;
-        vec![
+        let mut lookups = vec![
             get_moves_ray(
                 from,
                 |b| b.left(1),
@@ -53,7 +53,13 @@ impl Piece for QueenPiece {
                 |b| b.right(1).down(1, cols),
                 |b| b.is_empty() || (b & (edges.right | edges.bottom)).is_set(),
             ),
-        ]
+        ];
+        let mut combined_lookup = BitBoard::new();
+        for lookup in &lookups {
+            combined_lookup |= *lookup;
+        }
+        lookups.push(combined_lookup);
+        lookups
     }
 
     fn can_lookup(&self) -> bool {
@@ -61,17 +67,18 @@ impl Piece for QueenPiece {
     }
 
     #[allow(unused_variables)]
-    fn can_move(&self, board: &Board, from: BitBoard, piece_type: usize, team: u32, mode: u32, to: BitBoard) -> BitBoard {
+    fn can_move(&self, board: &Board, from: BitBoard, piece_type: usize, team: u32, mode: u32, to: BitBoard) -> bool {
         let lookup = self
             .get_attack_lookup(board, piece_type)
             .expect("Could not find the queen attack lookup.");
-        let mut attacks = BitBoard::new();
 
-        for dir in 0..8 {
-            attacks |= can_ray_attack(board, from, dir, &lookup, to);
+        for dir in 0..4 {
+            if can_ray_attack(board, from, dir, &lookup, to).is_set() {
+                return true;
+            }
         }
-
-        attacks
+        
+        return false;
     }
 
     #[allow(unused_variables)]
