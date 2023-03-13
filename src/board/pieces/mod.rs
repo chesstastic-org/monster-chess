@@ -113,6 +113,10 @@ pub trait Piece {
             self.make_capture_move(board, action, action.piece_type, from, to);
         }
 
+        self.update_turns(board);
+    }
+
+    fn update_turns(&self, board: &mut Board) {
         board.state.turns += 1;
         board.state.current_turn = board.state.turn_lookup[board.state.current_turn as usize];
         if board.state.current_turn == 0 {
@@ -122,7 +126,7 @@ pub trait Piece {
                 board.state.full_moves += 1;
             }
             board.state.moving_team = board.state.team_lookup[board.state.moving_team as usize];
-        }
+        };
     }
 
     fn undo_move(&self, state: &mut BoardState, game: &Game, history_move: &HistoryMove) {
