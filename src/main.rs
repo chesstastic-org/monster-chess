@@ -24,12 +24,12 @@ fn main() {
 
 
     let start = get_time_ms();
-    let perft = board.sub_perft(5, true);
+    let perft = board.perft(5, true);
     let end = get_time_ms();
     println!("perft(5): {} in {}ms", perft, end - start);
 
     let start = get_time_ms();
-    let perft = board.sub_perft(5, false);
+    let perft = board.perft(5, false);
     let end = get_time_ms();
     println!("perft<No Legality>(5): {} in {}ms", perft, end - start);
 }

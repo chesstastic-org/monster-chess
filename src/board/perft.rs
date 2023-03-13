@@ -26,7 +26,7 @@ impl PerftResults {
 }
 
 impl<'a> Board<'a> {
-    pub fn sub_perft(&mut self, depth: u32, legality: bool) -> u64 {
+    pub fn perft(&mut self, depth: u32, legality: bool) -> u64 {
         if depth == 0 {
             return 1;
         }
@@ -39,7 +39,7 @@ impl<'a> Board<'a> {
         };
         for node in moves {
             self.make_move(&node);
-            nodes += self.sub_perft(depth - 1, legality);
+            nodes += self.perft(depth - 1, legality);
             self.undo_move();
         }
 
@@ -47,7 +47,7 @@ impl<'a> Board<'a> {
     }
 
     pub fn assert_perft(&mut self, depth: u32, true_nodes: u64) {
-        let nodes = self.sub_perft(depth, true);
+        let nodes = self.perft(depth, true);
         assert_eq!(
             nodes,
             true_nodes,
@@ -66,7 +66,7 @@ impl<'a> Board<'a> {
         }
     }
 
-    pub fn perft(&mut self, depth: u32) -> PerftResults {
+    pub fn branch_perft(&mut self, depth: u32) -> PerftResults {
         if depth == 0 {
             return PerftResults {
                 nodes: 1,
@@ -78,7 +78,7 @@ impl<'a> Board<'a> {
         let mut branches: Vec<PerftBranch> = vec![];
         for node in self.generate_legal_moves(0) {
             self.make_move(&node);
-            let results = self.perft(depth - 1);
+            let results = self.branch_perft(depth - 1);
             nodes += results.nodes;
             branches.push((self.encode_action(&node), results));
             self.undo_move();

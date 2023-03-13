@@ -24,6 +24,11 @@ Types of games we're not aiming to be compatible with:
 - [5D Chess with Multiversal Time Travel](https://store.steampowered.com/app/1349230/5D_Chess_With_Multiverse_Time_Travel/)
 - [Minecraft](https://en.wikipedia.org/wiki/Minecraft)
 
+However, the following games _will_ be supported out of the box:
+- [Chess](https://en.wikipedia.org/wiki/Chess)
+- [Fischer Random Chess](https://en.wikipedia.org/wiki/Fischer_random_chess)
+- [Ataxx](https://en.wikipedia.org/wiki/Ataxx)
+
 If you're wondering if a given game or chess variant is compatible with chess, imagine starting with the base game of chess, and see if you can do any of the following to get to your variant.
 
 - Can I increase/decrease the board size?
@@ -32,11 +37,59 @@ If you're wondering if a given game or chess variant is compatible with chess, i
 - Can I change the movement restrictions? (eg. being allowed to move into check)
 - Can I change the win conditions? (eg. being able to win by capturing all pieces.)
 
-If so, `monster-chess` most likely will be able to be compatible with said variant.
+If so, `monster-chess` most likely will be able to be compatible with said variant, but you may have to add it.
 
-### Note
+## Out of the Box Support
 
-If you are only aiming to support chess or chess960, you should use the [cozy-chess](https://github.com/analog-hors/cozy-chess/) library, which will have much better performance and better code quality then the `monster-chess` library.
+### Chess
+
+Chess is a two-player game where both players start with a color and the same set of pieces, and must engage in a fruitful battle until one side is victorious. For the sake of brevity, we'll assume you're well-acquainted with the rules of chess (if not, feel free to [read about them here](https://www.chess.com/terms/chess)), and simply focus on the parts relevant to `monster-chess`.
+
+![Ladder Checkmate](https://i.imgur.com/xGu1ODZ.jpg)
+
+In chess, the end-goal of the game is **checkmate**, where the opponent's king is in check (in the line of sight of another piece), and has no moves that can escape said check (moving out of the way, blocking with another piece, etc.) The image above demonstrates this, with two rooks blocking all of the king's movement squares, and the opponent's king is simply unable to move out of the line of sight of the rooks. If the opponent is in check but can escape it, they must, and you cannot put yourself in check.
+
+The way `monster-chess` handles this is using **psuedolegal** move generation. First, we generate all of the moves any piece would be able to make (aka. psuedolegal moves), and then we check to make sure your king isn't in check after you perform the move. To do this, we have to generate _every possible move_ that the opponent can make after your move, and see if one of them allows for the king to be captured. This is expensive, but we have two ways to make this faster.
+- For pieces that move and capture differently, we only focus on the squares they capture.
+- For pieces that move in one direction until they hit another piece or the edge of the board (bishops, rooks, and queens), we check if the king is even in the line of sight of the piece before seeing if it's truly in the line of sight.
+
+Despite all of that, this legality check is rather expensive. Fortunately, it won't matter much if you're building a [chess engine](https://www.chessprogramming.org/Engines), as in any given position, you'll only be searching a fraction of the moves. This means, instead of performing the legality check for every move in the position, if you search 3 moves and find an instant hit, you won't need to check the rest.
+
+You can initialize the chess board as follows:
+
+```rust
+    // We have to store `chess` in a variable and borrow it because `monster-chess` separates the game instance from the actual board-state itself to avoid an extra runtime cost in many cases.
+    let chess = Chess::create();
+    let mut board = Board::new(
+        &chess,
+        2,
+        (8, 8),
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+    );
+```
+
+Then, we can generate the moves as follows:
+
+```rust
+// We have to specify the mode because `ATTACKS_MODE` is used to optimizing checks, and we don't know what mode to generate for until you specify it.
+let legal_moves = board.generate_legal_moves(NORMAL_MODE);
+let psuedolegal_moves = board.generate_moves(NORMAL_MODE);
+```
+
+For testing and benchmarking purposes, `monster-chess` provides a method named `perft`, which will count the number of all possible moves possible that are `depth` half-moves ahead from the position (with a half-move being a move from one of the two players for reference.)
+
+```rust
+    let perft = board.perft(5, true);
+    let perft_psuedolegal = board.perft(5, false);
+```
+
+From the benchmarks I've done, `monster-chess` can reach about 20,000,000 psuedo-legal moves per second, and 5,000,000 legal moves per second. This isn't ideal and if you're only interested in performance, I recommend using the [cozy-chess](https://github.com/analog-hors/cozy-chess/) trait, which is sure to have much more optimized move generation then anything `monster-chess` can provide. However, `monster-chess` is a sound option for chess given you also want the ability to support chess variants or even other games.
+
+It may be noted that `monster-chess` also aims to support [Fischer Random Chess](https://www.chess.com/terms/chess960). As of now, Fischer Random Chess is theoretically supported in the implementation of `monster-chess`'s Chess implementation, but as of now, it isn't tested, and FENs for the variant aren't supported. It would be trivial to add it in the framework of `monster-chess` as an extension of the existing Chess implementation, though.
+
+### Ataxx
+
+This game will be supported in the very-near future.
 
 ## Implementation
 
@@ -159,43 +212,7 @@ The games that `monster-chess` certainly plans to support out of the box are as 
 In addition, it's likely that we will also support the following out of the box:
 - [Ataxx](https://en.wikipedia.org/wiki/Ataxx)
 
-### Boards
-
-Once you have a `Game`, initializing a board becomes very easy. The example below should showcase this without any further explanation.
-
-```rust
-    let chess = Chess::create();
-    let mut board = Board::new(
-        &chess,
-        2,
-        (8, 8),
-        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
-    );
-```
-
 The only thing to note here is that `chess` is initialized as a variable so that it has a long enough lifetime to be preserved alongside the board.
-
-## TODOs
-
-### Indirection
-
-As of right now, we store `Piece` as a `&'static dyn Piece`, which introduces a layer of indirection. However, since we can guarantee the size of `Piece`, and we just want `Piece`'s functionality, we can optimize by writing our own vtable that removes the indirection.
-
-_(Example provided by the very kind quicknir#3667 on the Rust Programming Language Community Server.)_
-```rust
-struct foo {
-    first_method: fn(i32, i32) -> i32,
-}
-
-fn first_method_impl_one(x: i32, y: i32) -> i32 { x + y }
-
-static impl_one: foo = foo{first_method: first_method_impl_one};
-
-fn main() {
-   let mut v = vec![];
-   v.push(&impl_one);
-}
-```
 
 ## License
 
