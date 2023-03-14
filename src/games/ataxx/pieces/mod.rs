@@ -71,11 +71,11 @@ impl<const T: usize> Piece<T> for StonePiece {
                     )),
                     HistoryUpdate::Team(IndexedPreviousBoard(
                         team,
-                        board.state.teams[other_team],
+                        board.state.teams[team],
                     )),
                     HistoryUpdate::Team(IndexedPreviousBoard(
-                        team,
-                        board.state.teams[team],
+                        other_team,
+                        board.state.teams[other_team],
                     )),
                 ],
             },
@@ -89,6 +89,8 @@ impl<const T: usize> Piece<T> for StonePiece {
             board.state.all_pieces |= to;
             board.state.first_move &= !from;
         } else {
+            // Double Moves
+
             board.state.pieces[piece_type] ^= from;
             board.state.pieces[piece_type] |= to;
             board.state.teams[team] ^= from;
