@@ -6,6 +6,7 @@ pub mod lookups;
 pub mod perft;
 pub mod pieces;
 pub mod positions;
+pub mod tests;
 mod util;
 
 pub use util::*;
