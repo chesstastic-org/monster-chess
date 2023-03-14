@@ -1,6 +1,8 @@
 use std::usize;
 
-use crate::{board::{pieces::{Piece, PieceSymbol}, Board, AttackLookup, AttackDirections, actions::{Action, PreviousBoard, HistoryMove, HistoryState, HistoryUpdate, IndexedPreviousBoard}, edges::Edges, Cols}, bitboard::BitBoard};
+use crate::{board::{pieces::{Piece, PieceSymbol}, Board, AttackLookup, AttackDirections, actions::{Action, PreviousBoard, HistoryMove, HistoryState, HistoryUpdate, IndexedPreviousBoard}, edges::Edges, Cols, update_turns}, bitboard::BitBoard};
+
+use super::is_single_move;
 
 pub struct StonePiece;
 
@@ -64,8 +66,6 @@ impl<const T: usize> Piece<T> for StonePiece {
     }
 
     fn make_move(&self, board: &mut Board<T>, action: &Action) {
-        let dif = action.from.abs_diff(action.to);
-        let cols = board.state.cols;
         let from = BitBoard::<T>::from_lsb(action.from);
         let to = BitBoard::<T>::from_lsb(action.to);
 
@@ -95,7 +95,7 @@ impl<const T: usize> Piece<T> for StonePiece {
             },
         });
 
-        if dif == 1 || dif == 7 || dif == 6 || dif == 8 {
+        if is_single_move(action) {
             // Single Moves
             
             board.state.pieces[piece_type] |= to;
@@ -124,5 +124,7 @@ impl<const T: usize> Piece<T> for StonePiece {
 
         board.state.teams[other_team] ^= to_update;
         board.state.teams[team] |= to_update;
+
+        update_turns(&mut board.state);
     }
 }

@@ -6,7 +6,7 @@ use super::{
         UndoMoveError,
     },
     game::Game,
-    AttackDirections, AttackLookup, Board, BoardState, Cols, PieceType, Rows,
+    AttackDirections, AttackLookup, Board, BoardState, Cols, PieceType, Rows, update_turns, reverse_turns,
 };
 
 pub enum PieceSymbol {
@@ -165,33 +165,11 @@ pub trait Piece<const T: usize> {
             self.make_capture_move(board, action, action.piece_type, from, to);
         }
 
-        self.update_turns(board);
-    }
-
-    fn update_turns(&self, board: &mut Board<T>) {
-        board.state.turns += 1;
-        board.state.current_turn = board.state.turn_lookup[board.state.current_turn as usize];
-        if board.state.current_turn == 0 {
-            board.state.sub_moves += 1;
-
-            if board.state.moving_team == 0 {
-                board.state.full_moves += 1;
-            }
-            board.state.moving_team = board.state.team_lookup[board.state.moving_team as usize];
-        };
+        update_turns(&mut board.state);
     }
 
     fn undo_move(&self, state: &mut BoardState<T>, game: &Game<T>, history_move: &HistoryMove<T>) {
-        state.turns -= 1;
-        state.current_turn = state.turn_reverse_lookup[state.current_turn as usize];
-        if state.current_turn == game.turns - 1 {
-            state.moving_team = state.team_reverse_lookup[state.moving_team as usize];
-            state.sub_moves -= 1;
-
-            if state.moving_team == 0 {
-                state.full_moves -= 1;
-            }
-        }
+        reverse_turns(state, game);
 
         match &history_move.state {
             HistoryState::Single {

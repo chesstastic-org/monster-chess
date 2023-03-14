@@ -37,7 +37,7 @@ impl Chess {
             rows: 8,
             cols: 8,
             pieces: vec![PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING],
-            move_restrictions: Box::new(ChessMoveController),
+            controller: Box::new(ChessMoveController),
             fen_options: FenOptions {
                 state: FenState { first_moves: false },
                 args: vec![

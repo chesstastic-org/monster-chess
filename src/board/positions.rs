@@ -40,21 +40,10 @@ impl<'a, const T: usize> Board<'a, T> {
     }
 
     pub fn encode_action(&self, action: &Option<Action>) -> String {
-        match action {
-            Some(action) => format!(
-                "{}{}{}",
-                self.encode_position(action.from),
-                self.encode_position(action.to),
-                self.game.pieces[action.piece_type].format_info(self, action.info)
-            ),
-            None => "0000".to_string()
-        }
+        self.game.controller.encode_action(self, action)[0].clone()
     }
 
     pub fn decode_action(&mut self, action: &str, mode: u32) -> Option<Option<Action>> {
-        self.generate_legal_moves(mode)
-            .iter()
-            .find(|el| self.encode_action(el) == action)
-            .map(|el| el.clone())
+        self.game.controller.decode_action(self, action, mode)
     }
 }

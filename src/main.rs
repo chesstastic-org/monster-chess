@@ -21,7 +21,12 @@ fn main() {
         "x5o/7/7/7/7/7/o5x x 0 1",
     );
 
-    let perft = board.branch_perft(2);
+    let action = board.decode_action("g1g3", 0).unwrap();
+    board.make_move(&action);
+
+    println!("{}", board.to_fen());
+
+    let perft = board.branch_perft(1);
     for (action, subperft) in perft.branches {
         println!("{action} - {}", subperft.nodes);
     }

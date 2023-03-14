@@ -16,6 +16,32 @@ pub type PieceType = usize;
 pub type Rows = u32;
 pub type Cols = u32;
 
+pub fn update_turns<const T: usize>(state: &mut BoardState<T>) {
+    state.turns += 1;
+    state.current_turn = state.turn_lookup[state.current_turn as usize];
+    if state.current_turn == 0 {
+        state.sub_moves += 1;
+
+        if state.moving_team == 0 {
+            state.full_moves += 1;
+        }
+        state.moving_team = state.team_lookup[state.moving_team as usize];
+    };
+}
+
+pub fn reverse_turns<const T: usize>(state: &mut BoardState<T>, game: &Game<T>) {
+    state.turns -= 1;
+    state.current_turn = state.turn_reverse_lookup[state.current_turn as usize];
+    if state.current_turn == game.turns - 1 {
+        state.moving_team = state.team_reverse_lookup[state.moving_team as usize];
+        state.sub_moves -= 1;
+
+        if state.moving_team == 0 {
+            state.full_moves -= 1;
+        }
+    }
+}
+
 pub struct BoardState<const T: usize> {
     /// All Pieces is a BitBoard of all pieces, because keeping this bitboard ready makes it much easier to calculate movement for slider pieces.
     pub all_pieces: BitBoard<T>,
@@ -204,7 +230,7 @@ impl<'a, const T: usize> Board<'a, T> {
     */
     pub fn generate_legal_moves(&mut self, mode: u32) -> Vec<Option<Action>> {
         let moves = self.generate_moves(mode);
-        self.game.move_restrictions.transform_moves(self, mode, moves)
+        self.game.controller.transform_moves(self, mode, moves)
     }
 
     pub fn get_next_team(&self, mut team: u32) -> u32 {

@@ -1,10 +1,15 @@
-use crate::{board::{game::Game, fen::{FenOptions, FenState, FenSubMoves, FenTeamArgument, FenFullMoves}, pieces::Piece}, games::ataxx::AtaxxMoveController};
+use crate::{board::{game::Game, fen::{FenOptions, FenState, FenSubMoves, FenTeamArgument, FenFullMoves}, pieces::Piece, actions::Action}, games::ataxx::AtaxxMoveController};
 
 use super::{AtaxxPostProcess, pieces::StonePiece};
 
 pub struct Ataxx;
 
 const STONE: &dyn Piece<1> = &StonePiece;
+
+pub fn is_single_move(action: &Action) -> bool {
+    let dif = action.from.abs_diff(action.to);
+    dif == 1 || dif == 7 || dif == 6 || dif == 8 
+}
 
 impl Ataxx {
     pub fn create() -> Game<1> {
@@ -14,7 +19,7 @@ impl Ataxx {
             rows: 7,
             cols: 7,
             pieces: vec![ STONE ],
-            move_restrictions: Box::new(AtaxxMoveController),
+            controller: Box::new(AtaxxMoveController),
             fen_options: FenOptions {
                 state: FenState { first_moves: false },
                 args: vec![

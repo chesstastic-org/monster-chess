@@ -44,4 +44,18 @@ impl<const T: usize> MoveController<T> for ChessMoveController<T> {
         }
         legal_moves
     }
+
+    fn encode_action(&self, board: &Board<T>, action: &Option<Action>) -> Vec<String> {
+        vec![
+            match action {
+                Some(action) => format!(
+                    "{}{}{}",
+                    board.encode_position(action.from),
+                    board.encode_position(action.to),
+                    board.game.pieces[action.piece_type].format_info(board, action.info)
+                ),
+                None => "0000".to_string()
+            }   
+        ]
+    }
 }

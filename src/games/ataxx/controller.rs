@@ -2,6 +2,8 @@ use std::collections::HashSet;
 
 use crate::{board::{game::MoveController, Board, actions::Action}, bitboard::BitBoard};
 
+use super::is_single_move;
+
 pub struct AtaxxMoveController;
 impl<const T: usize> MoveController<T> for AtaxxMoveController {
     fn transform_moves(&self, board: &mut Board<T>, mode: u32, actions: Vec<Option<Action>>) -> Vec<Option<Action>> {
@@ -22,8 +24,7 @@ impl<const T: usize> MoveController<T> for AtaxxMoveController {
 
             for action in actions {
                 if let Some(action) = action {
-                    let dif = action.from.abs_diff(action.to);
-                    if dif == 1 || dif == 7 || dif == 6 || dif == 8 {
+                    if is_single_move(&action) {
                         // Single Move
 
                         if set.contains(&action.to) {
@@ -39,5 +40,29 @@ impl<const T: usize> MoveController<T> for AtaxxMoveController {
 
             new_actions
         }
+    }
+
+    fn encode_action(&self, board: &Board<T>, action: &Option<Action>) -> Vec<String> {
+        vec![
+            match action {
+                Some(action) => {
+                    if is_single_move(&action) {
+                        format!(
+                            "{}{}",
+                            board.encode_position(action.to),
+                            board.game.pieces[action.piece_type].format_info(board, action.info)
+                        )
+                    } else {
+                        format!(
+                            "{}{}{}",
+                            board.encode_position(action.from),
+                            board.encode_position(action.to),
+                            board.game.pieces[action.piece_type].format_info(board, action.info)
+                        )
+                    }
+                },
+                None => "0000".to_string()
+            }   
+        ]
     }
 }
