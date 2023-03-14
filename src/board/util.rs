@@ -263,6 +263,7 @@ impl<'a, const T: usize> Board<'a, T> {
                     action: None,
                     state: HistoryState::None
                 });
+                update_turns(&mut self.state);
                 return;
             }
         }
@@ -282,6 +283,7 @@ impl<'a, const T: usize> Board<'a, T> {
                         Ok(())
                     }
                     None => {
+                        reverse_turns(&mut self.state, &self.game);
                         Ok(())
                     }
                 };
