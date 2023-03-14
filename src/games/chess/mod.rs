@@ -1,14 +1,11 @@
 mod game;
+mod args;
+mod process;
+mod restrictions;
 mod suite;
 pub mod pieces;
 
 pub use game::*;
-
-#[cfg(test)]
-mod tests {
-    use crate::{
-        board::Board,
-        board::{actions::HistoryMove, game::Game},
-        games::chess::Chess,
-    };
-}
+pub use args::*;
+pub use process::*;
+pub use restrictions::*;
