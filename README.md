@@ -43,7 +43,7 @@ If so, `monster-chess` most likely will be able to be compatible with said varia
 
 ### Chess
 
-Chess is a two-player game where both players start with a color and the same set of pieces, and must engage in a fruitful battle until one side is victorious. For the sake of brevity, we'll assume you're well-acquainted with the rules of chess (if not, feel free to [read about them here](https://www.chess.com/terms/chess)), and simply focus on the parts relevant to `monster-chess`.
+[Chess](https://en.wikipedia.org/wiki/Chess) is a two-player game where both players start with a color and the same set of pieces on an eight by eight board, and must engage in a fruitful battle until one side is victorious. For the sake of brevity, we'll assume you're well-acquainted with the rules of chess (if not, feel free to [read about them here](https://www.chess.com/terms/chess)), and simply focus on the parts relevant to `monster-chess`.
 
 ![Ladder Checkmate](https://i.imgur.com/xGu1ODZ.jpg)
 
@@ -58,7 +58,6 @@ Despite all of that, this legality check is rather expensive. Fortunately, it wo
 You can initialize the chess board as follows:
 
 ```rust
-    // We have to store `chess` in a variable and borrow it because `monster-chess` separates the game instance from the actual board-state itself to avoid an extra runtime cost in many cases.
     let chess = Chess::create();
     let mut board = chess.from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 ```
@@ -84,7 +83,20 @@ It may be noted that `monster-chess` also aims to support [Fischer Random Chess]
 
 ### Ataxx
 
-This game will be supported in the very-near future.
+[Ataxx](https://en.wikipedia.org/wiki/Ataxx) is a two-player game where both players start with a single stone on a seven by seven board, and must fight for who will end up controlling the most territory. The game is mainly known for how much the board can change in one move; positions are generally not tactically stable.
+
+![Ataxx Start Position](https://camo.githubusercontent.com/a36e06d5e71d52af39027050f1263f2587e681bfd143195e79cbc970e4364651/687474703a2f2f692e696d6775722e636f6d2f696e764e6a4a6b2e706e67)
+
+`monster-chess` can easily implement Ataxx simply by writing an implementation of `StonePiece` to represent an Ataxx piece. Moves can be found using a lookup table and then masked to avoid all of the pieces on the board. As for making the moves, all we have to do is check whether it's a single or double move, and then handle the move-making logic appropiately before converting stones around the moved piece.
+
+Ataxx is not fully implemented as of now, it hasn't been tested at all and the implementation of Ataxx is still rather dry and perhaps unoptimized. Regardless of this, you can still create an Ataxx board as follows:
+
+```rust
+    let ataxx = Ataxx::create();
+    let mut board = ataxx.from_fen("x5o/7/7/7/7/7/o5x x 0 1");
+```
+
+Ataxx Gaps are also currently unsupported, but will be added soon.
 
 ## Implementation
 
