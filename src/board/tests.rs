@@ -1,3 +1,5 @@
+use std::time::{SystemTime, UNIX_EPOCH};
+
 use super::game::Game;
 
 fn get_time_ms() -> u128 {
@@ -14,19 +16,19 @@ pub struct FENTest<'a> {
     perft_counts: Vec<u64>
 }
 
-pub fn parse_tests<'a>(tests: &str) -> Vec<FENTest<'a>> {
+pub fn parse_tests<'a>(tests: &'a str) -> Vec<FENTest<'a>> {
     tests.split("\n").map(|test| {
         let strs = test.split(";").collect::<Vec<_>>();
         let fen = strs[0].trim();
-        let perft_counts = strs[1..].iter().map(|str| str.split(" ").nth(1).unwrap().parse::<u64>().unwrap()).collect::<Vec<_>>();
-        FENTest {
+        let perft_counts = strs[1..].iter().map(|str| str.trim().split(" ").nth(1).unwrap().parse::<u64>().unwrap()).collect::<Vec<_>>();
+        FENTest::<'a> {
             fen,
             perft_counts
         }
-    }).collect::<Vec<_>>()
+    }).collect::<Vec<FENTest<'a>>>()
 }
 
-pub fn run_tests(game: Game, tests: &str) {
+pub fn run_tests<const T: usize>(game: Game<T>, tests: &str) {
     let tests = parse_tests(tests);
     let test_count = tests.len();
 
@@ -44,8 +46,7 @@ pub fn run_tests(game: Game, tests: &str) {
                 continue;
             }
 
-            let chess = Chess::create();
-            let mut board = chess.from_fen(test.fen);
+            let mut board = game.from_fen(test.fen);
             board.assert_perft(depth as u32, test.perft_counts[depth - 1]);
             tests_completed += 1;
 

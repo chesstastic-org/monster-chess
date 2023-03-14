@@ -1,7 +1,7 @@
 use super::{actions::Action, fen::FenOptions, pieces::Piece, Board, Rows, Cols};
 
 pub trait MoveRestrictions<const T: usize> {
-    fn is_legal(&self, board: &mut Board<T>, action: &Action) -> bool;
+    fn is_legal(&self, board: &mut Board<T>, action: Option<&Action>) -> bool;
 }
 
 pub struct Game<const T: usize> {

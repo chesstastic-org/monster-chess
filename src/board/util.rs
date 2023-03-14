@@ -3,7 +3,7 @@ use arrayvec::ArrayVec;
 use crate::bitboard::BitBoard;
 
 use super::{
-    actions::{Action, HistoryMove, UndoMoveError},
+    actions::{Action, HistoryMove, UndoMoveError, HistoryState},
     edges::{generate_edge_list, Edges},
     game::Game,
     pieces::Piece,
@@ -206,7 +206,7 @@ impl<'a, const T: usize> Board<'a, T> {
         let moves = self.generate_moves(mode);
         let mut legal_moves = Vec::with_capacity(moves.len());
         for action in moves {
-            if self.game.move_restrictions.is_legal(self, &action) {
+            if self.game.move_restrictions.is_legal(self, Some(&action)) {
                 legal_moves.push(action);
             }
         }
@@ -233,21 +233,40 @@ impl<'a, const T: usize> Board<'a, T> {
         }
     }
 
-    pub fn make_move(&mut self, action: &Action) {
-        self.game.pieces[action.piece_type].make_move(self, action);
+    pub fn make_move(&mut self, action: Option<&Action>) {
+        match action {
+            Some(action) => {
+                self.game.pieces[action.piece_type].make_move(self, action);
+            }
+            None => {
+                self.history.push(HistoryMove {
+                    action: None,
+                    state: HistoryState::None
+                });
+                return;
+            }
+        }
     }
 
     #[inline(never)]
     pub fn undo_move(&mut self) -> Result<(), UndoMoveError> {
         match self.history.last() {
             Some(history_move) => {
-                self.game.pieces[history_move.action.piece_type].undo_move(
-                    &mut self.state,
-                    self.game,
-                    history_move,
-                );
+                let results = match history_move.action {
+                    Some(history_action) => {
+                        self.game.pieces[history_action.piece_type].undo_move(
+                            &mut self.state,
+                            self.game,
+                            history_move,
+                        );
+                        Ok(())
+                    }
+                    None => {
+                        Ok(())
+                    }
+                };
                 self.history.pop();
-                Ok(())
+                results
             }
             None => Err(UndoMoveError::NoHistoryMoves),
         }

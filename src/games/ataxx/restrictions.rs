@@ -2,7 +2,7 @@ use crate::{board::{game::MoveRestrictions, Board, actions::Action}, bitboard::B
 
 pub struct AtaxxMoveRestrictions;
 impl<const T: usize> MoveRestrictions<T> for AtaxxMoveRestrictions {
-    fn is_legal(&self, board: &mut Board<T>, action: &Action) -> bool {
+    fn is_legal(&self, board: &mut Board<T>, action: Option<&Action>) -> bool {
         true
     }
 }

@@ -57,7 +57,7 @@ impl<const T: usize> PawnPiece<T> {
         };
 
         board.history.push(HistoryMove {
-            action: *action,
+            action: Some(*action),
             state: HistoryState::Any {
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 first_move: PreviousBoard(board.state.first_move),
@@ -201,16 +201,18 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
         }
 
         if let Some(last_move) = board.history.last() {
-            let conditions = last_move.action.piece_type == 0
-                && (last_move.action.to.abs_diff(last_move.action.from) == (2 * (cols)));
+            if let Some(last_action) = last_move.action {
+                let conditions = last_action.piece_type == 0
+                    && (last_action.to.abs_diff(last_action.from) == (2 * (cols)));
 
-            if conditions {
-                capture_requirements |= up(
-                    &BitBoard::from_lsb(last_move.action.from),
-                    1,
-                    cols,
-                    board.get_next_team(team),
-                );
+                if conditions {
+                    capture_requirements |= up(
+                        &BitBoard::from_lsb(last_action.from),
+                        1,
+                        cols,
+                        board.get_next_team(team),
+                    );
+                }
             }
         }
 
@@ -244,7 +246,7 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
         }
 
         let mut history_move = HistoryMove {
-            action: *action,
+            action: Some(*action),
             state: HistoryState::Any {
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 first_move: PreviousBoard(board.state.first_move),
@@ -318,7 +320,7 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
         let color: usize = action.team as usize;
 
         board.history.push(HistoryMove {
-            action: *action,
+            action: Some(*action),
             state: HistoryState::Single {
                 team: IndexedPreviousBoard(color, board.state.teams[color]),
                 piece: IndexedPreviousBoard(piece_type, board.state.pieces[piece_type]),
@@ -402,13 +404,15 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
             } else {
                 let mut en_passant = false;
                 if let Some(last_move) = board.history.last() {
-                    let conditions = last_move.action.piece_type == 0
-                        && (last_move.action.to.abs_diff(last_move.action.from) == (2 * (cols)))
-                        && (last_move.action.to.abs_diff(bit) == (cols))
-                        && (from.abs_diff(bit) % cols != 0);
+                    if let Some(last_action) = last_move.action {
+                        let conditions = last_action.piece_type == 0
+                            && (last_action.to.abs_diff(last_action.from) == (2 * (cols)))
+                            && (last_action.to.abs_diff(bit) == (cols))
+                            && (from.abs_diff(bit) % cols != 0);
 
-                    if conditions {
-                        en_passant = true;
+                        if conditions {
+                            en_passant = true;
+                        }
                     }
                 }
 

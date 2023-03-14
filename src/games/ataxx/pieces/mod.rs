@@ -15,22 +15,26 @@ impl<const T: usize> Piece<T> for StonePiece {
 
     fn generate_lookup_moves(&self, board: &Board<T>, mut from: BitBoard<T>) -> AttackDirections<T> {
         let cols = board.state.cols;
+        let edges = board.state.edges[0];
+        let double_edges = board.state.edges[0];
+
         let mut single_moves = from;
+        single_moves |= (single_moves & !edges.top).up(1, cols);
+        single_moves |= (single_moves & !edges.bottom).down(1, cols);
+        single_moves |= (single_moves & !edges.right).right(1);
+        single_moves |= (single_moves & !edges.left).left(1);      
 
-        single_moves |= single_moves.up(1, cols);
-        single_moves |= single_moves.down(1, cols);
-        single_moves |= single_moves.right(1);
-        single_moves |= single_moves.left(1);      
+        let mut moves = from;
+        moves |= (moves & !edges.top).up(1, cols);
+        moves |= (moves & !edges.top).up(1, cols);
+        moves |= (moves & !edges.bottom).down(1, cols);
+        moves |= (moves & !edges.bottom).down(1, cols);
+        moves |= (moves & !edges.right).right(1);
+        moves |= (moves & !edges.right).right(1);
+        moves |= (moves & !edges.left).left(1);
+        moves |= (moves & !edges.left).left(1);
 
-        from |= from.up(1, cols);
-        from |= from.up(1, cols);
-        from |= from.down(1, cols);
-        from |= from.down(1, cols);
-        from |= from.right(1);
-        from |= from.right(1);
-        from |= from.left(1);
-        from |= from.left(1);
-        vec![ from, single_moves ]
+        vec![ moves & !from, single_moves & !from ]
     }
 
     fn get_moves(
@@ -46,7 +50,7 @@ impl<const T: usize> Piece<T> for StonePiece {
             Some(lookup) => lookup[from.bitscan_reverse() as usize][0],
             None => self.generate_lookup_moves(board, from)[0],
         };
-        base_moves & !board.state.pieces[0]
+        base_moves & !board.state.all_pieces
     }
 
     fn make_move(&self, board: &mut Board<T>, action: &Action) {
@@ -60,7 +64,7 @@ impl<const T: usize> Piece<T> for StonePiece {
         let other_team = board.state.team_lookup[team] as usize;
 
         board.history.push(HistoryMove {
-            action: *action,
+            action: Some(*action),
             state: HistoryState::Any {
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 first_move: PreviousBoard(board.state.first_move),

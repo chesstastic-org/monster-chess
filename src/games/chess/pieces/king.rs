@@ -62,7 +62,7 @@ impl<const T: usize> KingPiece<T> {
         let piece_type = action.piece_type;
 
         let history_move = HistoryMove {
-            action: *action,
+            action: Some(*action),
             state: HistoryState::Any {
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 first_move: PreviousBoard(board.state.first_move),
@@ -195,7 +195,7 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
         }
 
         let history_move = HistoryMove {
-            action: *action,
+            action: Some(*action),
             state: HistoryState::Any {
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 first_move: PreviousBoard(board.state.first_move),

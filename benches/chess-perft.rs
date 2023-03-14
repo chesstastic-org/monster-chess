@@ -7,7 +7,7 @@ fn startpos(depth: u32) {
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
     );
 
-    board.perft(depth);
+    board.perft(depth, true);
 }
 
 fn criterion_benchmark(c: &mut Criterion) {

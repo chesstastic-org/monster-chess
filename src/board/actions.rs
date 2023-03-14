@@ -19,7 +19,7 @@ pub struct Action {
     /// Moves can store extra information both for optimizing `make_move` or for specifying additional variants of a move.
     ///
     /// Eg. Pawn Promotion uses `info` to represent which piece is promoted to.
-    pub info: ActionInfo,
+    pub info: ActionInfo
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -58,6 +58,6 @@ pub enum HistoryState<const T: usize> {
 
 #[derive(Clone, Debug)]
 pub struct HistoryMove<const T: usize> {
-    pub action: Action,
+    pub action: Option<Action>,
     pub state: HistoryState<T>,
 }

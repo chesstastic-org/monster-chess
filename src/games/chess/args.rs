@@ -144,13 +144,13 @@ impl<const T: usize> FenArgument<T> for ChessEnPassant {
         let from = down::<T>(&to, 2, cols, previous_team);
 
         board.history.push(HistoryMove {
-            action: Action {
+            action: Some(Action {
                 from: from.bitscan_forward(),
                 to: to.bitscan_forward(),
                 team: previous_team,
                 piece_type: 0,
                 info: 0,
-            },
+            }),
             state: HistoryState::None,
         });
 
@@ -165,14 +165,22 @@ impl<const T: usize> FenArgument<T> for ChessEnPassant {
 
         let last_move =
             last_move.expect("The last move for exporting an en passant FEN must be Some.");
-        if last_move.action.piece_type != 0 {
-            return "-".to_string();
-        }
 
-        if (last_move.action.from.abs_diff(last_move.action.to) != (2 * board.state.cols)) {
-            return "-".to_string();
-        }
+        match last_move.action {
+            Some(last_action) => {
+                if last_action.piece_type != 0 {
+                    return "-".to_string();
+                }
 
-        return board.encode_position(last_move.action.to);
+                if last_action.from.abs_diff(last_action.to) != (2 * board.state.cols) {
+                    return "-".to_string();
+                }
+
+                return board.encode_position(last_action.to);
+            }
+            None => {
+                return "-".to_string();
+            }
+        }
     }
 }

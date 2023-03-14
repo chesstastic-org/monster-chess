@@ -85,7 +85,7 @@ pub trait Piece<const T: usize> {
         }
 
         let history_move = HistoryMove {
-            action: *action,
+            action: Some(*action),
             state: HistoryState::Any {
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 first_move: PreviousBoard(board.state.first_move),
@@ -134,7 +134,7 @@ pub trait Piece<const T: usize> {
         let color: usize = action.team as usize;
 
         board.history.push(HistoryMove {
-            action: *action,
+            action: Some(*action),
             state: HistoryState::Single {
                 team: IndexedPreviousBoard(color, board.state.teams[color]),
                 piece: IndexedPreviousBoard(piece_type, board.state.pieces[piece_type]),
