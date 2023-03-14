@@ -19,11 +19,11 @@ const ROOK_PIECE_TYPE: usize = 3;
 pub struct KingPiece<const T: usize>;
 
 fn right_one<const T: usize>(from: BitBoard<T>, edges: &Edges<T>) -> BitBoard<T> {
-    (from & !edges.right).right(1) & !edges.left
+    (from & !edges.right).right(1)
 }
 
 fn left_one<const T: usize>(from: BitBoard<T>, edges: &Edges<T>) -> BitBoard<T> {
-    (from & !edges.left).left(1) & !edges.right
+    (from & !edges.left).left(1)
 }
 
 fn up_one<const T: usize>(from: BitBoard<T>, cols: Cols, edges: &Edges<T>) -> BitBoard<T> {

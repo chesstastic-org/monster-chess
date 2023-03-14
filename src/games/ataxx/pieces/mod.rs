@@ -1,8 +1,32 @@
 use std::usize;
 
-use crate::{board::{pieces::{Piece, PieceSymbol}, Board, AttackLookup, AttackDirections, actions::{Action, PreviousBoard, HistoryMove, HistoryState, HistoryUpdate, IndexedPreviousBoard}}, bitboard::BitBoard};
+use crate::{board::{pieces::{Piece, PieceSymbol}, Board, AttackLookup, AttackDirections, actions::{Action, PreviousBoard, HistoryMove, HistoryState, HistoryUpdate, IndexedPreviousBoard}, edges::Edges, Cols}, bitboard::BitBoard};
 
 pub struct StonePiece;
+
+fn right_one<const T: usize>(from: BitBoard<T>, edges: &Edges<T>) -> BitBoard<T> {
+    (from & !edges.right).right(1)
+}
+
+fn left_one<const T: usize>(from: BitBoard<T>, edges: &Edges<T>) -> BitBoard<T> {
+    (from & !edges.left).left(1)
+}
+
+fn up_one<const T: usize>(from: BitBoard<T>, cols: Cols, edges: &Edges<T>) -> BitBoard<T> {
+    (from & !edges.top).up(1, cols)
+}
+
+fn down_one<const T: usize>(from: BitBoard<T>, cols: Cols, edges: &Edges<T>) -> BitBoard<T> {
+    (from & !edges.bottom).down(1, cols)
+}
+
+fn get_surrounding_moves<const T: usize>(mut from: BitBoard<T>, cols: Cols, edges: &Edges<T>) -> BitBoard<T> {
+    let mut moves = right_one(from, edges) | left_one(from, edges);
+    from |= moves;
+    moves |= up_one(from, cols, edges);
+    moves |= down_one(from, cols, edges); 
+    moves
+}
 
 impl<const T: usize> Piece<T> for StonePiece {
     fn get_piece_symbol(&self) -> PieceSymbol {
@@ -15,26 +39,12 @@ impl<const T: usize> Piece<T> for StonePiece {
 
     fn generate_lookup_moves(&self, board: &Board<T>, mut from: BitBoard<T>) -> AttackDirections<T> {
         let cols = board.state.cols;
-        let edges = board.state.edges[0];
-        let double_edges = board.state.edges[0];
+        let edges = &board.state.edges[0];
 
-        let mut single_moves = from;
-        single_moves |= (single_moves & !edges.top).up(1, cols);
-        single_moves |= (single_moves & !edges.bottom).down(1, cols);
-        single_moves |= (single_moves & !edges.right).right(1);
-        single_moves |= (single_moves & !edges.left).left(1);      
-
-        let mut moves = from;
-        moves |= (moves & !edges.top).up(1, cols);
-        moves |= (moves & !edges.top).up(1, cols);
-        moves |= (moves & !edges.bottom).down(1, cols);
-        moves |= (moves & !edges.bottom).down(1, cols);
-        moves |= (moves & !edges.right).right(1);
-        moves |= (moves & !edges.right).right(1);
-        moves |= (moves & !edges.left).left(1);
-        moves |= (moves & !edges.left).left(1);
-
-        vec![ moves & !from, single_moves & !from ]
+        let single_moves = get_surrounding_moves(from, cols, edges);
+        let all_moves = get_surrounding_moves(single_moves, cols, edges);
+        
+        vec![ all_moves & !from, single_moves & !from ]
     }
 
     fn get_moves(
@@ -111,6 +121,7 @@ impl<const T: usize> Piece<T> for StonePiece {
         };
 
         let to_update = board.state.teams[other_team] & update_radius;
+
         board.state.teams[other_team] ^= to_update;
         board.state.teams[team] |= to_update;
     }
