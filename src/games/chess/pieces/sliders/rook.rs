@@ -1,18 +1,18 @@
-use crate::board::{
+use crate::{board::{
     pieces::{Piece, PieceSymbol},
-    AttackDirections, BitBoard, Board, PieceType,
-};
+    AttackDirections, Board, PieceType,
+}, bitboard::BitBoard};
 
 use super::{get_moves_ray, get_ray_attacks};
 
 pub struct RookPiece;
 
-impl Piece for RookPiece {
+impl<const T: usize> Piece<T> for RookPiece {
     fn get_piece_symbol(&self) -> PieceSymbol {
         PieceSymbol::Char('r')
     }
 
-    fn generate_lookup_moves(&self, board: &Board, from: BitBoard) -> AttackDirections {
+    fn generate_lookup_moves(&self, board: &Board<T>, from: BitBoard<T>) -> AttackDirections<T> {
         let edges = &board.state.edges[0];
         let cols = board.state.cols;
         let mut lookups = vec![
@@ -47,14 +47,14 @@ impl Piece for RookPiece {
 
     fn can_move_mask(
         &self,
-        board: &Board,
-        from: BitBoard,
+        board: &Board<T>,
+        from: BitBoard<T>,
         from_bit: u32,
         piece_type: usize,
         team: u32,
         mode: u32,
-        to: BitBoard,
-    ) -> BitBoard {
+        to: BitBoard<T>,
+    ) -> BitBoard<T> {
         let lookup = self
             .get_attack_lookup(board, piece_type)
             .expect("Could not find the queen attack lookup.");
@@ -81,12 +81,12 @@ impl Piece for RookPiece {
     #[allow(unused_variables)]
     fn get_moves(
         &self,
-        board: &Board,
-        from: BitBoard,
+        board: &Board<T>,
+        from: BitBoard<T>,
         piece_type: usize,
         team: u32,
         mode: u32,
-    ) -> BitBoard {
+    ) -> BitBoard<T> {
         let lookup = self
             .get_attack_lookup(board, piece_type)
             .expect("Could not find the queen attack lookup.");

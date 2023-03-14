@@ -1,10 +1,12 @@
+use crate::bitboard::BitBoard;
+
 use super::{
     actions::{
         Action, HistoryMove, HistoryState, HistoryUpdate, IndexedPreviousBoard, PreviousBoard,
         UndoMoveError,
     },
     game::Game,
-    AttackDirections, AttackLookup, BitBoard, Board, BoardState, Cols, PieceType, Rows,
+    AttackDirections, AttackLookup, Board, BoardState, Cols, PieceType, Rows,
 };
 
 pub enum PieceSymbol {
@@ -14,13 +16,13 @@ pub enum PieceSymbol {
 
 const NORMAL_MOVE: usize = 0;
 
-pub trait Piece {
+pub trait Piece<const T: usize> {
     fn get_piece_symbol(&self) -> PieceSymbol;
 
-    fn format_info(&self, board: &Board, info: usize) -> String {
+    fn format_info(&self, board: &Board<T>, info: usize) -> String {
         "".to_string()
     }
-    fn parse_info(&self, board: &Board, info: String) -> u32 {
+    fn parse_info(&self, board: &Board<T>, info: String) -> u32 {
         0
     }
 
@@ -28,45 +30,45 @@ pub trait Piece {
 
     fn get_attack_lookup<'a>(
         &self,
-        board: &'a Board,
+        board: &'a Board<T>,
         piece_type: usize,
-    ) -> Option<&'a AttackLookup> {
+    ) -> Option<&'a AttackLookup<T>> {
         board.attack_lookup.get(piece_type)
     }
 
     fn get_moves(
         &self,
-        board: &Board,
-        from: BitBoard,
+        board: &Board<T>,
+        from: BitBoard<T>,
         piece_type: usize,
         team: u32,
         mode: u32,
-    ) -> BitBoard;
+    ) -> BitBoard<T>;
     fn can_move_mask(
         &self,
-        board: &Board,
-        from: BitBoard,
+        board: &Board<T>,
+        from: BitBoard<T>,
         from_bit: u32,
         piece_type: usize,
         team: u32,
         mode: u32,
-        to: BitBoard,
-    ) -> BitBoard {
+        to: BitBoard<T>,
+    ) -> BitBoard<T> {
         self.get_moves(board, from, piece_type, team, mode)
     }
 
     #[allow(unused_variables)]
-    fn generate_lookup_moves(&self, board: &Board, from: BitBoard) -> AttackDirections {
+    fn generate_lookup_moves(&self, board: &Board<T>, from: BitBoard<T>) -> AttackDirections<T> {
         Vec::new()
     }
 
     fn make_capture_move(
         &self,
-        board: &mut Board,
+        board: &mut Board<T>,
         action: &Action,
         piece_type: usize,
-        from: BitBoard,
-        to: BitBoard,
+        from: BitBoard<T>,
+        to: BitBoard<T>,
     ) {
         let color: usize = action.team as usize;
         let captured_color: usize = if (to & board.state.teams[0]).is_set() {
@@ -123,11 +125,11 @@ pub trait Piece {
 
     fn make_normal_move(
         &self,
-        board: &mut Board,
+        board: &mut Board<T>,
         action: &Action,
         piece_type: usize,
-        from: BitBoard,
-        to: BitBoard,
+        from: BitBoard<T>,
+        to: BitBoard<T>,
     ) {
         let color: usize = action.team as usize;
 
@@ -153,7 +155,7 @@ pub trait Piece {
         board.state.first_move &= !from;
     }
 
-    fn make_move(&self, board: &mut Board, action: &Action) {
+    fn make_move(&self, board: &mut Board<T>, action: &Action) {
         let from = BitBoard::from_lsb(action.from);
         let to = BitBoard::from_lsb(action.to);
 
@@ -166,7 +168,7 @@ pub trait Piece {
         self.update_turns(board);
     }
 
-    fn update_turns(&self, board: &mut Board) {
+    fn update_turns(&self, board: &mut Board<T>) {
         board.state.turns += 1;
         board.state.current_turn = board.state.turn_lookup[board.state.current_turn as usize];
         if board.state.current_turn == 0 {
@@ -179,7 +181,7 @@ pub trait Piece {
         };
     }
 
-    fn undo_move(&self, state: &mut BoardState, game: &Game, history_move: &HistoryMove) {
+    fn undo_move(&self, state: &mut BoardState<T>, game: &Game<T>, history_move: &HistoryMove<T>) {
         state.turns -= 1;
         state.current_turn = state.turn_reverse_lookup[state.current_turn as usize];
         if state.current_turn == game.turns - 1 {
@@ -228,7 +230,7 @@ pub trait Piece {
     fn add_actions(
         &self,
         actions: &mut Vec<Action>,
-        board: &Board,
+        board: &Board<T>,
         piece_type: usize,
         from: u32,
         team: u32,

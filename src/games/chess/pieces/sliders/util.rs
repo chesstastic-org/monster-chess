@@ -1,13 +1,13 @@
-use crate::board::{
+use crate::{board::{
     pieces::{Piece, PieceSymbol},
-    AttackDirections, AttackLookup, BitBoard, Board, PieceType,
-};
+    AttackDirections, AttackLookup, Board, PieceType,
+}, bitboard::BitBoard};
 
-pub fn get_moves_ray(
-    mut from: BitBoard,
-    slider: impl Fn(BitBoard) -> BitBoard,
-    can_stop: impl Fn(BitBoard) -> bool,
-) -> BitBoard {
+pub fn get_moves_ray<const T: usize>(
+    mut from: BitBoard<T>,
+    slider: impl Fn(BitBoard<T>) -> BitBoard<T>,
+    can_stop: impl Fn(BitBoard<T>) -> bool,
+) -> BitBoard<T> {
     let mut moves = BitBoard::new();
     if can_stop(from) {
         return moves;
@@ -25,13 +25,13 @@ pub fn get_moves_ray(
     moves
 }
 
-pub fn get_ray_attacks(
-    board: &Board,
-    from: BitBoard,
+pub fn get_ray_attacks<const T: usize>(
+    board: &Board<T>,
+    from: BitBoard<T>,
     from_bit: usize,
     dir: u32,
-    ray_attacks: &AttackLookup,
-) -> BitBoard {
+    ray_attacks: &AttackLookup<T>,
+) -> BitBoard<T> {
     let dir_usize = dir as usize;
     let mut attacks = ray_attacks[from_bit][dir_usize];
     let mut blocker = attacks;

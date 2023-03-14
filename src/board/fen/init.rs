@@ -4,11 +4,11 @@ use super::super::{
     actions::{Action, HistoryMove, UndoMoveError},
     game::Game,
     pieces::Piece,
-    BitBoard, Board, Cols, Rows,
+    Board, Cols, Rows,
 };
 
-impl<'a> Board<'a> {
-    pub fn new(game: &'a Game, (rows, cols): (Rows, Cols), fen: &str) -> Board<'a> {
+impl<'a, const T: usize> Board<'a, T> {
+    pub fn new(game: &'a Game<T>, (rows, cols): (Rows, Cols), fen: &str) -> Board<'a, T> {
         let args = split(fen).expect(&format!("{fen} cannot be split into arguments."));
         let mut board = Board::from_fen_state(game, (rows, cols), &args[0]);
 
@@ -17,7 +17,6 @@ impl<'a> Board<'a> {
             .fen_options
             .args
             .iter()
-            .map(|(name, arg_trait)| (name.clone(), arg_trait.duplicate()))
             .collect::<Vec<_>>();
         for (ind, (name, arg_trait)) in arg_traits.iter().enumerate() {
             let arg = &args.get(ind + 1).expect(&format!(
@@ -33,7 +32,7 @@ impl<'a> Board<'a> {
             }
         }
 
-        let post_process = board.game.fen_options.post_process.duplicate();
+        let post_process = &board.game.fen_options.post_process;
         post_process.apply(&mut board);
 
         board

@@ -19,7 +19,7 @@ fn main() {
     let mut board = Board::new(
         &chess,
         (8, 8),
-        "4k3/8/8/8/8/8/8/4K2R w K - 0 1",
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
     );
 
 

@@ -95,15 +95,15 @@ This game will be supported in the very-near future.
 
 ### Bitboards
 
-`monster-chess` uses a general implementation of [Bitboards](https://www.chessprogramming.org/Bitboards) to extend to larger board sizes, using a custom made `BitSet` data type.
+`monster-chess` uses a general implementation of [Bitboards](https://www.chessprogramming.org/Bitboards) to extend to larger board sizes, using a custom made `BitBoard` data type.
 
 ```rust
-pub struct BitSet<const T : usize> {
+pub struct BitBoard<const T : usize> {
     pub data: [ u128; T ]
 }
 ```
 
-BitSets are designed in such a way that if the BitSet only has to store one `u128`, it would (ideally) be optimized to be as fast as it would natively. Bitsets support all **bitwise** operators, alongside addition, subtraction, and two custom methods for [bitscans](https://www.chessprogramming.org/BitScan).
+BitBoards are designed in such a way that if the BitBoard only has to store one `u128`, it would (ideally) be optimized to be as fast as it would natively. BitBoards support all **bitwise** operators, alongside addition, subtraction, and two custom methods for [bitscans](https://www.chessprogramming.org/BitScan).
 
 The library generates movement for pieces by taking in a bitboard with one toggled bit representing where the piece currently is, and applying bitwise operations to it. In native chess, there are three main types of pieces.
 

@@ -3,7 +3,7 @@ use super::{
         actions::{Action, HistoryMove, UndoMoveError},
         game::Game,
         pieces::Piece,
-        BitBoard, Board, Cols, Rows,
+        Board, Cols, Rows,
     },
     FenArgument,
 };
@@ -17,14 +17,12 @@ pub struct FenState {
     pub first_moves: bool,
 }
 
-pub trait PostProcess {
-    fn apply(&self, board: &mut Board);
-
-    fn duplicate(&self) -> Box<dyn PostProcess>;
+pub trait PostProcess<const T: usize> {
+    fn apply(&self, board: &mut Board<T>);
 }
 
-pub struct FenOptions {
+pub struct FenOptions<const T: usize> {
     pub state: FenState,
-    pub args: Vec<(String, Box<dyn FenArgument>)>,
-    pub post_process: Box<dyn PostProcess>,
+    pub args: Vec<(String, Box<dyn FenArgument<T>>)>,
+    pub post_process: Box<dyn PostProcess<T>>,
 }

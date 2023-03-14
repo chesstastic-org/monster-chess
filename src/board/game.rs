@@ -1,14 +1,15 @@
 use super::{actions::Action, fen::FenOptions, pieces::Piece, Board};
 
-pub trait MoveRestrictions {
-    fn is_legal(&self, board: &mut Board, action: &Action) -> bool;
-    fn duplicate(&self) -> Box<dyn MoveRestrictions>;
+pub trait MoveRestrictions<const T: usize> {
+    fn is_legal(&self, board: &mut Board<T>, action: &Action) -> bool;
 }
 
-pub struct Game {
-    pub pieces: Vec<&'static dyn Piece>,
-    pub move_restrictions: Box<dyn MoveRestrictions>,
-    pub fen_options: FenOptions,
+pub struct Game<const T: usize> {
+    pub pieces: Vec<&'static dyn Piece<T>>,
+    pub move_restrictions: Box<dyn MoveRestrictions<T>>,
+    pub fen_options: FenOptions<T>,
     pub teams: u32,
     pub turns: u32,
+    pub rows: u32,
+    pub cols: u32
 }

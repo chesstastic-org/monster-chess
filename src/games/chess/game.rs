@@ -1,5 +1,5 @@
 use crate::{
-    bitset::Direction,
+    bitboard::{Direction, BitBoard},
     board::{
         actions::{Action, HistoryMove, HistoryState, IndexedPreviousBoard, PreviousBoard},
         edges::Edges,
@@ -9,7 +9,7 @@ use crate::{
         },
         game::{Game, MoveRestrictions},
         pieces::{Piece, PieceSymbol},
-        AttackDirections, BitBoard, Board, Cols, PieceType,
+        AttackDirections, Board, Cols, PieceType,
     },
 };
 
@@ -21,8 +21,8 @@ pub const NORMAL_MODE: u32 = 0;
 pub const ATTACKS_MODE: u32 = 1;
 
 pub struct ChessCastlingRights;
-impl FenArgument for ChessCastlingRights {
-    fn decode(&self, board: &mut Board, arg: &str) -> Result<(), FenDecodeError> {
+impl<const T: usize> FenArgument<T> for ChessCastlingRights {
+    fn decode(&self, board: &mut Board<T>, arg: &str) -> Result<(), FenDecodeError> {
         if arg == "-" {
             board.state.first_move &= !board.state.pieces[3];
             Ok(())
@@ -79,7 +79,7 @@ impl FenArgument for ChessCastlingRights {
         }
     }
 
-    fn encode(&self, board: &Board) -> String {
+    fn encode(&self, board: &Board<T>) -> String {
         let mut castling_rights: Vec<char> = Vec::with_capacity(4);
         for team in 0..board.state.teams.len() {
             let king = board.state.pieces[5] & board.state.teams[team] & board.state.first_move;
@@ -124,16 +124,12 @@ impl FenArgument for ChessCastlingRights {
                 .join("")
         }
     }
-
-    fn duplicate(&self) -> Box<dyn FenArgument> {
-        Box::new(ChessCastlingRights)
-    }
 }
 
 pub struct ChessEnPassant;
 
-impl FenArgument for ChessEnPassant {
-    fn decode(&self, board: &mut Board, arg: &str) -> Result<(), FenDecodeError> {
+impl<const T: usize> FenArgument<T> for ChessEnPassant {
+    fn decode(&self, board: &mut Board<T>, arg: &str) -> Result<(), FenDecodeError> {
         if arg == "-" {
             return Ok(());
         }
@@ -148,8 +144,8 @@ impl FenArgument for ChessEnPassant {
 
         let cols = board.state.cols;
 
-        let to = up(&BitBoard::from_lsb(en_passant_target), 1, cols, 1);
-        let from = down(&to, 2, cols, previous_team);
+        let to = up::<T>(&BitBoard::from_lsb(en_passant_target), 1, cols, 1);
+        let from = down::<T>(&to, 2, cols, previous_team);
 
         board.history.push(HistoryMove {
             action: Action {
@@ -165,7 +161,7 @@ impl FenArgument for ChessEnPassant {
         Ok(())
     }
 
-    fn encode(&self, board: &Board) -> String {
+    fn encode(&self, board: &Board<T>) -> String {
         let last_move = (&board.history).last();
         if let None = last_move {
             return "-".to_string();
@@ -183,15 +179,11 @@ impl FenArgument for ChessEnPassant {
 
         return board.encode_position(last_move.action.to);
     }
-
-    fn duplicate(&self) -> Box<dyn FenArgument> {
-        Box::new(ChessEnPassant)
-    }
 }
 
 pub struct ChessPostProcess;
-impl PostProcess for ChessPostProcess {
-    fn apply(&self, board: &mut Board) {
+impl<const T: usize> PostProcess<T> for ChessPostProcess {
+    fn apply(&self, board: &mut Board<T>) {
         let cols = board.state.cols;
         let edges = &board.state.edges[0];
         let mut bottom = edges.bottom;
@@ -205,15 +197,11 @@ impl PostProcess for ChessPostProcess {
             | (board.state.all_pieces ^ board.state.pieces[0]);
         board.state.first_move &= first_move;
     }
-
-    fn duplicate(&self) -> Box<dyn PostProcess> {
-        Box::new(ChessPostProcess)
-    }
 }
 
 pub struct ChessMoveRestrictions;
-impl MoveRestrictions for ChessMoveRestrictions {
-    fn is_legal(&self, board: &mut Board, action: &Action) -> bool {
+impl<const T: usize> MoveRestrictions<T> for ChessMoveRestrictions {
+    fn is_legal(&self, board: &mut Board<T>, action: &Action) -> bool {
         let to_board = BitBoard::from_lsb(action.to);
         let kings = board.state.pieces[5];
         if (to_board & kings).is_set() {
@@ -229,26 +217,24 @@ impl MoveRestrictions for ChessMoveRestrictions {
         board.undo_move();
         !in_check
     }
-
-    fn duplicate(&self) -> Box<dyn MoveRestrictions> {
-        Box::new(ChessMoveRestrictions)
-    }
 }
 
-const PAWN: &dyn Piece = &PawnPiece;
-const KNIGHT: &dyn Piece = &KnightPiece;
-const BISHOP: &dyn Piece = &BishopPiece;
-const ROOK: &dyn Piece = &RookPiece;
-const QUEEN: &dyn Piece = &QueenPiece;
-const KING: &dyn Piece = &KingPiece;
+const PAWN: &dyn Piece<1> = &PawnPiece;
+const KNIGHT: &dyn Piece<1> = &KnightPiece;
+const BISHOP: &dyn Piece<1> = &BishopPiece;
+const ROOK: &dyn Piece<1> = &RookPiece;
+const QUEEN: &dyn Piece<1> = &QueenPiece;
+const KING: &dyn Piece<1> = &KingPiece;
 
 pub struct Chess;
 
 impl Chess {
-    pub fn create() -> Game {
+    pub fn create() -> Game<1> {
         Game {
             teams: 2,
             turns: 1,
+            rows: 8,
+            cols: 8,
             pieces: vec![PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING],
             move_restrictions: Box::new(ChessMoveRestrictions),
             fen_options: FenOptions {
@@ -264,7 +250,7 @@ impl Chess {
                     ("full moves".to_string(), Box::new(FenFullMoves)),
                 ],
                 post_process: Box::new(ChessPostProcess),
-            },
+            }
         }
     }
 }

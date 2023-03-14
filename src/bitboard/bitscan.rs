@@ -1,4 +1,4 @@
-use super::BitSet;
+use super::BitBoard;
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum Direction {
@@ -15,12 +15,12 @@ impl Direction {
     }
 }
 
-impl<const T: usize> BitSet<T> {
+impl<const T: usize> BitBoard<T> {
     /// A forward bitscan, which finds the least significant 1-bit.
     pub fn bitscan_forward(&self) -> u32 {
         assert!(
             self.is_set(),
-            "Bitscan Forward only works for non-empty bitsets."
+            "Bitscan Forward only works for non-empty BitBoards."
         );
 
         if T == 1 {
@@ -44,7 +44,7 @@ impl<const T: usize> BitSet<T> {
     pub fn bitscan_reverse(&self) -> u32 {
         assert!(
             self.is_set(),
-            "Bitscan Reverse only works for non-empty bitsets."
+            "Bitscan Reverse only works for non-empty BitBoards."
         );
 
         if T == 1 {
@@ -74,21 +74,21 @@ impl<const T: usize> BitSet<T> {
 
 #[cfg(test)]
 mod tests {
-    use super::BitSet;
+    use super::BitBoard;
 
     #[test]
     fn bitscan_forward() {
-        assert_eq!(BitSet::from_data([0, 1]).bitscan_forward(), 0);
-        assert_eq!(BitSet::from_data([1, 1]).bitscan_forward(), 0);
-        assert_eq!(BitSet::from_data([3, 3]).bitscan_forward(), 0);
-        assert_eq!(BitSet::from_data([1, 0]).bitscan_forward(), 128);
+        assert_eq!(BitBoard::from_data([0, 1]).bitscan_forward(), 0);
+        assert_eq!(BitBoard::from_data([1, 1]).bitscan_forward(), 0);
+        assert_eq!(BitBoard::from_data([3, 3]).bitscan_forward(), 0);
+        assert_eq!(BitBoard::from_data([1, 0]).bitscan_forward(), 128);
     }
 
     #[test]
     fn bitscan_reverse() {
-        assert_eq!(BitSet::from_data([0, 1]).bitscan_reverse(), 0);
-        assert_eq!(BitSet::from_data([1, 1]).bitscan_reverse(), 128);
-        assert_eq!(BitSet::from_data([3, 3]).bitscan_reverse(), 129);
-        assert_eq!(BitSet::from_data([1, 0]).bitscan_reverse(), 128);
+        assert_eq!(BitBoard::from_data([0, 1]).bitscan_reverse(), 0);
+        assert_eq!(BitBoard::from_data([1, 1]).bitscan_reverse(), 128);
+        assert_eq!(BitBoard::from_data([3, 3]).bitscan_reverse(), 129);
+        assert_eq!(BitBoard::from_data([1, 0]).bitscan_reverse(), 128);
     }
 }

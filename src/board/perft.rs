@@ -25,7 +25,7 @@ impl PerftResults {
     }
 }
 
-impl<'a> Board<'a> {
+impl<'a, const T: usize> Board<'a, T> {
     pub fn perft(&mut self, depth: u32, legality: bool) -> u64 {
         if depth == 0 {
             return 1;
@@ -59,7 +59,7 @@ impl<'a> Board<'a> {
         );
     }
 
-    pub fn assert_perfts<const T: usize>(&mut self, nodes: [u64; T]) {
+    pub fn assert_perfts<const S: usize>(&mut self, nodes: [u64; S]) {
         for (ind, true_nodes) in nodes.iter().enumerate() {
             let depth = (ind + 1) as u32;
             self.assert_perft(depth, *true_nodes);

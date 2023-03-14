@@ -1,6 +1,6 @@
 use arrayvec::ArrayVec;
 
-use crate::bitset::BitSet;
+use crate::bitboard::BitBoard;
 
 use super::{
     actions::{Action, HistoryMove, UndoMoveError},
@@ -9,7 +9,6 @@ use super::{
     pieces::Piece,
 };
 
-pub type BitBoard = BitSet<1>;
 pub type PieceType = usize;
 
 /// I doubt anyone would be practically creating boards of 4,294,967,296 x 4,294,967,296.
@@ -17,12 +16,12 @@ pub type PieceType = usize;
 pub type Rows = u32;
 pub type Cols = u32;
 
-pub struct BoardState {
+pub struct BoardState<const T: usize> {
     /// All Pieces is a BitBoard of all pieces, because keeping this bitboard ready makes it much easier to calculate movement for slider pieces.
-    pub all_pieces: BitBoard,
-    pub first_move: BitBoard,
-    pub pieces: Vec<BitBoard>,
-    pub teams: Vec<BitBoard>,
+    pub all_pieces: BitBoard<T>,
+    pub first_move: BitBoard<T>,
+    pub pieces: Vec<BitBoard<T>>,
+    pub teams: Vec<BitBoard<T>>,
 
     pub moving_team: u32,
     pub current_turn: u32,
@@ -37,7 +36,7 @@ pub struct BoardState {
     pub turns: u32,
 
     /// Edges is a list of "boundary bitboards" for validating the movement of delta pieces (pieces that move in a fixed way everytime)
-    pub edges: Vec<Edges>,
+    pub edges: Vec<Edges<T>>,
     pub rows: Rows,
     pub cols: Cols,
     pub squares: u32,
@@ -48,13 +47,13 @@ pub struct BoardState {
     pub team_reverse_lookup: ArrayVec<u32, 16>,
 }
 
-impl BoardState {
-    pub fn get_piece_team_board(&self, piece: usize, team: usize) -> BitBoard {
+impl<const T: usize> BoardState<T> {
+    pub fn get_piece_team_board(&self, piece: usize, team: usize) -> BitBoard<T> {
         self.pieces[piece] & self.teams[team]
     }
 }
 
-pub type AttackDirections = Vec<BitBoard>;
+pub type AttackDirections<const T: usize> = Vec<BitBoard<T>>;
 
 /// AttackLookup is indexed by the index of the Most Significant 1-Bit.
 ///
@@ -62,13 +61,13 @@ pub type AttackDirections = Vec<BitBoard>;
 ///     For pieces that always move the same way (like Delta Pieces), only the first slot of this AttackDirections is used, because there's no directions.
 ///     For slider pieces, there are different indexes for specific ray directions of it.
 
-pub type AttackLookup = Vec<AttackDirections>;
+pub type AttackLookup<const T: usize> = Vec<AttackDirections<T>>;
 
-pub struct Board<'a> {
-    pub state: BoardState,
-    pub game: &'a Game,
-    pub attack_lookup: Vec<AttackLookup>,
-    pub history: ArrayVec<HistoryMove, 2048>,
+pub struct Board<'a, const T: usize> {
+    pub state: BoardState<T>,
+    pub game: &'a Game<T>,
+    pub attack_lookup: Vec<AttackLookup<T>>,
+    pub history: ArrayVec<HistoryMove<T>, 2048>,
 }
 
 fn generate_forward_lookup(count: u32) -> ArrayVec<u32, 16> {
@@ -96,8 +95,8 @@ fn generate_reverse_lookup(count: u32) -> ArrayVec<u32, 16> {
     lookup
 }
 
-impl<'a> Board<'a> {
-    pub fn empty(game: &'a Game, (rows, cols): (Rows, Cols)) -> Board<'a> {
+impl<'a, const T: usize> Board<'a, T> {
+    pub fn empty(game: &'a Game<T>, (rows, cols): (Rows, Cols)) -> Board<'a, T> {
         let pieces_state = game
             .pieces
             .iter()
@@ -140,7 +139,7 @@ impl<'a> Board<'a> {
         board
     }
 
-    pub fn get_move_mask(&self, team: u32, mode: u32) -> BitBoard {
+    pub fn get_move_mask(&self, team: u32, mode: u32) -> BitBoard<T> {
         let board_len = self.state.squares;
         let mut bitboard = BitBoard::new();
 
@@ -156,11 +155,11 @@ impl<'a> Board<'a> {
         bitboard
     }
 
-    pub fn can_move(&self, team: u32, target: BitBoard, mode: u32) -> bool {
+    pub fn can_move(&self, team: u32, target: BitBoard<T>, mode: u32) -> bool {
         let board_len = self.state.squares;
 
         let team = self.state.moving_team;
-        let mut mask: BitBoard = BitBoard::new();
+        let mut mask = BitBoard::new();
 
         for (ind, board) in self.state.pieces.iter().enumerate() {
             let board = *board & self.state.teams[team as usize];

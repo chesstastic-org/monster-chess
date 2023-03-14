@@ -1,21 +1,21 @@
 use crate::board::Cols;
 
-use super::BitSet;
+use super::BitBoard;
 
-impl<const T: usize> BitSet<T> {
-    pub fn up(&self, shift: u32, cols: Cols) -> BitSet<T> {
+impl<const T: usize> BitBoard<T> {
+    pub fn up(&self, shift: u32, cols: Cols) -> BitBoard<T> {
         *self >> shift * (cols)
     }
 
-    pub fn down(&self, shift: u32, cols: Cols) -> BitSet<T> {
+    pub fn down(&self, shift: u32, cols: Cols) -> BitBoard<T> {
         *self << shift * (cols)
     }
 
-    pub fn right(&self, shift: u32) -> BitSet<T> {
+    pub fn right(&self, shift: u32) -> BitBoard<T> {
         *self << shift
     }
 
-    pub fn left(&self, shift: u32) -> BitSet<T> {
+    pub fn left(&self, shift: u32) -> BitBoard<T> {
         *self >> shift
     }
 

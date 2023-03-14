@@ -1,12 +1,12 @@
 use crate::{
-    bitset::Direction,
+    bitboard::{Direction, BitBoard},
     board::{
         actions::{
             Action, HistoryMove, HistoryState, HistoryUpdate, IndexedPreviousBoard, PreviousBoard,
         },
         edges::Edges,
         pieces::{Piece, PieceSymbol},
-        AttackDirections, BitBoard, Board, Cols, PieceType,
+        AttackDirections, Board, Cols, PieceType,
     },
     games::chess::game::ATTACKS_MODE,
 };
@@ -16,26 +16,26 @@ const CASTLING_MOVE: usize = 1;
 
 const ROOK_PIECE_TYPE: usize = 3;
 
-pub struct KingPiece;
+pub struct KingPiece<const T: usize>;
 
-fn right_one(from: BitBoard, edges: &Edges) -> BitBoard {
+fn right_one<const T: usize>(from: BitBoard<T>, edges: &Edges<T>) -> BitBoard<T> {
     (from & !edges.right).right(1) & !edges.left
 }
 
-fn left_one(from: BitBoard, edges: &Edges) -> BitBoard {
+fn left_one<const T: usize>(from: BitBoard<T>, edges: &Edges<T>) -> BitBoard<T> {
     (from & !edges.left).left(1) & !edges.right
 }
 
-fn up_one(from: BitBoard, cols: Cols, edges: &Edges) -> BitBoard {
+fn up_one<const T: usize>(from: BitBoard<T>, cols: Cols, edges: &Edges<T>) -> BitBoard<T> {
     (from & !edges.top).up(1, cols)
 }
 
-fn down_one(from: BitBoard, cols: Cols, edges: &Edges) -> BitBoard {
+fn down_one<const T: usize>(from: BitBoard<T>, cols: Cols, edges: &Edges<T>) -> BitBoard<T> {
     (from & !edges.bottom).down(1, cols)
 }
 
-impl KingPiece {
-    fn make_castling_move(&self, board: &mut Board, action: &Action, from: BitBoard, to: BitBoard) {
+impl<const T: usize> KingPiece<T> {
+    fn make_castling_move(&self, board: &mut Board<T>, action: &Action, from: BitBoard<T>, to: BitBoard<T>) {
         let cols = board.state.cols;
         let mut left_center = BitBoard::from_lsb(if cols % 2 == 0 {
             (cols / 2) - 1
@@ -118,12 +118,12 @@ impl KingPiece {
     }
 }
 
-impl Piece for KingPiece {
+impl<const T: usize> Piece<T> for KingPiece<T> {
     fn get_piece_symbol(&self) -> PieceSymbol {
         PieceSymbol::Char('k')
     }
 
-    fn generate_lookup_moves(&self, board: &Board, mut from: BitBoard) -> AttackDirections {
+    fn generate_lookup_moves(&self, board: &Board<T>, mut from: BitBoard<T>) -> AttackDirections<T> {
         let cols = board.state.cols;
         let edges = &board.state.edges[0];
         let mut moves = right_one(from, edges) | left_one(from, edges);
@@ -139,26 +139,26 @@ impl Piece for KingPiece {
 
     fn can_move_mask(
         &self,
-        board: &Board,
-        from: BitBoard,
+        board: &Board<T>,
+        from: BitBoard<T>,
         from_bit: u32,
         piece_type: usize,
         team: u32,
         mode: u32,
-        to: BitBoard,
-    ) -> BitBoard {
+        to: BitBoard<T>,
+    ) -> BitBoard<T> {
         self.get_attack_lookup(board, piece_type).unwrap()[from_bit as usize][0]
     }
 
     #[allow(unused_variables)]
     fn get_moves(
         &self,
-        board: &Board,
-        from: BitBoard,
+        board: &Board<T>,
+        from: BitBoard<T>,
         piece_type: usize,
         team: u32,
         mode: u32,
-    ) -> BitBoard {
+    ) -> BitBoard<T> {
         let lookup = self.get_attack_lookup(board, piece_type);
         match lookup {
             Some(lookup) => lookup[from.bitscan_reverse() as usize][0],
@@ -168,11 +168,11 @@ impl Piece for KingPiece {
 
     fn make_capture_move(
         &self,
-        board: &mut Board,
+        board: &mut Board<T>,
         action: &Action,
         piece_type: usize,
-        from: BitBoard,
-        to: BitBoard,
+        from: BitBoard<T>,
+        to: BitBoard<T>,
     ) {
         if action.info == CASTLING_MOVE {
             self.make_castling_move(board, action, from, to);
@@ -236,7 +236,7 @@ impl Piece for KingPiece {
     fn add_actions(
         &self,
         actions: &mut Vec<Action>,
-        board: &Board,
+        board: &Board<T>,
         piece_type: usize,
         from: u32,
         team: u32,

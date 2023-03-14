@@ -1,12 +1,12 @@
 use crate::{
-    bitset::Direction,
+    bitboard::{Direction, BitBoard},
     board::{
         actions::{
             Action, HistoryMove, HistoryState, HistoryUpdate, IndexedPreviousBoard, PreviousBoard,
         },
         edges::Edges,
         pieces::{Piece, PieceSymbol},
-        AttackDirections, BitBoard, Board, Cols, PieceType,
+        AttackDirections, Board, Cols, PieceType,
     },
     games::chess::game::ATTACKS_MODE,
 };
@@ -17,9 +17,9 @@ fn promotion_move(piece_type: PieceType) -> usize {
     piece_type + 2
 }
 
-pub struct PawnPiece;
+pub struct PawnPiece<const T: usize>;
 
-pub fn up(bitboard: &BitBoard, shift: u32, cols: Cols, team: u32) -> BitBoard {
+pub fn up<const T: usize>(bitboard: &BitBoard<T>, shift: u32, cols: Cols, team: u32) -> BitBoard<T> {
     match team {
         0 => bitboard.up(shift, cols),
         1 => bitboard.down(shift, cols),
@@ -27,7 +27,7 @@ pub fn up(bitboard: &BitBoard, shift: u32, cols: Cols, team: u32) -> BitBoard {
     }
 }
 
-pub fn down(bitboard: &BitBoard, shift: u32, cols: Cols, team: u32) -> BitBoard {
+pub fn down<const T: usize>(bitboard: &BitBoard<T>, shift: u32, cols: Cols, team: u32) -> BitBoard<T> {
     match team {
         0 => bitboard.down(shift, cols),
         1 => bitboard.up(shift, cols),
@@ -35,14 +35,14 @@ pub fn down(bitboard: &BitBoard, shift: u32, cols: Cols, team: u32) -> BitBoard 
     }
 }
 
-impl PawnPiece {
+impl<const T: usize> PawnPiece<T> {
     fn make_en_passant_move(
         &self,
-        board: &mut Board,
+        board: &mut Board<T>,
         action: &Action,
         piece_type: usize,
-        from: BitBoard,
-        to: BitBoard,
+        from: BitBoard<T>,
+        to: BitBoard<T>,
     ) {
         let cols = board.state.cols;
 
@@ -92,13 +92,13 @@ impl PawnPiece {
     }
 }
 
-impl Piece for PawnPiece {
+impl<const T: usize> Piece<T> for PawnPiece<T> {
     fn can_lookup(&self) -> bool {
         true
     }
 
-    fn generate_lookup_moves(&self, board: &Board, mut from: BitBoard) -> AttackDirections {
-        let mut attack_dirs: AttackDirections = vec![];
+    fn generate_lookup_moves(&self, board: &Board<T>, mut from: BitBoard<T>) -> AttackDirections<T> {
+        let mut attack_dirs: AttackDirections<T> = vec![];
         let edges = board.state.edges[0];
         for team in 0..board.game.teams {
             let from = match team {
@@ -118,7 +118,7 @@ impl Piece for PawnPiece {
         PieceSymbol::Char('p')
     }
 
-    fn parse_info(&self, board: &Board, info: String) -> u32 {
+    fn parse_info(&self, board: &Board<T>, info: String) -> u32 {
         if info.is_empty() {
             // TODO: Check for En Passant
             0
@@ -142,7 +142,7 @@ impl Piece for PawnPiece {
         }
     }
 
-    fn format_info(&self, board: &Board, info: usize) -> String {
+    fn format_info(&self, board: &Board<T>, info: usize) -> String {
         if info > 1 {
             let piece_trait = &board.game.pieces[info - 2];
             if let PieceSymbol::Char(char) = piece_trait.get_piece_symbol() {
@@ -157,25 +157,25 @@ impl Piece for PawnPiece {
 
     fn can_move_mask(
         &self,
-        board: &Board,
-        from: BitBoard,
+        board: &Board<T>,
+        from: BitBoard<T>,
         from_bit: u32,
         piece_type: usize,
         team: u32,
         mode: u32,
-        to: BitBoard,
-    ) -> BitBoard {
+        to: BitBoard<T>,
+    ) -> BitBoard<T> {
         self.get_attack_lookup(board, piece_type).unwrap()[from_bit as usize][team as usize]
     }
 
     fn get_moves(
         &self,
-        board: &Board,
-        from: BitBoard,
+        board: &Board<T>,
+        from: BitBoard<T>,
         piece_type: usize,
         team: u32,
         mode: u32,
-    ) -> BitBoard {
+    ) -> BitBoard<T> {
         let cols = board.state.cols;
         let edges = &board.state.edges[0];
 
@@ -223,11 +223,11 @@ impl Piece for PawnPiece {
 
     fn make_capture_move(
         &self,
-        board: &mut Board,
+        board: &mut Board<T>,
         action: &Action,
         piece_type: usize,
-        from: BitBoard,
-        to: BitBoard,
+        from: BitBoard<T>,
+        to: BitBoard<T>,
     ) {
         let color: usize = action.team as usize;
         let captured_color: usize = if (to & board.state.teams[0]).is_set() {
@@ -304,11 +304,11 @@ impl Piece for PawnPiece {
 
     fn make_normal_move(
         &self,
-        board: &mut Board,
+        board: &mut Board<T>,
         action: &Action,
         piece_type: usize,
-        from: BitBoard,
-        to: BitBoard,
+        from: BitBoard<T>,
+        to: BitBoard<T>,
     ) {
         if action.info == EN_PASSANT_MOVE {
             self.make_en_passant_move(board, action, piece_type, from, to);
@@ -362,7 +362,7 @@ impl Piece for PawnPiece {
     fn add_actions(
         &self,
         actions: &mut Vec<Action>,
-        board: &Board,
+        board: &Board<T>,
         piece_type: usize,
         from: u32,
         team: u32,

@@ -1,40 +1,36 @@
-use std::backtrace::Backtrace;
-
-use crate::board::BitBoard;
-
 /// I've chosen to use this little utility because of its performance in benchmarks being the best, and because it makes it the easiest to specialize to the needs of this project (in terms of both optimizations and code structure.)
 /// In this case, those needs being a way to have bigger integer sizes that are compatible with bit operations at high speeds.
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Ord)]
-pub struct BitSet<const T: usize> {
+pub struct BitBoard<const T: usize> {
     pub bits: [u128; T],
 }
 
-impl<const T: usize> BitSet<T> {
-    pub fn from_data(data: [u128; T]) -> BitSet<T> {
-        BitSet { bits: data }
+impl<const T: usize> BitBoard<T> {
+    pub fn from_data(data: [u128; T]) -> BitBoard<T> {
+        BitBoard { bits: data }
     }
 
-    pub fn from_element(el: u128) -> BitSet<T> {
+    pub fn from_element(el: u128) -> BitBoard<T> {
         let mut arr = [0; T];
         arr[T - 1] = el;
-        BitSet { bits: arr }
+        BitBoard { bits: arr }
     }
 
-    pub fn from_lsb(bit: u32) -> BitSet<T> {
-        BitSet::<T>::from_element(1) << bit
+    pub fn from_lsb(bit: u32) -> BitBoard<T> {
+        BitBoard::<T>::from_element(1) << bit
     }
 
-    pub fn from_msb(bit: u32) -> BitSet<T> {
-        !(BitSet::<T>::max() >> 1) >> bit
+    pub fn from_msb(bit: u32) -> BitBoard<T> {
+        !(BitBoard::<T>::max() >> 1) >> bit
     }
 
-    pub fn starting_at_lsb(bit: u32, length: u32) -> BitSet<T> {
-        (BitSet::<T>::from_lsb(length) - BitSet::<T>::from_element(1)) << bit
+    pub fn starting_at_lsb(bit: u32, length: u32) -> BitBoard<T> {
+        (BitBoard::<T>::from_lsb(length) - BitBoard::<T>::from_element(1)) << bit
     }
 
     pub fn has_bit(self, bit: u32) -> bool {
-        (self & (BitSet::<T>::from_element(1) << bit)).is_set()
+        (self & (BitBoard::<T>::from_element(1) << bit)).is_set()
     }
 
     pub fn is_empty(&self) -> bool {
@@ -53,23 +49,23 @@ impl<const T: usize> BitSet<T> {
         self.bits.iter().any(|el| *el != 0)
     }
 
-    pub fn max() -> BitSet<T> {
-        BitSet::<T>::from_data([u128::MAX; T])
+    pub fn max() -> BitBoard<T> {
+        BitBoard::<T>::from_data([u128::MAX; T])
     }
 
-    pub fn new() -> BitSet<T> {
-        BitSet::<T>::from_data([0; T])
+    pub fn new() -> BitBoard<T> {
+        BitBoard::<T>::from_data([0; T])
     }
 
     #[inline(always)]
-    pub fn apply(self, rhs: BitSet<T>, apply: impl Fn((&u128, u128)) -> u128) -> Self {
+    pub fn apply(self, rhs: BitBoard<T>, apply: impl Fn((&u128, u128)) -> u128) -> Self {
         if T == 1 {
-            return BitSet {
+            return BitBoard {
                 bits: [apply((&self.bits[0], rhs.bits[0])); T],
             };
         }
 
-        BitSet {
+        BitBoard {
             bits: self
                 .bits
                 .iter()
@@ -77,12 +73,12 @@ impl<const T: usize> BitSet<T> {
                 .map(apply)
                 .collect::<Vec<_>>()
                 .try_into()
-                .expect(&format!("Could not convert BitSet data vector into an array when applying operation with `apply`."))
+                .expect(&format!("Could not convert BitBoard data vector into an array when applying operation with `apply`."))
         }
     }
 
     #[inline(always)]
-    pub fn effect(&mut self, rhs: BitSet<T>, apply: impl Fn((&u128, u128)) -> u128) {
+    pub fn effect(&mut self, rhs: BitBoard<T>, apply: impl Fn((&u128, u128)) -> u128) {
         if T == 1 {
             self.bits = [apply((&self.bits[0], rhs.bits[0])); T];
             return;
@@ -95,7 +91,7 @@ impl<const T: usize> BitSet<T> {
             .map(apply)
             .collect::<Vec<_>>()
             .try_into()
-            .expect(&format!("Could not convert BitSet data vector into an array when applying operation with `effect`."));
+            .expect(&format!("Could not convert BitBoard data vector into an array when applying operation with `effect`."));
     }
 
     pub fn count_zeros(&self) -> u32 {
@@ -148,7 +144,7 @@ impl<const T: usize> BitSet<T> {
     }
 }
 
-pub struct BitIterator<const T: usize>(pub BitSet<T>, u32);
+pub struct BitIterator<const T: usize>(pub BitBoard<T>, u32);
 
 impl<const T: usize> Iterator for BitIterator<T> {
     type Item = u32;
@@ -159,7 +155,7 @@ impl<const T: usize> Iterator for BitIterator<T> {
             if bit >= self.1 {
                 return None;
             }
-            self.0 &= self.0 - BitSet::from_element(1);
+            self.0 &= self.0 - BitBoard::from_element(1);
             Some(bit)
         } else {
             None
@@ -167,7 +163,7 @@ impl<const T: usize> Iterator for BitIterator<T> {
     }
 }
 
-/*impl<const T: usize> Display for BitSet<T> {
+/*impl<const T: usize> Display for BitBoard<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "({}, {})", self.longitude, self.latitude);
     }
