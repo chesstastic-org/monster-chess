@@ -49,7 +49,7 @@ Chess is a two-player game where both players start with a color and the same se
 
 In chess, the end-goal of the game is **checkmate**, where the opponent's king is in check (in the line of sight of another piece), and has no moves that can escape said check (moving out of the way, blocking with another piece, etc.) The image above demonstrates this, with two rooks blocking all of the king's movement squares, and the opponent's king is simply unable to move out of the line of sight of the rooks. If the opponent is in check but can escape it, they must, and you cannot put yourself in check.
 
-The way `monster-chess` handles this is using **psuedolegal** move generation. First, we generate all of the moves any piece would be able to make (aka. psuedolegal moves), and then we check to make sure your king isn't in check after you perform the move. To do this, we have to generate _every possible move_ that the opponent can make after your move, and see if one of them allows for the king to be captured. This is expensive, but we have two ways to make this faster.
+The way `monster-chess` handles this is using **pseudolegal** move generation. First, we generate all of the moves any piece would be able to make (aka. pseudolegal moves), and then we check to make sure your king isn't in check after you perform the move. To do this, we have to generate _every possible move_ that the opponent can make after your move, and see if one of them allows for the king to be captured. This is expensive, but we have two ways to make this faster.
 - For pieces that move and capture differently, we only focus on the squares they capture.
 - For pieces that move in one direction until they hit another piece or the edge of the board (bishops, rooks, and queens), we check if the king is even in the line of sight of the piece before seeing if it's truly in the line of sight.
 
@@ -68,17 +68,17 @@ Then, we can generate the moves as follows:
 ```rust
 // We have to specify the mode because `ATTACKS_MODE` is used to optimizing checks, and we don't know what mode to generate for until you specify it.
 let legal_moves = board.generate_legal_moves(NORMAL_MODE);
-let psuedolegal_moves = board.generate_moves(NORMAL_MODE);
+let pseudolegal_moves = board.generate_moves(NORMAL_MODE);
 ```
 
 For testing and benchmarking purposes, `monster-chess` provides a method named `perft`, which will count the number of all possible moves possible that are `depth` half-moves ahead from the position (with a half-move being a move from one of the two players for reference.)
 
 ```rust
     let perft = board.perft(5, true);
-    let perft_psuedolegal = board.perft(5, false);
+    let perft_pseudolegal = board.perft(5, false);
 ```
 
-From the benchmarks I've done, `monster-chess` can reach about 20,000,000 psuedo-legal moves per second, and 5,000,000 legal moves per second. This isn't ideal and if you're only interested in performance, I recommend using the [cozy-chess](https://github.com/analog-hors/cozy-chess/) crate which is at least 25x faster then the implementation of chess in `monster-chess`. However, `monster-chess` is a sound option for chess given you also want the ability to support chess variants or even other games.
+From the benchmarks I've done, `monster-chess` can reach about 20,000,000 pseudo-legal moves per second, and 5,000,000 legal moves per second. This isn't ideal and if you're only interested in performance, I recommend using the [cozy-chess](https://github.com/analog-hors/cozy-chess/) crate which is at least 25x faster then the implementation of chess in `monster-chess`. However, `monster-chess` is a sound option for chess given you also want the ability to support chess variants or even other games.
 
 It may be noted that `monster-chess` also aims to support [Fischer Random Chess](https://www.chess.com/terms/chess960). As of now, Fischer Random Chess is theoretically supported in the implementation of `monster-chess`'s Chess implementation, but as of now, it isn't tested, and FENs for the variant aren't supported. It would be trivial to add it in the framework of `monster-chess` as an extension of the existing Chess implementation, though.
 
@@ -193,7 +193,7 @@ If your game needs an argument to represent which side has to move (which it alm
 ```rust
 pub struct Game {
     pub pieces: Vec<&'static dyn Piece>,
-    pub move_restrictions: Box<dyn MoveRestrictions>, // Psuedo-legal Move Generation
+    pub move_restrictions: Box<dyn MoveRestrictions>, // Pseudo-legal Move Generation
 }
 ```
 
