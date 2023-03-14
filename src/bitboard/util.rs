@@ -38,7 +38,7 @@ impl<const T: usize> BitBoard<T> {
             return self.bits[0] == 0;
         }
 
-        self.bits.iter().any(|el| *el == 0)
+        self.bits.iter().all(|el| *el == 0)
     }
 
     pub fn is_set(&self) -> bool {
@@ -113,7 +113,7 @@ impl<const T: usize> BitBoard<T> {
     /// Not a well optimized method; avoid using in hot loops.
     pub fn get_bits(&self) -> Vec<u128> {
         let mut bits: Vec<u128> = Vec::with_capacity(128 * T);
-        for container in self.bits {
+        for container in self.bits.iter().rev() {
             for i in 0..128 {
                 bits.push((container >> i) & 1); // Get `i`th bit of `container` and check if it is toggled on (equal to 1)
             }
