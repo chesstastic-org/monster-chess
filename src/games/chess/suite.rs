@@ -176,11 +176,7 @@ fn perft_suite() {
             }
 
             let chess = Chess::create();
-            let mut board = Board::new(
-                &chess,
-                (8, 8),
-                test.fen,
-            );
+            let mut board = chess.from_fen(test.fen);
             board.assert_perft(depth as u32, test.perft_counts[depth - 1]);
             tests_completed += 1;
 

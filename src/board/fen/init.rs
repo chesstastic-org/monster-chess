@@ -7,10 +7,10 @@ use super::super::{
     Board, Cols, Rows,
 };
 
-impl<'a, const T: usize> Board<'a, T> {
-    pub fn new(game: &'a Game<T>, (rows, cols): (Rows, Cols), fen: &str) -> Board<'a, T> {
+impl<const T: usize> Game<T> {
+    pub fn from_fen(&self, fen: &str) -> Board<T> {
         let args = split(fen).expect(&format!("{fen} cannot be split into arguments."));
-        let mut board = Board::from_fen_state(game, (rows, cols), &args[0]);
+        let mut board = Board::from_fen_state(self, (self.rows, self.cols), &args[0]);
 
         let arg_traits = board
             .game
@@ -37,7 +37,9 @@ impl<'a, const T: usize> Board<'a, T> {
 
         board
     }
+}
 
+impl<'a, const T: usize> Board<'a, T> {
     pub fn to_fen(&self) -> String {
         let mut fen = self.to_fen_state();
         if fen.contains(" ") {

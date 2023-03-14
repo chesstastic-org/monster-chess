@@ -16,9 +16,7 @@ fn main() {
     env::set_var("RUST_BACKTRACE", "1000");
 
     let chess = Chess::create();
-    let mut board = Board::new(
-        &chess,
-        (8, 8),
+    let mut board = chess.from_fen(
         "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
     );
 

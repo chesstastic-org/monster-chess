@@ -60,12 +60,7 @@ You can initialize the chess board as follows:
 ```rust
     // We have to store `chess` in a variable and borrow it because `monster-chess` separates the game instance from the actual board-state itself to avoid an extra runtime cost in many cases.
     let chess = Chess::create();
-    let mut board = Board::new(
-        &chess,
-        2,
-        (8, 8),
-        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
-    );
+    let mut board = chess.from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 ```
 
 Then, we can generate the moves as follows:
