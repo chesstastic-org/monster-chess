@@ -1,8 +1,10 @@
-use crate::{board::{game::Game, fen::{FenOptions, FenState, FenSubMoves, FenTeamArgument, FenFullMoves}}, games::ataxx::AtaxxMoveRestrictions};
+use crate::{board::{game::Game, fen::{FenOptions, FenState, FenSubMoves, FenTeamArgument, FenFullMoves}, pieces::Piece}, games::ataxx::AtaxxMoveRestrictions};
 
-use super::AtaxxPostProcess;
+use super::{AtaxxPostProcess, pieces::StonePiece};
 
 pub struct Ataxx;
+
+const STONE: &dyn Piece<1> = &StonePiece;
 
 impl Ataxx {
     pub fn create() -> Game<1> {
@@ -11,7 +13,7 @@ impl Ataxx {
             turns: 1,
             rows: 7,
             cols: 7,
-            pieces: vec![],
+            pieces: vec![ STONE ],
             move_restrictions: Box::new(AtaxxMoveRestrictions),
             fen_options: FenOptions {
                 state: FenState { first_moves: false },
