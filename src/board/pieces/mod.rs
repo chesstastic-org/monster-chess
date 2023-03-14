@@ -229,7 +229,7 @@ pub trait Piece<const T: usize> {
 
     fn add_actions(
         &self,
-        actions: &mut Vec<Action>,
+        actions: &mut Vec<Option<Action>>,
         board: &Board<T>,
         piece_type: usize,
         from: u32,
@@ -246,13 +246,13 @@ pub trait Piece<const T: usize> {
         }
 
         for bit in bit_actions.iter_one_bits(board.state.squares) {
-            actions.push(Action {
+            actions.push(Some(Action {
                 from,
                 to: bit,
                 team,
                 info: NORMAL_MOVE,
                 piece_type,
-            });
+            }));
         }
     }
 }

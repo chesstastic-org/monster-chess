@@ -235,7 +235,7 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
 
     fn add_actions(
         &self,
-        actions: &mut Vec<Action>,
+        actions: &mut Vec<Option<Action>>,
         board: &Board<T>,
         piece_type: usize,
         from: u32,
@@ -255,13 +255,13 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
         }
 
         for bit in bit_actions.iter_one_bits(board_len) {
-            actions.push(Action {
+            actions.push(Some(Action {
                 from,
                 to: bit,
                 team,
                 info: NORMAL_KING_MOVE,
                 piece_type,
-            });
+            }));
         }
 
         /*
@@ -364,13 +364,13 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
                 continue;
             }
 
-            actions.push(Action {
+            actions.push(Some(Action {
                 from,
                 to: rook,
                 team,
                 info: CASTLING_MOVE,
                 piece_type,
-            });
+            }));
         }
     }
 }

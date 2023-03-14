@@ -7,7 +7,7 @@ use crate::{
             FenArgument, FenDecodeError, FenFullMoves, FenOptions, FenState, FenSubMoves,
             FenTeamArgument, PostProcess,
         },
-        game::{Game, MoveRestrictions},
+        game::{Game, MoveController},
         pieces::{Piece, PieceSymbol},
         AttackDirections, Board, Cols, PieceType,
     },
@@ -15,7 +15,7 @@ use crate::{
 
 use super::{pieces::{
     down, up, BishopPiece, KingPiece, KnightPiece, PawnPiece, QueenPiece, RookPiece,
-}, ChessMoveRestrictions, ChessPostProcess, ChessCastlingRights, ChessEnPassant};
+}, ChessMoveController, ChessPostProcess, ChessCastlingRights, ChessEnPassant};
 
 pub const NORMAL_MODE: u32 = 0;
 pub const ATTACKS_MODE: u32 = 1;
@@ -37,7 +37,7 @@ impl Chess {
             rows: 8,
             cols: 8,
             pieces: vec![PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING],
-            move_restrictions: Box::new(ChessMoveRestrictions),
+            move_restrictions: Box::new(ChessMoveController),
             fen_options: FenOptions {
                 state: FenState { first_moves: false },
                 args: vec![

@@ -205,7 +205,7 @@ If your game needs an argument to represent which side has to move (which it alm
 ```rust
 pub struct Game {
     pub pieces: Vec<&'static dyn Piece>,
-    pub move_restrictions: Box<dyn MoveRestrictions>, // Pseudo-legal Move Generation
+    pub move_controller: Box<dyn MoveController>, // Pseudo-legal Move Generation
 }
 ```
 

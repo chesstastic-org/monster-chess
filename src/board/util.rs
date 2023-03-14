@@ -181,9 +181,9 @@ impl<'a, const T: usize> Board<'a, T> {
         (mask & target).is_set()
     }
 
-    pub fn generate_moves(&self, mode: u32) -> Vec<Action> {
+    pub fn generate_moves(&self, mode: u32) -> Vec<Option<Action>> {
         let board_len = self.state.squares;
-        let mut actions: Vec<Action> = Vec::with_capacity(board_len as usize);
+        let mut actions: Vec<Option<Action>> = Vec::with_capacity(board_len as usize);
 
         let team = self.state.moving_team;
 
@@ -202,15 +202,9 @@ impl<'a, const T: usize> Board<'a, T> {
     /*
         Don't use when writing an engine directly; use `generate_moves` and `move_restrictions.is_legal` to avoid extra legality checks during pruning.
     */
-    pub fn generate_legal_moves(&mut self, mode: u32) -> Vec<Action> {
+    pub fn generate_legal_moves(&mut self, mode: u32) -> Vec<Option<Action>> {
         let moves = self.generate_moves(mode);
-        let mut legal_moves = Vec::with_capacity(moves.len());
-        for action in moves {
-            if self.game.move_restrictions.is_legal(self, Some(&action)) {
-                legal_moves.push(action);
-            }
-        }
-        legal_moves
+        self.game.move_restrictions.transform_moves(self, mode, moves)
     }
 
     pub fn get_next_team(&self, mut team: u32) -> u32 {
@@ -233,7 +227,7 @@ impl<'a, const T: usize> Board<'a, T> {
         }
     }
 
-    pub fn make_move(&mut self, action: Option<&Action>) {
+    pub fn make_move(&mut self, action: &Option<Action>) {
         match action {
             Some(action) => {
                 self.game.pieces[action.piece_type].make_move(self, action);

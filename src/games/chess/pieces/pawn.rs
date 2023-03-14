@@ -363,7 +363,7 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
 
     fn add_actions(
         &self,
-        actions: &mut Vec<Action>,
+        actions: &mut Vec<Option<Action>>,
         board: &Board<T>,
         piece_type: usize,
         from: u32,
@@ -393,13 +393,13 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
                     if promotion_piece_type == 5 {
                         continue;
                     }
-                    actions.push(Action {
+                    actions.push(Some(Action {
                         from,
                         to: bit,
                         team,
                         info: promotion_move(promotion_piece_type),
                         piece_type,
-                    });
+                    }));
                 }
             } else {
                 let mut en_passant = false;
@@ -416,7 +416,7 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
                     }
                 }
 
-                actions.push(Action {
+                actions.push(Some(Action {
                     from,
                     to: bit,
                     team,
@@ -426,7 +426,7 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
                         NORMAL_PAWN_MOVE
                     },
                     piece_type,
-                });
+                }));
             }
         }
     }

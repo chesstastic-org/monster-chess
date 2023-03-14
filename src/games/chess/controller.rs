@@ -1,10 +1,11 @@
-use crate::{board::{game::MoveRestrictions, Board, actions::Action}, bitboard::BitBoard};
+use crate::{board::{game::MoveController, Board, actions::Action}, bitboard::BitBoard};
 
 use super::ATTACKS_MODE;
 
-pub struct ChessMoveRestrictions;
-impl<const T: usize> MoveRestrictions<T> for ChessMoveRestrictions {
-    fn is_legal(&self, board: &mut Board<T>, action: Option<&Action>) -> bool {
+pub struct ChessMoveController<const T: usize>;
+
+impl<const T: usize> ChessMoveController<T> {
+    fn is_legal(&self, board: &mut Board<T>, action: &Option<Action>) -> bool {
         match action {
             Some(action) => {
                 let to_board = BitBoard::from_lsb(action.to);
@@ -15,7 +16,7 @@ impl<const T: usize> MoveRestrictions<T> for ChessMoveRestrictions {
 
                 let current_team = board.state.moving_team;
 
-                board.make_move(Some(action));
+                board.make_move(&Some(*action));
                 let kings = board.state.pieces[5];
                 let king_board = board.state.teams[current_team as usize] & kings;
                 let in_check = board.can_move(board.state.moving_team, king_board, ATTACKS_MODE);
@@ -29,5 +30,18 @@ impl<const T: usize> MoveRestrictions<T> for ChessMoveRestrictions {
                 false
             }
         }
+    }
+}
+
+impl<const T: usize> MoveController<T> for ChessMoveController<T> {
+    fn transform_moves(&self, board: &mut Board<T>, mode: u32, actions: Vec<Option<Action>>) -> Vec<Option<Action>> {
+        let moves = board.generate_moves(mode);
+        let mut legal_moves = Vec::with_capacity(moves.len());
+        for action in moves {
+            if self.is_legal(board, &action) {
+                legal_moves.push(action);
+            }
+        }
+        legal_moves
     }
 }

@@ -7,7 +7,7 @@ use crate::{
             FenArgument, FenDecodeError, FenFullMoves, FenOptions, FenState, FenSubMoves,
             FenTeamArgument, PostProcess,
         },
-        game::{Game, MoveRestrictions},
+        game::{Game, MoveController},
         pieces::{Piece, PieceSymbol},
         AttackDirections, Board, Cols, PieceType,
     },

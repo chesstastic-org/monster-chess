@@ -1,10 +1,10 @@
 mod game;
 mod process;
-mod restrictions;
+mod controller;
 mod pieces;
 mod suite;
 
 pub use game::*;
 pub use process::*;
-pub use restrictions::*;
+pub use controller::*;
 pub use suite::*;

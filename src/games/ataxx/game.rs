@@ -1,4 +1,4 @@
-use crate::{board::{game::Game, fen::{FenOptions, FenState, FenSubMoves, FenTeamArgument, FenFullMoves}, pieces::Piece}, games::ataxx::AtaxxMoveRestrictions};
+use crate::{board::{game::Game, fen::{FenOptions, FenState, FenSubMoves, FenTeamArgument, FenFullMoves}, pieces::Piece}, games::ataxx::AtaxxMoveController};
 
 use super::{AtaxxPostProcess, pieces::StonePiece};
 
@@ -14,7 +14,7 @@ impl Ataxx {
             rows: 7,
             cols: 7,
             pieces: vec![ STONE ],
-            move_restrictions: Box::new(AtaxxMoveRestrictions),
+            move_restrictions: Box::new(AtaxxMoveController),
             fen_options: FenOptions {
                 state: FenState { first_moves: false },
                 args: vec![

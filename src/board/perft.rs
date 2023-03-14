@@ -38,7 +38,7 @@ impl<'a, const T: usize> Board<'a, T> {
             self.generate_moves(0)
         };
         for node in moves {
-            self.make_move(Some(&node));
+            self.make_move(&node);
             nodes += self.perft(depth - 1, legality);
             self.undo_move();
         }
@@ -77,7 +77,7 @@ impl<'a, const T: usize> Board<'a, T> {
         let mut nodes = 0;
         let mut branches: Vec<PerftBranch> = vec![];
         for node in self.generate_legal_moves(0) {
-            self.make_move(Some(&node));
+            self.make_move(&node);
             let results = self.branch_perft(depth - 1);
             nodes += results.nodes;
             branches.push((self.encode_action(&node), results));
