@@ -17,7 +17,7 @@ Types of games that we're aiming to be compatible with:
 - [Maharajah and the Sepoys](https://en.wikipedia.org/wiki/Maharajah_and_the_Sepoys)
 - [Ataxx](https://en.wikipedia.org/wiki/Ataxx)
 
-Types of games we *may* aim to be comaptible with:
+Types of games we *may* aim to be compatible with:
 - [Go](https://en.wikipedia.org/wiki/Go_(game))
 
 Types of games we're not aiming to be compatible with:
