@@ -6,6 +6,14 @@ use super::is_single_move;
 
 pub struct AtaxxMoveController;
 impl<const T: usize> MoveController<T> for AtaxxMoveController {
+    fn is_legal(&self, board: &mut Board<T>, action: &Option<Action>) -> bool {
+        return true;
+    }
+
+    fn use_psuedolegal(&self) -> bool {
+        return false;
+    }
+
     fn transform_moves(&self, board: &mut Board<T>, mode: u32, actions: Vec<Option<Action>>) -> Vec<Option<Action>> {
         // No Legal Moves
         if actions.len() == 0 {

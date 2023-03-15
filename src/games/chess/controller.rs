@@ -4,7 +4,18 @@ use super::ATTACKS_MODE;
 
 pub struct ChessMoveController<const T: usize>;
 
-impl<const T: usize> ChessMoveController<T> {
+impl<const T: usize> MoveController<T> for ChessMoveController<T> {
+    fn transform_moves(&self, board: &mut Board<T>, mode: u32, actions: Vec<Option<Action>>) -> Vec<Option<Action>> {
+        let moves = board.generate_moves(mode);
+        let mut legal_moves = Vec::with_capacity(moves.len());
+        for action in moves {
+            if self.is_legal(board, &action) {
+                legal_moves.push(action);
+            }
+        }
+        legal_moves
+    }
+
     fn is_legal(&self, board: &mut Board<T>, action: &Option<Action>) -> bool {
         match action {
             Some(action) => {
@@ -31,18 +42,9 @@ impl<const T: usize> ChessMoveController<T> {
             }
         }
     }
-}
 
-impl<const T: usize> MoveController<T> for ChessMoveController<T> {
-    fn transform_moves(&self, board: &mut Board<T>, mode: u32, actions: Vec<Option<Action>>) -> Vec<Option<Action>> {
-        let moves = board.generate_moves(mode);
-        let mut legal_moves = Vec::with_capacity(moves.len());
-        for action in moves {
-            if self.is_legal(board, &action) {
-                legal_moves.push(action);
-            }
-        }
-        legal_moves
+    fn use_psuedolegal(&self) -> bool {
+        return true;
     }
 
     fn encode_action(&self, board: &Board<T>, action: &Option<Action>) -> Vec<String> {

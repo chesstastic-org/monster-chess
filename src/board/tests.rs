@@ -40,6 +40,7 @@ pub fn run_tests<const T: usize>(test_name: &str, game: Game<T>, tests: &str) {
         }
         let mut tests_completed = 0;
         let mut start = get_time_ms();
+        let mut full_time: u128 = 0;
         let mut nodes = 0;
         for (ind, test) in tests.iter().enumerate() {
             if depth > test.perft_counts.len() {
@@ -54,6 +55,7 @@ pub fn run_tests<const T: usize>(test_name: &str, game: Game<T>, tests: &str) {
 
             let end = get_time_ms();
             if (end - start) > 400 {
+                full_time += end - start;
                 println!("  {}% complete ({nodes} nodes so far)", (((ind as f64) / (test_count as f64)) * 100.0) as u64);
                 start = get_time_ms();
             }
@@ -62,6 +64,10 @@ pub fn run_tests<const T: usize>(test_name: &str, game: Game<T>, tests: &str) {
             println!("No {test_name} tests found for depth {depth}, ending!");
             return;
         }
-        print!("All {test_name} tests for depth {depth} have completed ({nodes} nodes searched.) ");
+        
+        let end = get_time_ms();
+        full_time += end - start;
+        
+        print!("All {test_name} tests for depth {depth} have been completed in {full_time}ms ({nodes} nodes searched.) ");
     }
 }

@@ -2,6 +2,9 @@ use super::{actions::Action, fen::FenOptions, pieces::Piece, Board, Rows, Cols};
 
 pub trait MoveController<const T: usize> {
     fn transform_moves(&self, board: &mut Board<T>, mode: u32, actions: Vec<Option<Action>>) -> Vec<Option<Action>>;
+    fn is_legal(&self, board: &mut Board<T>, action: &Option<Action>) -> bool;
+    fn use_psuedolegal(&self) -> bool;
+
     fn encode_action(&self, board: &Board<T>, action: &Option<Action>) -> Vec<String>;
 
     fn decode_action(&self, board: &mut Board<T>, action: &str, mode: u32) -> Option<Option<Action>> {
