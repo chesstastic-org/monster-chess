@@ -58,8 +58,10 @@ Despite all of that, this legality check is rather expensive. Fortunately, it wo
 You can initialize the chess board as follows:
 
 ```rust
-    let chess = Chess::create();
-    let mut board = chess.from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+use monster_chess::games::chess::Chess;
+
+let chess = Chess::create();
+let mut board = chess.from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 ```
 
 Then, we can generate the moves as follows:
@@ -73,8 +75,8 @@ let pseudolegal_moves = board.generate_moves(NORMAL_MODE);
 For testing and benchmarking purposes, `monster-chess` provides a method named `perft`, which will count the number of all possible moves possible that are `depth` half-moves ahead from the position (with a half-move being a move from one of the two players for reference.)
 
 ```rust
-    let perft = board.perft(5, true);
-    let perft_pseudolegal = board.perft(5, false);
+let perft = board.perft(5, true);
+let perft_pseudolegal = board.perft(5, false);
 ```
 
 From the benchmarks I've done, `monster-chess` can reach about 20,000,000 pseudo-legal moves per second, and 5,000,000 legal moves per second. This isn't ideal and if you're only interested in performance, I recommend using the [cozy-chess](https://github.com/analog-hors/cozy-chess/) crate which is at least 25x faster then the implementation of chess in `monster-chess`. However, `monster-chess` is a sound option for chess given you also want the ability to support chess variants or even other games.
@@ -92,8 +94,10 @@ It may be noted that `monster-chess` also aims to support [Fischer Random Chess]
 You can still create an Ataxx board as follows:
 
 ```rust
-    let ataxx = Ataxx::create();
-    let mut board = ataxx.from_fen("x5o/7/7/7/7/7/o5x x 0 1");
+use monster_chess::games::chess::Ataxx;
+
+let ataxx = Ataxx::create();
+let mut board = ataxx.from_fen("x5o/7/7/7/7/7/o5x x 0 1");
 ```
 
 Then, we can generate the moves as follows:
@@ -209,14 +213,18 @@ pub enum FenTeamArgument {
 
 If your game needs an argument to represent which side has to move (which it almost certainly does), using `FenTeamArgument` is necessary, unless you decide to define your own argument representing which side has to move.
 
+`monster-chess` also provides implementations for `Turns`, `SubMoves` (half moves), and `FullMoves` out of the box.
+
 ### Games
 
 `monster-chess` finally provides a struct called `Game`, which is used to describe the rules of your chess-adjacent game. It would be declared as follows:
 
 ```rust
-pub struct Game {
-    pub pieces: Vec<&'static dyn Piece>,
-    pub move_controller: Box<dyn MoveController>, // Pseudo-legal Move Generation
+pub struct Game<const T: usize> {
+    pub pieces: Vec<&'static dyn Piece<T>>,
+    pub controller: Box<dyn MoveController<T>>,
+    pub resolution: Box<dyn Resolution<T>>,
+    pub fen_options: FenOptions<T>
 }
 ```
 
