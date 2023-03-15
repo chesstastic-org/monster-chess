@@ -298,7 +298,7 @@ impl<'a, const T: usize> Board<'a, T> {
             }
             None => {
                 // We panic instead of making it an error because this is an incredible unlikely error that almost 
-                // certainly won't happen in monster_chess's code, and consumers would easily be able 
+                // certainly won't happen in monster-chess's code, and consumers would easily be able 
                 // to come across and handle this.
                 // It isn't worth the effort having to propagate the error through so many functions.
 

@@ -1,14 +1,14 @@
 <div align = "center">
-<h1>monster_chess</h1>
+<h1>monster-chess</h1>
 </div>
 
 ## Overview
 
-`monster_chess` is a fairy chess move generation library written in Rust. It was created as part of the Chesstastic project (which aims to allow for users to easily create chess variants, play against others in those chess variants and analyze games of said variants), or more specifically, the [Ampersand](https://github.com/chesstastic-org/Ampersand) chess engine. The library is meant to handle move generation and move validation logic that happens in chess variants and chess-adjacent games.
+`monster-chess` is a fairy chess move generation library written in Rust. It was created as part of the Chesstastic project (which aims to allow for users to easily create chess variants, play against others in those chess variants and analyze games of said variants), or more specifically, the [Ampersand](https://github.com/chesstastic-org/Ampersand) chess engine. The library is meant to handle move generation and move validation logic that happens in chess variants and chess-adjacent games.
 
 ### Compatibility
 
-When we say that we're compatible with a given game, that doesn't mean we'll necessarily be providing out-of-the-box support for it, but that the game will be implementable given the framework that `monster_chess` provides.
+When we say that we're compatible with a given game, that doesn't mean we'll necessarily be providing out-of-the-box support for it, but that the game will be implementable given the framework that `monster-chess` provides.
 
 Types of games that we're aiming to be compatible with:
 - [Chess](https://en.wikipedia.org/wiki/Chess)
@@ -37,19 +37,19 @@ If you're wondering if a given game or chess variant is compatible with chess, i
 - Can I change the movement restrictions? (eg. being allowed to move into check)
 - Can I change the win conditions? (eg. being able to win by capturing all pieces.)
 
-If so, `monster_chess` most likely will be able to be compatible with said variant, but you may have to add it.
+If so, `monster-chess` most likely will be able to be compatible with said variant, but you may have to add it.
 
 ## Out of the Box Support
 
 ### Chess
 
-[Chess](https://en.wikipedia.org/wiki/Chess) is a two-player game where both players start with a color and the same set of pieces on an eight by eight board, and must engage in a fruitful battle until one side is victorious. For the sake of brevity, we'll assume you're well-acquainted with the rules of chess (if not, feel free to [read about them here](https://www.chess.com/terms/chess)), and simply focus on the parts relevant to `monster_chess`.
+[Chess](https://en.wikipedia.org/wiki/Chess) is a two-player game where both players start with a color and the same set of pieces on an eight by eight board, and must engage in a fruitful battle until one side is victorious. For the sake of brevity, we'll assume you're well-acquainted with the rules of chess (if not, feel free to [read about them here](https://www.chess.com/terms/chess)), and simply focus on the parts relevant to `monster-chess`.
 
 ![Ladder Checkmate](https://i.imgur.com/xGu1ODZ.jpg)
 
 In chess, the end-goal of the game is **checkmate**, where the opponent's king is in check (in the line of sight of another piece), and has no moves that can escape said check (moving out of the way, blocking with another piece, etc.) The image above demonstrates this, with two rooks blocking all of the king's movement squares, and the opponent's king is simply unable to move out of the line of sight of the rooks. If the opponent is in check but can escape it, they must, and you cannot put yourself in check.
 
-The way `monster_chess` handles this is using **pseudolegal** move generation. First, we generate all of the moves any piece would be able to make (aka. pseudolegal moves), and then we check to make sure your king isn't in check after you perform the move. To do this, we have to generate _every possible move_ that the opponent can make after your move, and see if one of them allows for the king to be captured. This is expensive, but we have two ways to make this faster.
+The way `monster-chess` handles this is using **pseudolegal** move generation. First, we generate all of the moves any piece would be able to make (aka. pseudolegal moves), and then we check to make sure your king isn't in check after you perform the move. To do this, we have to generate _every possible move_ that the opponent can make after your move, and see if one of them allows for the king to be captured. This is expensive, but we have two ways to make this faster.
 - For pieces that move and capture differently, we only focus on the squares they capture.
 - For pieces that move in one direction until they hit another piece or the edge of the board (bishops, rooks, and queens), we check if the king is even in the line of sight of the piece before seeing if it's truly in the line of sight.
 
@@ -58,7 +58,7 @@ Despite all of that, this legality check is rather expensive. Fortunately, it wo
 You can initialize the chess board as follows:
 
 ```rust
-use monster_chess::games::chess::Chess;
+use monster-chess::games::chess::Chess;
 
 let chess = Chess::create();
 let mut board = chess.from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
@@ -72,16 +72,16 @@ let legal_moves = board.generate_legal_moves(NORMAL_MODE);
 let pseudolegal_moves = board.generate_moves(NORMAL_MODE);
 ```
 
-For testing and benchmarking purposes, `monster_chess` provides a method named `perft`, which will count the number of all possible moves possible that are `depth` half-moves ahead from the position (with a half-move being a move from one of the two players for reference.)
+For testing and benchmarking purposes, `monster-chess` provides a method named `perft`, which will count the number of all possible moves possible that are `depth` half-moves ahead from the position (with a half-move being a move from one of the two players for reference.)
 
 ```rust
 let perft = board.perft(5, true);
 let perft_pseudolegal = board.perft(5, false);
 ```
 
-From the benchmarks I've done, `monster_chess` can reach about 20,000,000 pseudo-legal moves per second, and 5,000,000 legal moves per second. This isn't ideal and if you're only interested in performance, I recommend using the [cozy-chess](https://github.com/analog-hors/cozy-chess/) crate which is at least 25x faster then the implementation of chess in `monster_chess`. However, `monster_chess` is a sound option for chess given you also want the ability to support chess variants or even other games.
+From the benchmarks I've done, `monster-chess` can reach about 20,000,000 pseudo-legal moves per second, and 5,000,000 legal moves per second. This isn't ideal and if you're only interested in performance, I recommend using the [cozy-chess](https://github.com/analog-hors/cozy-chess/) crate which is at least 25x faster then the implementation of chess in `monster-chess`. However, `monster-chess` is a sound option for chess given you also want the ability to support chess variants or even other games.
 
-It may be noted that `monster_chess` also aims to support [Fischer Random Chess](https://www.chess.com/terms/chess960). As of now, Fischer Random Chess is theoretically supported in the implementation of `monster_chess`'s Chess implementation, but as of now, it isn't tested, and FENs for the variant aren't supported. It would be trivial to add it in the framework of `monster_chess` as an extension of the existing Chess implementation, though.
+It may be noted that `monster-chess` also aims to support [Fischer Random Chess](https://www.chess.com/terms/chess960). As of now, Fischer Random Chess is theoretically supported in the implementation of `monster-chess`'s Chess implementation, but as of now, it isn't tested, and FENs for the variant aren't supported. It would be trivial to add it in the framework of `monster-chess` as an extension of the existing Chess implementation, though.
 
 ### Ataxx
 
@@ -89,12 +89,12 @@ It may be noted that `monster_chess` also aims to support [Fischer Random Chess]
 
 ![Ataxx Start Position](https://camo.githubusercontent.com/a36e06d5e71d52af39027050f1263f2587e681bfd143195e79cbc970e4364651/687474703a2f2f692e696d6775722e636f6d2f696e764e6a4a6b2e706e67)
 
-`monster_chess` can easily implement Ataxx simply by writing an implementation of `StonePiece` to represent an Ataxx piece. Moves can be found using a lookup table and then masked to avoid all of the pieces on the board. As for making the moves, all we have to do is check whether it's a single or double move, and then handle the move-making logic appropiately before converting stones around the moved piece.
+`monster-chess` can easily implement Ataxx simply by writing an implementation of `StonePiece` to represent an Ataxx piece. Moves can be found using a lookup table and then masked to avoid all of the pieces on the board. As for making the moves, all we have to do is check whether it's a single or double move, and then handle the move-making logic appropiately before converting stones around the moved piece.
 
 You can still create an Ataxx board as follows:
 
 ```rust
-use monster_chess::games::chess::Ataxx;
+use monster-chess::games::chess::Ataxx;
 
 let ataxx = Ataxx::create();
 let mut board = ataxx.from_fen("x5o/7/7/7/7/7/o5x x 0 1");
@@ -117,7 +117,7 @@ For moves that the engine parses, single moves _must_ be represented by only pro
 
 ### Bitboards
 
-`monster_chess` uses a general implementation of [Bitboards](https://www.chessprogramming.org/Bitboards) to extend to larger board sizes, using a custom made `BitBoard` data type.
+`monster-chess` uses a general implementation of [Bitboards](https://www.chessprogramming.org/Bitboards) to extend to larger board sizes, using a custom made `BitBoard` data type.
 
 ```rust
 pub struct BitBoard<const T : usize> {
@@ -133,11 +133,11 @@ The library generates movement for pieces by taking in a bitboard with one toggl
 - **Slider Pieces**, like the Bishop, Rook, and Queen, which move almost in the same way every time looking in a certain direction, but can be blocked by pieces.
 - **Pawns**.
 
-To optimize move generation for Delta Pieces and Slider Pieces, `monster_chess` provides an attack lookup table. Once a board is initialized, if a piece chooses to enable attack table lookups for speeding up move generation, its moves will be generated for every possible square it can go to. This means for kings and knights, move generation is effectively instant, only requiring an attack table lookup. For rooks, bishops, and queens, the attack table is used to retrieve the directions they can move in from any given square, but additional logic is needed to block out any pieces in the way.
+To optimize move generation for Delta Pieces and Slider Pieces, `monster-chess` provides an attack lookup table. Once a board is initialized, if a piece chooses to enable attack table lookups for speeding up move generation, its moves will be generated for every possible square it can go to. This means for kings and knights, move generation is effectively instant, only requiring an attack table lookup. For rooks, bishops, and queens, the attack table is used to retrieve the directions they can move in from any given square, but additional logic is needed to block out any pieces in the way.
 
 Attack table lookups are stored as an `AttackDirections` once retrieved, which is an alias for `Vec<BitBoard>`. This means for delta pieces, they can just store their moves in the first slot, but for sliding pieces, they can store a bitboard for each direction they can go in.
 
-Here's an example of what the King piece would look like with `monster_chess`'s piece system.
+Here's an example of what the King piece would look like with `monster-chess`'s piece system.
 
 ```rust
 impl Piece for KingPiece {
@@ -172,7 +172,7 @@ impl Piece for KingPiece {
 
 #### Board State
 
-Because `monster_chess` is aiming to support all chess variants, a general modification of FEN is used for this (with a specific version of FEN for the base game of chess itself.) This version of FEN for the board state itself is the same as the typical chess FEN, with the following additions:
+Because `monster-chess` is aiming to support all chess variants, a general modification of FEN is used for this (with a specific version of FEN for the base game of chess itself.) This version of FEN for the board state itself is the same as the typical chess FEN, with the following additions:
 
 - The FEN variant can support more or less than 8 rows and 8 columns.
 - The FEN variant can support custom pieces, by defining the custom piece symbol (eg. `A` for Archbishops) in the piece's `get_piece_symbol` method.
@@ -188,7 +188,7 @@ There's only one option for FEN States, and that's `first_move`. In most games, 
 
 #### Fen Arguments
 
-FEN Notation for games like chess also have additional information provided that isn't in the board state representation itself. For instance, the en passant square, or castling rights, or the side to move. `monster_chess` does not support these natively as part of the `Board` implementation. Instead, individual games have to manage the additional arguments for their respective FEN notations themselves, by implementing the `FenArgument` trait.
+FEN Notation for games like chess also have additional information provided that isn't in the board state representation itself. For instance, the en passant square, or castling rights, or the side to move. `monster-chess` does not support these natively as part of the `Board` implementation. Instead, individual games have to manage the additional arguments for their respective FEN notations themselves, by implementing the `FenArgument` trait.
 
 `FenArgument` provides two main methods, `encode`, and `decode`.
 
@@ -202,7 +202,7 @@ pub trait FenArgument {
 }
 ```
 
-`monster_chess` provides an implementation of one argument for you, which is `FenTeamArgument`, defined like this:
+`monster-chess` provides an implementation of one argument for you, which is `FenTeamArgument`, defined like this:
 
 ```rust
 pub enum FenTeamArgument {
@@ -213,11 +213,11 @@ pub enum FenTeamArgument {
 
 If your game needs an argument to represent which side has to move (which it almost certainly does), using `FenTeamArgument` is necessary, unless you decide to define your own argument representing which side has to move.
 
-`monster_chess` also provides implementations for `Turns`, `SubMoves` (half moves), and `FullMoves` out of the box.
+`monster-chess` also provides implementations for `Turns`, `SubMoves` (half moves), and `FullMoves` out of the box.
 
 ### Games
 
-`monster_chess` finally provides a struct called `Game`, which is used to describe the rules of your chess-adjacent game. It would be declared as follows:
+`monster-chess` finally provides a struct called `Game`, which is used to describe the rules of your chess-adjacent game. It would be declared as follows:
 
 ```rust
 pub struct Game<const T: usize> {
@@ -232,7 +232,7 @@ Note: For games like Go, where you're able to drop pieces onto squares, you'll n
 
 ## License
 
-`monster_chess` available under the
+`monster-chess` available under the
 [MIT license](https://opensource.org/licenses/MIT). See
 [LICENSE](https://github.com/chesstastic-org/monster-chess/blob/main/LICENSE) for the full
 license text.

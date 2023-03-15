@@ -7,16 +7,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in library 'monster_chess'",
+            "name": "Debug unit tests in library 'monster-chess'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
                     "--lib",
-                    "--package=monster_chess"
+                    "--package=monster-chess"
                 ],
                 "filter": {
-                    "name": "monster_chess",
+                    "name": "monster-chess",
                     "kind": "lib"
                 }
             },
@@ -26,16 +26,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'monster_chess' in --release",
+            "name": "Debug executable 'monster-chess' in --release",
             "cargo": {
                 "args": [
                     "build",
                     "--release",
-                    "--bin=monster_chess",
-                    "--package=monster_chess"
+                    "--bin=monster-chess",
+                    "--package=monster-chess"
                 ],
                 "filter": {
-                    "name": "monster_chess",
+                    "name": "monster-chess",
                     "kind": "bin"
                 }
             },
@@ -45,16 +45,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'monster_chess'",
+            "name": "Debug unit tests in executable 'monster-chess'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
-                    "--bin=monster_chess",
-                    "--package=monster_chess"
+                    "--bin=monster-chess",
+                    "--package=monster-chess"
                 ],
                 "filter": {
-                    "name": "monster_chess",
+                    "name": "monster-chess",
                     "kind": "bin"
                 }
             },
@@ -70,7 +70,7 @@
                     "test",
                     "--no-run",
                     "--bench=chess-perft",
-                    "--package=monster_chess"
+                    "--package=monster-chess"
                 ],
                 "filter": {
                     "name": "chess-perft",
