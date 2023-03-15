@@ -7,7 +7,7 @@ description = "A fairy chess movegen library that can be easily extended to new 
 repository = "https://github.com/chesstastic-org/monster-chess"
 readme = "README.md"
 categories = ["games"]
-keywords = ["chess", "fairy chess", "ataxx", "move generation", "movegen"]
+keywords = ["chess", "ataxx", "movegen"]
 
 [profile.release]
 debug = true
