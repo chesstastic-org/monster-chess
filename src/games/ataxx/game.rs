@@ -20,6 +20,7 @@ impl Ataxx {
             turns: 1,
             rows: 7,
             cols: 7,
+            name: String::from("Ataxx"),
             pieces: vec![ STONE ],
             controller: Box::new(AtaxxMoveController),
             fen_options: FenOptions {
@@ -32,7 +33,8 @@ impl Ataxx {
                     ("half moves".to_string(), Box::new(FenSubMoves)),
                     ("full moves".to_string(), Box::new(FenFullMoves)),
                 ],
-                post_process: Box::new(AtaxxPostProcess)
+                post_process: Box::new(AtaxxPostProcess),
+                default_fen: String::from("x5o/7/7/7/7/7/o5x x 0 1")
             }
         }
     }

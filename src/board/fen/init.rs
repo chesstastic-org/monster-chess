@@ -37,6 +37,10 @@ impl<const T: usize> Game<T> {
 
         board
     }
+
+    pub fn default(&self) -> Board<T> {
+        self.from_fen(&self.fen_options.default_fen)
+    } 
 }
 
 impl<'a, const T: usize> Board<'a, T> {

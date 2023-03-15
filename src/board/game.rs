@@ -19,6 +19,7 @@ pub struct Game<const T: usize> {
     pub pieces: Vec<&'static dyn Piece<T>>,
     pub controller: Box<dyn MoveController<T>>,
     pub fen_options: FenOptions<T>,
+    pub name: String,
     pub teams: u32,
     pub turns: u32,
     pub rows: Rows,

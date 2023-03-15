@@ -36,6 +36,7 @@ impl Chess {
             turns: 1,
             rows: 8,
             cols: 8,
+            name: String::from("Chess"),
             pieces: vec![PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING],
             controller: Box::new(ChessMoveController),
             fen_options: FenOptions {
@@ -51,6 +52,7 @@ impl Chess {
                     ("full moves".to_string(), Box::new(FenFullMoves)),
                 ],
                 post_process: Box::new(ChessPostProcess),
+                default_fen: String::from("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
             }
         }
     }

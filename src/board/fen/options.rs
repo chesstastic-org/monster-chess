@@ -25,4 +25,5 @@ pub struct FenOptions<const T: usize> {
     pub state: FenState,
     pub args: Vec<(String, Box<dyn FenArgument<T>>)>,
     pub post_process: Box<dyn PostProcess<T>>,
+    pub default_fen: String
 }

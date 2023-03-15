@@ -1,5 +1,6 @@
 use monster_chess::games::ataxx::Ataxx;
 use monster_chess::{board::Board, games::chess::Chess};
+use rand::{thread_rng, Rng};
 use std::env;
 use std::time::Duration;
 
@@ -16,13 +17,19 @@ fn get_time_ms() -> u128 {
 fn main() {
     env::set_var("RUST_BACKTRACE", "1000");
 
-    let ataxx = Ataxx::create();
-    let mut board = ataxx.from_fen(
-        "x5o/7/7/7/7/7/o5x x 0 1"
-    );
+    let games = vec![
+        Chess::create(),
+        Ataxx::create()
+    ];
+    
+    let mut rng = thread_rng();
 
-    let start = get_time_ms();
-    let nodes = board.perft(6, true);
-    let end = get_time_ms();
-    println!("perft(6): {} in {}ms", nodes, end - start);
+    for i in 0..16 {
+        let game = &games[rng.gen_range(0..2)];
+        let mut board = game.default();
+        let start = get_time_ms();
+        let nodes = board.perft(5, true);
+        let end = get_time_ms();
+        println!("{i}. Game {} perft(5): {} in {}ms ({}/ms npms)", game.name, nodes, end - start, (nodes as u128) / (end - start));
+    }
 }
