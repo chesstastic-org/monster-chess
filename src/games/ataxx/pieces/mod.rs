@@ -116,8 +116,8 @@ impl<const T: usize> Piece<T> for StonePiece {
 
         let lookup = self.get_attack_lookup(board, piece_type);
         let update_radius = match lookup {
-            Some(lookup) => lookup[from.bitscan_reverse() as usize][1],
-            None => self.generate_lookup_moves(board, from)[1],
+            Some(lookup) => lookup[to.bitscan_reverse() as usize][1],
+            None => self.generate_lookup_moves(board, to)[1],
         };
 
         let to_update = board.state.teams[other_team] & update_radius;

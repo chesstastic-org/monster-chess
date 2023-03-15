@@ -162,9 +162,3 @@ impl<const T: usize> Iterator for BitIterator<T> {
         }
     }
 }
-
-/*impl<const T: usize> Display for BitBoard<T> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "({}, {})", self.longitude, self.latitude);
-    }
-}*/
