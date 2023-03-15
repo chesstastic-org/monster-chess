@@ -234,5 +234,5 @@ Note: For games like Go, where you're able to drop pieces onto squares, you'll n
 
 `monster_chess` available under the
 [MIT license](https://opensource.org/licenses/MIT). See
-[LICENSE](https://github.com/chesstastic-org/monster_chess/blob/main/LICENSE) for the full
+[LICENSE](https://github.com/chesstastic-org/monster-chess/blob/main/LICENSE) for the full
 license text.
