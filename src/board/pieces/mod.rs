@@ -156,16 +156,18 @@ pub trait Piece<const T: usize> {
     }
 
     fn make_move(&self, board: &mut Board<T>, action: &Action) {
-        let from = BitBoard::from_lsb(action.from);
-        let to = BitBoard::from_lsb(action.to);
+        if let Some(from) = action.from {
+            let from = BitBoard::from_lsb(from);
+            let to = BitBoard::from_lsb(action.to);
 
-        if (board.state.all_pieces & to).is_empty() {
-            self.make_normal_move(board, action, action.piece_type, from, to);
-        } else {
-            self.make_capture_move(board, action, action.piece_type, from, to);
+            if (board.state.all_pieces & to).is_empty() {
+                self.make_normal_move(board, action, action.piece_type, from, to);
+            } else {
+                self.make_capture_move(board, action, action.piece_type, from, to);
+            }
+
+            update_turns(&mut board.state);
         }
-
-        update_turns(&mut board.state);
     }
 
     fn undo_move(&self, state: &mut BoardState<T>, game: &Game<T>, history_move: &HistoryMove<T>) {
@@ -225,7 +227,7 @@ pub trait Piece<const T: usize> {
 
         for bit in bit_actions.iter_one_bits(board.state.squares) {
             actions.push(Some(Action {
-                from,
+                from: Some(from),
                 to: bit,
                 team,
                 info: NORMAL_MOVE,

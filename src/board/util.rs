@@ -273,27 +273,31 @@ impl<'a, const T: usize> Board<'a, T> {
     }
 
     #[inline(never)]
-    pub fn undo_move(&mut self) -> Result<(), UndoMoveError> {
+    pub fn undo_move(&mut self) {
         match self.history.last() {
             Some(history_move) => {
-                let results = match history_move.action {
+                match history_move.action {
                     Some(history_action) => {
                         self.game.pieces[history_action.piece_type].undo_move(
                             &mut self.state,
                             self.game,
                             history_move,
                         );
-                        Ok(())
                     }
                     None => {
                         reverse_turns(&mut self.state, &self.game);
-                        Ok(())
                     }
                 };
                 self.history.pop();
-                results
             }
-            None => Err(UndoMoveError::NoHistoryMoves),
+            None => {
+                // We panic instead of making it an error because this is an incredible unlikely error that almost 
+                // certainly won't happen in monster-chess's code, and consumers would easily be able 
+                // to come across and handle this.
+                // It isn't worth the effort having to propagate the error through so many functions.
+
+                panic!("Can't undo move when there's no history moves.");
+            }
         }
     }
 }

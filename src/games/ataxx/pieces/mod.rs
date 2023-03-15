@@ -66,65 +66,67 @@ impl<const T: usize> Piece<T> for StonePiece {
     }
 
     fn make_move(&self, board: &mut Board<T>, action: &Action) {
-        let from = BitBoard::<T>::from_lsb(action.from);
-        let to = BitBoard::<T>::from_lsb(action.to);
+        if let Some(from) = action.from {
+            let from = BitBoard::<T>::from_lsb(from);
+            let to = BitBoard::<T>::from_lsb(action.to);
 
-        let piece_type = action.piece_type;
-        let team = action.team as usize;
-        let other_team = board.state.team_lookup[team] as usize;
+            let piece_type = action.piece_type;
+            let team = action.team as usize;
+            let other_team = board.state.team_lookup[team] as usize;
 
-        board.history.push(HistoryMove {
-            action: Some(*action),
-            state: HistoryState::Any {
-                all_pieces: PreviousBoard(board.state.all_pieces),
-                first_move: PreviousBoard(board.state.first_move),
-                updates: vec![
-                    HistoryUpdate::Piece(IndexedPreviousBoard(
-                        piece_type,
-                        board.state.pieces[piece_type],
-                    )),
-                    HistoryUpdate::Team(IndexedPreviousBoard(
-                        team,
-                        board.state.teams[team],
-                    )),
-                    HistoryUpdate::Team(IndexedPreviousBoard(
-                        other_team,
-                        board.state.teams[other_team],
-                    )),
-                ],
-            },
-        });
+            board.history.push(HistoryMove {
+                action: Some(*action),
+                state: HistoryState::Any {
+                    all_pieces: PreviousBoard(board.state.all_pieces),
+                    first_move: PreviousBoard(board.state.first_move),
+                    updates: vec![
+                        HistoryUpdate::Piece(IndexedPreviousBoard(
+                            piece_type,
+                            board.state.pieces[piece_type],
+                        )),
+                        HistoryUpdate::Team(IndexedPreviousBoard(
+                            team,
+                            board.state.teams[team],
+                        )),
+                        HistoryUpdate::Team(IndexedPreviousBoard(
+                            other_team,
+                            board.state.teams[other_team],
+                        )),
+                    ],
+                },
+            });
 
-        if is_single_move(action) {
-            // Single Moves
-            
-            board.state.pieces[piece_type] |= to;
-            board.state.teams[team] |= to;
-            board.state.all_pieces |= to;
-            board.state.first_move &= !from;
-        } else {
-            // Double Moves
+            if is_single_move(action) {
+                // Single Moves
+                
+                board.state.pieces[piece_type] |= to;
+                board.state.teams[team] |= to;
+                board.state.all_pieces |= to;
+                board.state.first_move &= !from;
+            } else {
+                // Double Moves
 
-            board.state.pieces[piece_type] ^= from;
-            board.state.pieces[piece_type] |= to;
-            board.state.teams[team] ^= from;
-            board.state.teams[team] |= to;
-            board.state.all_pieces ^= from;
-            board.state.all_pieces |= to;
-            board.state.first_move &= !from;
+                board.state.pieces[piece_type] ^= from;
+                board.state.pieces[piece_type] |= to;
+                board.state.teams[team] ^= from;
+                board.state.teams[team] |= to;
+                board.state.all_pieces ^= from;
+                board.state.all_pieces |= to;
+                board.state.first_move &= !from;
+            }
+
+            let lookup = self.get_attack_lookup(board, piece_type);
+            let update_radius = match lookup {
+                Some(lookup) => lookup[to.bitscan_reverse() as usize][1],
+                None => self.generate_lookup_moves(board, to)[1],
+            };
+
+            let to_update = board.state.teams[other_team] & update_radius;
+
+            board.state.teams[other_team] ^= to_update;
+            board.state.teams[team] |= to_update;
+
+            update_turns(&mut board.state);
         }
-
-        let lookup = self.get_attack_lookup(board, piece_type);
-        let update_radius = match lookup {
-            Some(lookup) => lookup[to.bitscan_reverse() as usize][1],
-            None => self.generate_lookup_moves(board, to)[1],
-        };
-
-        let to_update = board.state.teams[other_team] & update_radius;
-
-        board.state.teams[other_team] ^= to_update;
-        board.state.teams[team] |= to_update;
-
-        update_turns(&mut board.state);
     }
 }

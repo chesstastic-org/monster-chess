@@ -83,7 +83,7 @@ impl<const T: usize> Piece<T> for KnightPiece<T> {
         mode: u32,
         to: BitBoard<T>,
     ) -> BitBoard<T> {
-        self.get_attack_lookup(board, piece_type).unwrap()[from_bit as usize][0]
+        self.get_attack_lookup(board, piece_type).expect("Could not find move lookup table for Knight")[from_bit as usize][0]
     }
 
     #[allow(unused_variables)]

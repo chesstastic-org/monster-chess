@@ -52,7 +52,7 @@ impl<const T: usize> KingPiece<T> {
         let castle_right_king = left_center.right(3);
         let castle_right_rook = left_center.right(2);
 
-        let dir = if action.from < action.to {
+        let dir = if from.bitscan_forward() < action.to {
             Direction::RIGHT
         } else {
             Direction::LEFT
@@ -147,7 +147,7 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
         mode: u32,
         to: BitBoard<T>,
     ) -> BitBoard<T> {
-        self.get_attack_lookup(board, piece_type).unwrap()[from_bit as usize][0]
+        self.get_attack_lookup(board, piece_type).expect("Could not find move lookup table for king")[from_bit as usize][0]
     }
 
     #[allow(unused_variables)]
@@ -256,7 +256,7 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
 
         for bit in bit_actions.iter_one_bits(board_len) {
             actions.push(Some(Action {
-                from,
+                from: Some(from),
                 to: bit,
                 team,
                 info: NORMAL_KING_MOVE,
@@ -365,7 +365,7 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
             }
 
             actions.push(Some(Action {
-                from,
+                from: Some(from),
                 to: rook,
                 team,
                 info: CASTLING_MOVE,

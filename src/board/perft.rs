@@ -19,7 +19,7 @@ impl PerftResults {
         self.branches
             .iter()
             .find(|el| el.0 == branch)
-            .unwrap()
+            .expect("Should have found a perft branch.")
             .1
             .clone()
     }

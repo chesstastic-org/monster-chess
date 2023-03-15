@@ -11,7 +11,7 @@ pub type ActionInfo = usize;
 
 #[derive(Copy, Clone, Debug)]
 pub struct Action {
-    pub from: u32,
+    pub from: Option<u32>,
     pub to: u32,
     pub team: u32,
     pub piece_type: PieceType,

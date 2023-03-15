@@ -126,7 +126,9 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
             if info.len() > 1 {
                 panic!("Promotion Piece Types can only be a single char. '{info}' is invalid.")
             }
-            let char = info.chars().nth(0).unwrap();
+            let char = info.chars().nth(0).expect(
+                &format!("Promotion Piece Types can only be a single char. '{info}' is invalid.")
+            );
             let piece_type = board
                 .game
                 .pieces
@@ -165,7 +167,7 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
         mode: u32,
         to: BitBoard<T>,
     ) -> BitBoard<T> {
-        self.get_attack_lookup(board, piece_type).unwrap()[from_bit as usize][team as usize]
+        self.get_attack_lookup(board, piece_type).expect("Could not find pawn attack lookup")[from_bit as usize][team as usize]
     }
 
     fn get_moves(
@@ -180,14 +182,14 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
         let edges = &board.state.edges[0];
 
         if mode == ATTACKS_MODE {
-            return self.get_attack_lookup(board, piece_type).unwrap()
+            return self.get_attack_lookup(board, piece_type).expect("Could not find pawn attack lookup")
                 [from.bitscan_forward() as usize][team as usize];
         }
 
         let mut moves = BitBoard::new();
 
         let mut capture_requirements = board.state.all_pieces;
-        let mut captures = self.get_attack_lookup(board, piece_type).unwrap()
+        let mut captures = self.get_attack_lookup(board, piece_type).expect("Could not find pawn attack lookup")
             [from.bitscan_forward() as usize][team as usize];
 
         let single_moves = up(&from, 1, cols, team) & !board.state.all_pieces;
@@ -202,16 +204,18 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
 
         if let Some(last_move) = board.history.last() {
             if let Some(last_action) = last_move.action {
-                let conditions = last_action.piece_type == 0
-                    && (last_action.to.abs_diff(last_action.from) == (2 * (cols)));
+                if let Some(from) = last_action.from {
+                    let conditions = last_action.piece_type == 0
+                        && (last_action.to.abs_diff(from) == (2 * (cols)));
 
-                if conditions {
-                    capture_requirements |= up(
-                        &BitBoard::from_lsb(last_action.from),
-                        1,
-                        cols,
-                        board.get_next_team(team),
-                    );
+                    if conditions {
+                        capture_requirements |= up(
+                            &BitBoard::from_lsb(from),
+                            1,
+                            cols,
+                            board.get_next_team(team),
+                        );
+                    }
                 }
             }
         }
@@ -331,7 +335,7 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
 
         if action.info >= 2 {
             let promotion_type = action.info - 2;
-            let history_state = &mut board.history.last_mut().unwrap().state;
+            let history_state = &mut board.history.last_mut().expect("Couldn't find the last move saved to history even though we just saved it (what)").state;
             *history_state = HistoryState::Any {
                 first_move: PreviousBoard(board.state.first_move),
                 all_pieces: PreviousBoard(board.state.all_pieces),
@@ -394,7 +398,7 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
                         continue;
                     }
                     actions.push(Some(Action {
-                        from,
+                        from: Some(from),
                         to: bit,
                         team,
                         info: promotion_move(promotion_piece_type),
@@ -405,19 +409,21 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
                 let mut en_passant = false;
                 if let Some(last_move) = board.history.last() {
                     if let Some(last_action) = last_move.action {
-                        let conditions = last_action.piece_type == 0
-                            && (last_action.to.abs_diff(last_action.from) == (2 * (cols)))
-                            && (last_action.to.abs_diff(bit) == (cols))
-                            && (from.abs_diff(bit) % cols != 0);
+                        if let Some(from) = last_action.from {
+                            let conditions = last_action.piece_type == 0
+                                && (last_action.to.abs_diff(from) == (2 * (cols)))
+                                && (last_action.to.abs_diff(bit) == (cols))
+                                && (from.abs_diff(bit) % cols != 0);
 
-                        if conditions {
-                            en_passant = true;
+                            if conditions {
+                                en_passant = true;
+                            }
                         }
                     }
                 }
 
                 actions.push(Some(Action {
-                    from,
+                    from: Some(from),
                     to: bit,
                     team,
                     info: if en_passant {

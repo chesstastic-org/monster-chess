@@ -20,7 +20,11 @@ pub fn parse_tests<'a>(tests: &'a str) -> Vec<FENTest<'a>> {
     tests.split("\n").map(|test| {
         let strs = test.split(";").collect::<Vec<_>>();
         let fen = strs[0].trim();
-        let perft_counts = strs[1..].iter().map(|str| str.trim().split(" ").nth(1).unwrap().parse::<u64>().unwrap()).collect::<Vec<_>>();
+        let perft_counts = strs[1..].iter().map(|str| {
+            str.trim()
+                .split(" ").nth(1).expect("Could not find perft count")
+                .parse::<u64>().expect("Could not parse perft count as u64")
+    }).collect::<Vec<_>>();
         FENTest::<'a> {
             fen,
             perft_counts

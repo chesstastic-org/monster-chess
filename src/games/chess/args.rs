@@ -145,7 +145,7 @@ impl<const T: usize> FenArgument<T> for ChessEnPassant {
 
         board.history.push(HistoryMove {
             action: Some(Action {
-                from: from.bitscan_forward(),
+                from: Some(from.bitscan_forward()),
                 to: to.bitscan_forward(),
                 team: previous_team,
                 piece_type: 0,
@@ -172,11 +172,16 @@ impl<const T: usize> FenArgument<T> for ChessEnPassant {
                     return "-".to_string();
                 }
 
-                if last_action.from.abs_diff(last_action.to) != (2 * board.state.cols) {
-                    return "-".to_string();
+                match last_action.from {
+                    Some(from) => {
+                        if from.abs_diff(last_action.to) != (2 * board.state.cols) {
+                            return "-".to_string();
+                        }
+    
+                        return board.encode_position(last_action.to);
+                    }
+                    None => "-".to_string()
                 }
-
-                return board.encode_position(last_action.to);
             }
             None => {
                 return "-".to_string();

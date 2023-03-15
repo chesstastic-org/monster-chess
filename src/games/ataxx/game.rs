@@ -9,8 +9,13 @@ pub const STONE: &dyn Piece<1> = &StonePiece;
 pub const NORMAL_MODE: u32 = 1;
 
 pub fn is_single_move(action: &Action) -> bool {
-    let dif = action.from.abs_diff(action.to);
-    dif == 1 || dif == 7 || dif == 6 || dif == 8 
+    match action.from {
+        Some(from) => {
+            let dif = from.abs_diff(action.to);
+            dif == 1 || dif == 7 || dif == 6 || dif == 8 
+        }
+        None => false
+    }
 }
 
 impl Ataxx {

@@ -67,12 +67,16 @@ impl<const T: usize> MoveController<T> for AtaxxMoveController {
                             board.game.pieces[action.piece_type].format_info(board, action.info)
                         )
                     } else {
-                        format!(
-                            "{}{}{}",
-                            board.encode_position(action.from),
-                            board.encode_position(action.to),
-                            board.game.pieces[action.piece_type].format_info(board, action.info)
-                        )
+                        if let Some(from) = action.from {
+                            format!(
+                                "{}{}{}",
+                                board.encode_position(from),
+                                board.encode_position(action.to),
+                                board.game.pieces[action.piece_type].format_info(board, action.info)
+                            )
+                        } else {
+                            "----".to_string()
+                        }
                     }
                 },
                 None => "0000".to_string()
