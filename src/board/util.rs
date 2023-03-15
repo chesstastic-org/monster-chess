@@ -225,6 +225,8 @@ impl<'a, const T: usize> Board<'a, T> {
             }
         }
 
+        self.game.controller.add_moves(self, &mut actions);
+
         actions
     }
 
@@ -259,7 +261,11 @@ impl<'a, const T: usize> Board<'a, T> {
     pub fn make_move(&mut self, action: &Option<Action>) {
         match action {
             Some(action) => {
-                self.game.pieces[action.piece_type].make_move(self, action);
+                if action.from.is_some() {
+                    self.game.pieces[action.piece_type].make_move(self, action);
+                } else {
+                    self.game.controller.make_drop_move(self, action);
+                }
             }
             None => {
                 self.history.push(HistoryMove {

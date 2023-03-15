@@ -5,8 +5,12 @@ pub trait MoveController<const T: usize> {
     fn is_legal(&self, board: &mut Board<T>, action: &Option<Action>) -> bool;
     fn use_psuedolegal(&self) -> bool;
 
-    fn encode_action(&self, board: &Board<T>, action: &Option<Action>) -> Vec<String>;
+    fn add_moves(&self, board: &Board<T>, actions: &mut Vec<Option<Action>>) {}
+    fn make_drop_move(&self, board: &mut Board<T>, action: &Action) {
+        panic!("Drop moves aren't supported. Make sure to override `make_drop_move` in your game's MoveController to support them.");
+    }
 
+    fn encode_action(&self, board: &Board<T>, action: &Option<Action>) -> Vec<String>;
     fn decode_action(&self, board: &mut Board<T>, action: &str, mode: u32) -> Option<Option<Action>> {
         board.generate_legal_moves(mode)
             .iter()

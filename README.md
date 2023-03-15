@@ -228,6 +228,8 @@ pub struct Game<const T: usize> {
 }
 ```
 
+Note: For games like Go, where you're able to drop pieces onto squares, you'll need to handle that manually, by implementing an `add_moves` method on `MoveController` to generate drop moves (moves with `from` as `None`), and implementing a `make_drop_move` method on `MoveController` for making those moves.
+
 ## License
 
 `monster-chess` available under the
