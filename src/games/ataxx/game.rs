@@ -1,6 +1,6 @@
 use crate::{board::{game::Game, fen::{FenOptions, FenState, FenSubMoves, FenTeamArgument, FenFullMoves}, pieces::Piece, actions::Action}, games::ataxx::AtaxxMoveController};
 
-use super::{AtaxxPostProcess, pieces::StonePiece};
+use super::{AtaxxPostProcess, AtaxxResolution, pieces::StonePiece};
 
 pub struct Ataxx;
 
@@ -23,6 +23,7 @@ impl Ataxx {
             name: String::from("Ataxx"),
             pieces: vec![ STONE ],
             controller: Box::new(AtaxxMoveController),
+            resolution: Box::new(AtaxxResolution),
             fen_options: FenOptions {
                 state: FenState { first_moves: false, gaps: '-' },
                 args: vec![

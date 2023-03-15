@@ -15,9 +15,20 @@ pub trait MoveController<const T: usize> {
     }
 }
 
+pub enum GameResults {
+    Win(u32),
+    Draw,
+    Ongoing
+}
+
+pub trait Resolution<const T: usize> {
+    fn resolution(&self, board: &mut Board<T>, legal_moves: &Vec<Option<Action>>) -> GameResults;
+}
+
 pub struct Game<const T: usize> {
     pub pieces: Vec<&'static dyn Piece<T>>,
     pub controller: Box<dyn MoveController<T>>,
+    pub resolution: Box<dyn Resolution<T>>,
     pub fen_options: FenOptions<T>,
     pub name: String,
     pub teams: u32,

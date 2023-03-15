@@ -15,7 +15,7 @@ use crate::{
 
 use super::{pieces::{
     down, up, BishopPiece, KingPiece, KnightPiece, PawnPiece, QueenPiece, RookPiece,
-}, ChessMoveController, ChessPostProcess, ChessCastlingRights, ChessEnPassant};
+}, ChessMoveController, ChessPostProcess, ChessCastlingRights, ChessEnPassant, ChessResolution};
 
 pub const NORMAL_MODE: u32 = 0;
 pub const ATTACKS_MODE: u32 = 1;
@@ -39,6 +39,7 @@ impl Chess {
             name: String::from("Chess"),
             pieces: vec![PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING],
             controller: Box::new(ChessMoveController),
+            resolution: Box::new(ChessResolution),
             fen_options: FenOptions {
                 state: FenState { first_moves: false, gaps: '-' },
                 args: vec![
