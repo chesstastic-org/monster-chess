@@ -4,7 +4,7 @@
 
 ## Overview
 
-`monster-chess` is a fairy chess move generation library written in Rust. It was created as part of the Chesstastic project (which aims to allow for users to easily create chess variants, play against others in those chess variants and analyze games of said variants), and is meant to handle move generation and move validation logic that happens in those variants. Currently, the library isn't functional, but hopefully it will be in the near future.
+`monster-chess` is a fairy chess move generation library written in Rust. It was created as part of the Chesstastic project (which aims to allow for users to easily create chess variants, play against others in those chess variants and analyze games of said variants), or more specifically, the [Ampersand](https://github.com/chesstastic-org/Ampersand) chess engine. The library is meant to handle move generation and move validation logic that happens in chess variants and chess-adjacent games.
 
 ### Compatibility
 
