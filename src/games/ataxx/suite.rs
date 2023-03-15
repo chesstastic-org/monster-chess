@@ -25,5 +25,6 @@ x5o/7/3-3/2-1-2/3-3/7/o5x o 0 1; D1 16; D2 256; D3 5948; D4 133264; D5 3639856"#
 
 #[test]
 fn ataxx_perft_suite() {
-    run_tests(Ataxx::create(), TEST_STR);
+    run_tests("Ataxx Gapless", Ataxx::create(), TEST_STR);
+    run_tests("Ataxx Gapped", Ataxx::create(), GAPPED_TESTS);
 }

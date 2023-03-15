@@ -13,7 +13,9 @@ impl<const T: usize> MoveController<T> for AtaxxMoveController {
             let filled_squares = board.state.pieces[0];
             let empty_squares = board_mask & !filled_squares;
 
-            if empty_squares.count_ones() > 0 && filled_squares.count_ones() > 0 {
+            let team_squares = board.state.teams[board.state.moving_team as usize];
+
+            if empty_squares.count_ones() > 0 && team_squares.count_ones() > 0 {
                 vec![ None ]
             } else {
                 actions

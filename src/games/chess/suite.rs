@@ -132,5 +132,5 @@ n1n5/PPPk4/8/8/8/8/4Kppp/5N1N b - - 0 1 ;D1 24 ;D2 496 ;D3 9483 ;D4 182838 ;D5 3
 
 #[test]
 fn chess_perft_suite() {
-    run_tests(Chess::create(), TEST_STR);
+    run_tests("Chess", Chess::create(), TEST_STR);
 }

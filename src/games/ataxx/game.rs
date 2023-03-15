@@ -21,7 +21,7 @@ impl Ataxx {
             pieces: vec![ STONE ],
             controller: Box::new(AtaxxMoveController),
             fen_options: FenOptions {
-                state: FenState { first_moves: false },
+                state: FenState { first_moves: false, gaps: '-' },
                 args: vec![
                     (
                         "team to move".to_string(),

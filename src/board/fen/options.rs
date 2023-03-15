@@ -14,7 +14,7 @@ pub enum FenStateTeams {
 }
 
 pub struct FenState {
-    pub first_moves: bool,
+    pub first_moves: bool, pub gaps: char
 }
 
 pub trait PostProcess<const T: usize> {

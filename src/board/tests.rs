@@ -28,15 +28,15 @@ pub fn parse_tests<'a>(tests: &'a str) -> Vec<FENTest<'a>> {
     }).collect::<Vec<FENTest<'a>>>()
 }
 
-pub fn run_tests<const T: usize>(game: Game<T>, tests: &str) {
+pub fn run_tests<const T: usize>(test_name: &str, game: Game<T>, tests: &str) {
     let tests = parse_tests(tests);
     let test_count = tests.len();
 
     for depth in 1..100 {
         if depth == 1 {
-            println!("Testing depth {depth}...");
+            println!("Testing depth {depth} for {test_name}...");
         } else {
-            println!("Testing depth {depth}...");
+            println!("Testing depth {depth} for {test_name}...");
         }
         let mut tests_completed = 0;
         let mut start = get_time_ms();
@@ -59,9 +59,9 @@ pub fn run_tests<const T: usize>(game: Game<T>, tests: &str) {
             }
         }
         if tests_completed == 0 {
-            println!("No tests found for depth {depth}, ending!");
+            println!("No {test_name} tests found for depth {depth}, ending!");
             return;
         }
-        print!("All tests for depth {depth} have completed ({nodes} nodes searched.) ");
+        print!("All {test_name} tests for depth {depth} have completed ({nodes} nodes searched.) ");
     }
 }

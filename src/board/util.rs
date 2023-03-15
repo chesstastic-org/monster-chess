@@ -45,6 +45,8 @@ pub fn reverse_turns<const T: usize>(state: &mut BoardState<T>, game: &Game<T>) 
 pub struct BoardState<const T: usize> {
     /// All Pieces is a BitBoard of all pieces, because keeping this bitboard ready makes it much easier to calculate movement for slider pieces.
     pub all_pieces: BitBoard<T>,
+    /// Walls is all "gaps" in the board that can't be moved to, or moved through.
+    pub gaps: BitBoard<T>,
     pub first_move: BitBoard<T>,
     pub pieces: Vec<BitBoard<T>>,
     pub teams: Vec<BitBoard<T>>,
@@ -142,6 +144,7 @@ impl<'a, const T: usize> Board<'a, T> {
             state: BoardState {
                 all_pieces: BitBoard::new(),
                 first_move: BitBoard::new(),
+                gaps: BitBoard::new(),
                 pieces: pieces_state.clone(),
                 teams: (0..game.teams).map(|_| BitBoard::new()).collect::<Vec<_>>(),
                 edges: generate_edge_list(rows, cols),

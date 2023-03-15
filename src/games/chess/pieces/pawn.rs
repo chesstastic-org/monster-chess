@@ -374,7 +374,7 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
 
         let from_board = BitBoard::from_lsb(from);
         let bit_actions = self.get_moves(board, from_board, piece_type, team, mode)
-            & !board.state.teams[team as usize];
+            & !board.state.teams[team as usize] & !board.state.gaps;
 
         if bit_actions.is_empty() {
             return;

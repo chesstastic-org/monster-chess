@@ -39,7 +39,7 @@ impl Chess {
             pieces: vec![PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING],
             controller: Box::new(ChessMoveController),
             fen_options: FenOptions {
-                state: FenState { first_moves: false },
+                state: FenState { first_moves: false, gaps: '-' },
                 args: vec![
                     (
                         "team to move".to_string(),
