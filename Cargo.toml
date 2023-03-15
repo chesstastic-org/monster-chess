@@ -14,7 +14,6 @@ debug = true
 
 [dependencies]
 arrayvec = "0.7.2"
-rand = "0.8.5"
 shell-words = "1.1.0"
 
 [dev-dependencies]
