@@ -4,7 +4,9 @@ use super::{AtaxxPostProcess, pieces::StonePiece};
 
 pub struct Ataxx;
 
-const STONE: &dyn Piece<1> = &StonePiece;
+pub const STONE: &dyn Piece<1> = &StonePiece;
+
+pub const NORMAL_MODE: u32 = 1;
 
 pub fn is_single_move(action: &Action) -> bool {
     let dif = action.from.abs_diff(action.to);

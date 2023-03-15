@@ -18,10 +18,14 @@ fn main() {
 
     let ataxx = Ataxx::create();
     let mut board = ataxx.from_fen(
-        "7/7/7/2x1o2/7/7/7 x 0 1"
+        "7/7/7/7/-------/-------/x5o x 0 0"
     );
 
+    println!("{}", board.state.gaps.display(7, 7));
     println!("{}", board.to_fen());
+
+    
+    return;
 
     let lines = r#"b3 23
     c3 22

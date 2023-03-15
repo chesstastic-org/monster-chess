@@ -123,6 +123,11 @@ impl<'a, const T: usize> Board<'a, T> {
 
             let bitboard = BitBoard::from_lsb(i);
 
+            if (self.state.gaps & bitboard).is_set() {
+                fen_state.push(self.game.fen_options.state.gaps);
+                continue;
+            }
+
             if (self.state.all_pieces & bitboard).is_empty() {
                 empty_spaces += 1;
                 continue;
@@ -133,44 +138,40 @@ impl<'a, const T: usize> Board<'a, T> {
             }
             empty_spaces = 0;
 
-            if (self.state.gaps & bitboard).is_set() {
-                fen_state.push(self.game.fen_options.state.gaps);
-            } else {
-                let mut team = usize::MAX;
-                for ind in 0..self.state.teams.len() {
-                    if (self.state.teams[ind] & bitboard).is_set() {
-                        team = ind;
-                    }
+            let mut team = usize::MAX;
+            for ind in 0..self.state.teams.len() {
+                if (self.state.teams[ind] & bitboard).is_set() {
+                    team = ind;
                 }
-    
-                let mut piece_type = usize::MAX;
-                for ind in 0..self.state.pieces.len() {
-                    if (self.state.pieces[ind] & bitboard).is_set() {
-                        piece_type = ind;
-                        break;
-                    }
-                }
-    
-                let first_move = (self.state.first_move & bitboard).is_set();
-    
-                let mut piece_str = match self.game.pieces[piece_type].get_piece_symbol() {
-                    PieceSymbol::Char(char) => {
-                        if self.state.teams.len() > 2 {
-                            format!("{}{{{}}}", char.to_ascii_lowercase(), team)
-                        } else if team == 0 {
-                            char.to_ascii_uppercase().to_string()
-                        } else {
-                            char.to_ascii_lowercase().to_string()
-                        }
-                    }
-                    PieceSymbol::TeamSymbol(teams) => teams[team].to_string(),
-                };
-                if self.game.fen_options.state.first_moves && !first_move {
-                    piece_str.push_str("!");
-                }
-
-                fen_state.push_str(&piece_str);
             }
+
+            let mut piece_type = usize::MAX;
+            for ind in 0..self.state.pieces.len() {
+                if (self.state.pieces[ind] & bitboard).is_set() {
+                    piece_type = ind;
+                    break;
+                }
+            }
+
+            let first_move = (self.state.first_move & bitboard).is_set();
+
+            let mut piece_str = match self.game.pieces[piece_type].get_piece_symbol() {
+                PieceSymbol::Char(char) => {
+                    if self.state.teams.len() > 2 {
+                        format!("{}{{{}}}", char.to_ascii_lowercase(), team)
+                    } else if team == 0 {
+                        char.to_ascii_uppercase().to_string()
+                    } else {
+                        char.to_ascii_lowercase().to_string()
+                    }
+                }
+                PieceSymbol::TeamSymbol(teams) => teams[team].to_string(),
+            };
+            if self.game.fen_options.state.first_moves && !first_move {
+                piece_str.push_str("!");
+            }
+
+            fen_state.push_str(&piece_str);
         }
 
         fen_state

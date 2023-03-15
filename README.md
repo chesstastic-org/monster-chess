@@ -89,14 +89,25 @@ It may be noted that `monster-chess` also aims to support [Fischer Random Chess]
 
 `monster-chess` can easily implement Ataxx simply by writing an implementation of `StonePiece` to represent an Ataxx piece. Moves can be found using a lookup table and then masked to avoid all of the pieces on the board. As for making the moves, all we have to do is check whether it's a single or double move, and then handle the move-making logic appropiately before converting stones around the moved piece.
 
-Ataxx is not fully implemented as of now, it hasn't been tested at all and the implementation of Ataxx is still rather dry and perhaps unoptimized. Regardless of this, you can still create an Ataxx board as follows:
+You can still create an Ataxx board as follows:
 
 ```rust
     let ataxx = Ataxx::create();
     let mut board = ataxx.from_fen("x5o/7/7/7/7/7/o5x x 0 1");
 ```
 
-Ataxx Gaps are also currently unsupported, but will be added soon.
+Then, we can generate the moves as follows:
+
+```rust
+let legal_moves = board.generate_legal_moves(NORMAL_MODE);
+let pseudolegal_moves = board.generate_moves(NORMAL_MODE);
+```
+
+As the FEN Notation for Ataxx could be somewhat difficult to find, we follow this format: `[piece placement] [moving team] [half moves] [full moves]`.
+
+For piece placement, `x` is a piece from team one, black, and `y` is a piece from team two, white. In addition, `-` represents gaps, holes in the board. For the moving team, `x` is black, `y` is white.
+
+For moves that the engine parses, single moves _must_ be represented by only providing the destination square, and double moves are represented as `[from][to]`.
 
 ## Implementation
 

@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use crate::{board::{game::MoveController, Board, actions::Action}, bitboard::BitBoard};
+use crate::{board::{game::MoveController, Board, actions::Action}, bitboard::BitBoard, games::ataxx::NORMAL_MODE};
 
 use super::is_single_move;
 
@@ -15,11 +15,15 @@ impl<const T: usize> MoveController<T> for AtaxxMoveController {
 
             let team_squares = board.state.teams[board.state.moving_team as usize];
 
-            if empty_squares.count_ones() > 0 && team_squares.count_ones() > 0 {
+            board.make_move(&None);
+            let opposing_moves = board.generate_moves(NORMAL_MODE).len();
+            board.undo_move();
+            if opposing_moves > 0 && empty_squares.count_ones() > 0 && team_squares.count_ones() > 0  {
                 vec![ None ]
             } else {
                 actions
             }
+            
         } else {
             let mut set = HashSet::<u32>::with_capacity(actions.len());
             let mut new_actions = Vec::with_capacity(actions.len());
