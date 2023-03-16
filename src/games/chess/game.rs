@@ -17,7 +17,6 @@ use super::{pieces::{
     down, up, BishopPiece, KingPiece, KnightPiece, PawnPiece, QueenPiece, RookPiece,
 }, ChessMoveController, ChessPostProcess, ChessCastlingRights, ChessEnPassant, ChessResolution};
 
-pub const NORMAL_MODE: u32 = 0;
 pub const ATTACKS_MODE: u32 = 1;
 
 const PAWN: &dyn Piece<1> = &PawnPiece;

@@ -12,39 +12,39 @@ use crate::{
 #[derive(Debug)] pub struct KnightPiece<const T: usize>;
 
 fn up2_right<const T: usize>(b: BitBoard<T>, cols: Cols, edges: &Edges<T>, deep_edges: &Edges<T>) -> BitBoard<T> {
-    (b & !deep_edges.top & !edges.right).up(2, cols).right(1)
+    (b & !(deep_edges.top | edges.right)).up(2, cols).right(1)
 }
 
 fn up_right2<const T: usize>(b: BitBoard<T>, cols: Cols, edges: &Edges<T>, deep_edges: &Edges<T>) -> BitBoard<T> {
-    (b & !edges.top & !deep_edges.right).up(1, cols).right(2)
+    (b & !(edges.top | deep_edges.right)).up(1, cols).right(2)
 }
 
 fn down2_right<const T: usize>(b: BitBoard<T>, cols: Cols, edges: &Edges<T>, deep_edges: &Edges<T>) -> BitBoard<T> {
-    (b & !deep_edges.bottom & !edges.right)
+    (b & !(deep_edges.bottom | edges.right))
         .down(2, cols)
         .right(1)
 }
 
 fn down_right2<const T: usize>(b: BitBoard<T>, cols: Cols, edges: &Edges<T>, deep_edges: &Edges<T>) -> BitBoard<T> {
-    (b & !edges.bottom & !deep_edges.right)
+    (b & !(edges.bottom | deep_edges.right))
         .down(1, cols)
         .right(2)
 }
 
 fn up2_left<const T: usize>(b: BitBoard<T>, cols: Cols, edges: &Edges<T>, deep_edges: &Edges<T>) -> BitBoard<T> {
-    (b & !deep_edges.top & !edges.left).up(2, cols).left(1)
+    (b & !(deep_edges.top | edges.left)).up(2, cols).left(1)
 }
 
 fn up_left2<const T: usize>(b: BitBoard<T>, cols: Cols, edges: &Edges<T>, deep_edges: &Edges<T>) -> BitBoard<T> {
-    (b & !edges.top & !deep_edges.left).up(1, cols).left(2)
+    (b & !(edges.top | deep_edges.left)).up(1, cols).left(2)
 }
 
 fn down2_left<const T: usize>(b: BitBoard<T>, cols: Cols, edges: &Edges<T>, deep_edges: &Edges<T>) -> BitBoard<T> {
-    (b & !deep_edges.bottom & !edges.left).down(2, cols).left(1)
+    (b & !(deep_edges.bottom | edges.left)).down(2, cols).left(1)
 }
 
 fn down_left2<const T: usize>(b: BitBoard<T>, cols: Cols, edges: &Edges<T>, deep_edges: &Edges<T>) -> BitBoard<T> {
-    (b & !edges.bottom & !deep_edges.left).down(1, cols).left(2)
+    (b & !(edges.bottom | deep_edges.left)).down(1, cols).left(2)
 }
 
 impl<const T: usize> Piece<T> for KnightPiece<T> {

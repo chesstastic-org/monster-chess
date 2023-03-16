@@ -8,6 +8,15 @@
 
 ### Quickstart
 
+Import `monster-chess`.
+
+```rust
+use monster_chess::{games::{chess::Chess, ataxx::Ataxx}, board::game::NORMAL_MODE};
+
+let chess = Chess::create();
+let mut board = chess.from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+```
+
 Create a game.
 
 ```rust
@@ -29,8 +38,8 @@ let board = game.from_fen("r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1N
 Generate moves.
 
 ```rust
-// `0` is the normal move generation of any game, other move generations generate specialized moves (eg. `1` to optimize checking for attacks on the king in chess)
-let moves = board.generate_legal_moves(0);
+// `NORMAL_MODE` is the normal move generation of any game, other move generations generate specialized moves.
+let moves = board.generate_legal_moves(NORMAL_MODE);
 ```
 
 Hash a position.

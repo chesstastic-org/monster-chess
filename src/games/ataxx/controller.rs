@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use crate::{board::{game::MoveController, Board, actions::Action}, bitboard::BitBoard, games::ataxx::NORMAL_MODE};
+use crate::{board::{game::{MoveController, NORMAL_MODE}, Board, actions::Action}, bitboard::BitBoard};
 
 use super::is_single_move;
 

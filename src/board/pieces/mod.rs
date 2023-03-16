@@ -18,7 +18,7 @@ pub enum PieceSymbol {
 
 const NORMAL_MOVE: usize = 0;
 
-pub trait Piece<const T: usize> : Debug {
+pub trait Piece<const T: usize> : Debug + Send + Sync {
     fn get_piece_symbol(&self) -> PieceSymbol;
 
     fn format_info(&self, board: &Board<T>, info: usize) -> String {

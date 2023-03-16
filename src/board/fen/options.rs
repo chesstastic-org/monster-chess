@@ -20,7 +20,7 @@ pub struct FenState {
     pub first_moves: bool, pub gaps: char
 }
 
-pub trait PostProcess<const T: usize> : Debug {
+pub trait PostProcess<const T: usize> : Debug + Send + Sync {
     fn apply(&self, board: &mut Board<T>);
 }
 

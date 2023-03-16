@@ -1,8 +1,10 @@
 use std::fmt::Debug;
 
+pub const NORMAL_MODE: u32 = 0;
+
 use super::{actions::Action, fen::FenOptions, pieces::Piece, Board, Rows, Cols, zobrist::ZobristHashTable};
 
-pub trait MoveController<const T: usize> : Debug {
+pub trait MoveController<const T: usize> : Debug + Send + Sync {
     fn transform_moves(&self, board: &mut Board<T>, mode: u32, actions: Vec<Option<Action>>) -> Vec<Option<Action>>;
     fn is_legal(&self, board: &mut Board<T>, action: &Option<Action>) -> bool;
     fn use_psuedolegal(&self) -> bool;
@@ -27,11 +29,11 @@ pub enum GameResults {
     Ongoing
 }
 
-pub trait Resolution<const T: usize> : Debug {
+pub trait Resolution<const T: usize> : Debug + Send + Sync {
     fn resolution(&self, board: &mut Board<T>, legal_moves: &Vec<Option<Action>>) -> GameResults;
 }
 
-pub trait ZobristController<const T: usize> : Debug {
+pub trait ZobristController<const T: usize> : Debug + Send + Sync {
     fn get_extra_hashes(&self) -> usize { 0 }
     fn apply(&self, hash: &mut u64, zobrist: &mut ZobristHashTable<T>, board: &mut Board<T>) {}
 }

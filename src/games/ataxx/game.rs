@@ -6,8 +6,6 @@ pub struct Ataxx;
 
 pub const STONE: &dyn Piece<1> = &StonePiece;
 
-pub const NORMAL_MODE: u32 = 1;
-
 pub fn is_single_move(action: &Action) -> bool {
     match action.from {
         Some(from) => {
