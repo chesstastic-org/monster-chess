@@ -227,7 +227,7 @@ pub trait Piece<const T: usize> : Debug {
             return;
         }
 
-        for bit in bit_actions.iter_one_bits(board.state.squares) {
+        for bit in bit_actions.iter_set_bits(board.state.squares) {
             actions.push(Some(Action {
                 from: Some(from),
                 to: bit,

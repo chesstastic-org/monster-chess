@@ -182,7 +182,7 @@ impl<'a, const T: usize> Board<'a, T> {
             let board = *board & self.state.teams[team as usize];
             let piece = &self.game.pieces[ind];
 
-            for bit in board.iter_one_bits(board_len as u32) {
+            for bit in board.iter_set_bits(board_len as u32) {
                 bitboard |= piece.get_moves(self, BitBoard::from_lsb(bit), ind, team, mode);
             }
         }
@@ -200,7 +200,7 @@ impl<'a, const T: usize> Board<'a, T> {
             let board = *board & self.state.teams[team as usize];
             let piece = &self.game.pieces[ind];
 
-            for bit in board.iter_one_bits(board_len) {
+            for bit in board.iter_set_bits(board_len) {
                 mask |= piece.can_move_mask(
                     self,
                     BitBoard::from_lsb(bit),
@@ -226,7 +226,7 @@ impl<'a, const T: usize> Board<'a, T> {
             let board = *board & self.state.teams[team as usize];
             let piece = &self.game.pieces[ind];
 
-            for bit in board.iter_one_bits(board_len as u32) {
+            for bit in board.iter_set_bits(board_len as u32) {
                 piece.add_actions(&mut actions, self, ind, bit, team, mode);
             }
         }
