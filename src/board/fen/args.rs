@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use super::super::{
     actions::{Action, HistoryMove, UndoMoveError},
     game::Game,
@@ -5,7 +7,7 @@ use super::super::{
     Board, Cols, Rows,
 };
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum FenTeamArgument {
     Number,
     Teams(Vec<char>),
@@ -49,6 +51,7 @@ impl<const T: usize> FenArgument<T> for FenTeamArgument {
     }
 }
 
+#[derive(Debug)]
 pub struct FenTurns;
 
 impl<const T: usize> FenArgument<T> for FenTurns {
@@ -66,6 +69,7 @@ impl<const T: usize> FenArgument<T> for FenTurns {
     }
 }
 
+#[derive(Debug)]
 pub struct FenSubMoves;
 
 impl<const T: usize> FenArgument<T> for FenSubMoves {
@@ -83,6 +87,7 @@ impl<const T: usize> FenArgument<T> for FenSubMoves {
     }
 }
 
+#[derive(Debug)]
 pub struct FenFullMoves;
 
 impl<const T: usize> FenArgument<T> for FenFullMoves {
@@ -105,7 +110,7 @@ pub enum FenDecodeError {
     InvalidArgument(String),
 }
 
-pub trait FenArgument<const T: usize> {
+pub trait FenArgument<const T: usize> : Debug {
     /// `encode` takes in a board, and outputs what this FEN argument's encoded result would be (eg. for a team argument, it could be `"b"`)
     fn encode(&self, board: &Board<T>) -> String;
 

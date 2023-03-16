@@ -1,3 +1,5 @@
+use std::hash::Hash;
+
 use arrayvec::ArrayVec;
 
 use crate::bitboard::BitBoard;
@@ -42,6 +44,7 @@ pub fn reverse_turns<const T: usize>(state: &mut BoardState<T>, game: &Game<T>) 
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BoardState<const T: usize> {
     /// All Pieces is a BitBoard of all pieces, because keeping this bitboard ready makes it much easier to calculate movement for slider pieces.
     pub all_pieces: BitBoard<T>,
@@ -91,12 +94,15 @@ pub type AttackDirections<const T: usize> = Vec<BitBoard<T>>;
 
 pub type AttackLookup<const T: usize> = Vec<AttackDirections<T>>;
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Board<'a, const T: usize> {
     pub state: BoardState<T>,
     pub game: &'a Game<T>,
     pub attack_lookup: Vec<AttackLookup<T>>,
     pub history: ArrayVec<HistoryMove<T>, 2048>,
 }
+
+
 
 fn generate_forward_lookup(count: u32) -> ArrayVec<u32, 16> {
     let mut lookup = ArrayVec::new();

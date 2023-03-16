@@ -4,6 +4,7 @@ use crate::board::{game::{Resolution, GameResults}, Board, actions::Action};
 
 use super::ATTACKS_MODE;
 
+#[derive(Debug)]
 pub struct ChessResolution<const T: usize>;
 
 impl<const T: usize> Resolution<T> for ChessResolution<T> {

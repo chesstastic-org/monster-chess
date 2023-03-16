@@ -16,7 +16,7 @@ const CASTLING_MOVE: usize = 1;
 
 const ROOK_PIECE_TYPE: usize = 3;
 
-pub struct KingPiece<const T: usize>;
+#[derive(Debug)] pub struct KingPiece<const T: usize>;
 
 fn right_one<const T: usize>(from: BitBoard<T>, edges: &Edges<T>) -> BitBoard<T> {
     (from & !edges.right).right(1)

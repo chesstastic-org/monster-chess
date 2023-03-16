@@ -5,7 +5,7 @@ use crate::{board::{
 
 use super::{get_moves_ray, get_ray_attacks};
 
-pub struct QueenPiece;
+#[derive(Debug)] pub struct QueenPiece;
 
 impl<const T: usize> Piece<T> for QueenPiece {
     fn get_piece_symbol(&self) -> PieceSymbol {

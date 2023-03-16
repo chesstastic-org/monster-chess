@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use crate::bitboard::BitBoard;
 
 use super::{
@@ -16,7 +18,7 @@ pub enum PieceSymbol {
 
 const NORMAL_MOVE: usize = 0;
 
-pub trait Piece<const T: usize> {
+pub trait Piece<const T: usize> : Debug {
     fn get_piece_symbol(&self) -> PieceSymbol;
 
     fn format_info(&self, board: &Board<T>, info: usize) -> String {

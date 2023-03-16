@@ -9,7 +9,7 @@ use crate::{
     games::chess::game::ATTACKS_MODE,
 };
 
-pub struct KnightPiece<const T: usize>;
+#[derive(Debug)] pub struct KnightPiece<const T: usize>;
 
 fn up2_right<const T: usize>(b: BitBoard<T>, cols: Cols, edges: &Edges<T>, deep_edges: &Edges<T>) -> BitBoard<T> {
     (b & !deep_edges.top & !edges.right).up(2, cols).right(1)

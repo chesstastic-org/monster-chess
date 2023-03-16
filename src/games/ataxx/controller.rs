@@ -4,6 +4,7 @@ use crate::{board::{game::MoveController, Board, actions::Action}, bitboard::Bit
 
 use super::is_single_move;
 
+#[derive(Debug)]
 pub struct AtaxxMoveController;
 impl<const T: usize> MoveController<T> for AtaxxMoveController {
     fn is_legal(&self, board: &mut Board<T>, action: &Option<Action>) -> bool {

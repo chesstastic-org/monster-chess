@@ -16,6 +16,7 @@ use crate::{
 use super::pieces::{down, up};
 
 
+#[derive(Debug)]
 pub struct ChessCastlingRights;
 impl<const T: usize> FenArgument<T> for ChessCastlingRights {
     fn decode(&self, board: &mut Board<T>, arg: &str) -> Result<(), FenDecodeError> {
@@ -122,6 +123,7 @@ impl<const T: usize> FenArgument<T> for ChessCastlingRights {
     }
 }
 
+#[derive(Debug)]
 pub struct ChessEnPassant;
 
 impl<const T: usize> FenArgument<T> for ChessEnPassant {

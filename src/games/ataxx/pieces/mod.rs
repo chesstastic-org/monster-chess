@@ -4,7 +4,7 @@ use crate::{board::{pieces::{Piece, PieceSymbol}, Board, AttackLookup, AttackDir
 
 use super::is_single_move;
 
-pub struct StonePiece;
+#[derive(Debug)] pub struct StonePiece;
 
 fn right_one<const T: usize>(from: BitBoard<T>, edges: &Edges<T>) -> BitBoard<T> {
     (from & !edges.right).right(1)

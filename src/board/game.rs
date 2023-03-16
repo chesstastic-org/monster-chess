@@ -1,6 +1,8 @@
+use std::fmt::Debug;
+
 use super::{actions::Action, fen::FenOptions, pieces::Piece, Board, Rows, Cols};
 
-pub trait MoveController<const T: usize> {
+pub trait MoveController<const T: usize> : Debug {
     fn transform_moves(&self, board: &mut Board<T>, mode: u32, actions: Vec<Option<Action>>) -> Vec<Option<Action>>;
     fn is_legal(&self, board: &mut Board<T>, action: &Option<Action>) -> bool;
     fn use_psuedolegal(&self) -> bool;
@@ -25,10 +27,11 @@ pub enum GameResults {
     Ongoing
 }
 
-pub trait Resolution<const T: usize> {
+pub trait Resolution<const T: usize> : Debug {
     fn resolution(&self, board: &mut Board<T>, legal_moves: &Vec<Option<Action>>) -> GameResults;
 }
 
+#[derive(Debug)]
 pub struct Game<const T: usize> {
     pub pieces: Vec<&'static dyn Piece<T>>,
     pub controller: Box<dyn MoveController<T>>,
@@ -40,3 +43,11 @@ pub struct Game<const T: usize> {
     pub rows: Rows,
     pub cols: Cols
 }
+
+impl<const T: usize> PartialEq for Game<T> {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name
+    }
+}
+
+impl<const T: usize> Eq for Game<T> {}

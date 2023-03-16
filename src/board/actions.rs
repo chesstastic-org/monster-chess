@@ -9,7 +9,7 @@ pub enum UndoMoveError {
 
 pub type ActionInfo = usize;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub struct Action {
     pub from: Option<u32>,
     pub to: u32,
@@ -22,19 +22,19 @@ pub struct Action {
     pub info: ActionInfo
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub struct PreviousBoard<const T: usize>(pub BitBoard<T>);
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub struct IndexedPreviousBoard<const T: usize>(pub usize, pub BitBoard<T>);
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum HistoryUpdate<const T: usize> {
     Team(IndexedPreviousBoard<T>),
     Piece(IndexedPreviousBoard<T>),
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub enum HistoryState<const T: usize> {
     // This is when we want to a less common change where we effect many more bitboards then can be predicted. Avoid this when possible.
     Any {
@@ -52,7 +52,7 @@ pub enum HistoryState<const T: usize> {
     None,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct HistoryMove<const T: usize> {
     pub action: Option<Action>,
     pub state: HistoryState<T>,

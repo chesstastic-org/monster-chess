@@ -2,6 +2,7 @@ use crate::{board::{game::MoveController, Board, actions::Action}, bitboard::Bit
 
 use super::ATTACKS_MODE;
 
+#[derive(Debug)]
 pub struct ChessMoveController<const T: usize>;
 
 impl<const T: usize> MoveController<T> for ChessMoveController<T> {

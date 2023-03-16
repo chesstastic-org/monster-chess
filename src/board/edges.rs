@@ -9,7 +9,7 @@ use super::{
 
 pub type EdgeBuffer = u32;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub struct Edges<const T: usize> {
     pub top: BitBoard<T>,
     pub bottom: BitBoard<T>,

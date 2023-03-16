@@ -2,6 +2,7 @@ use std::cmp::Ordering;
 
 use crate::board::{game::{Resolution, GameResults}, Board, actions::Action};
 
+#[derive(Debug)]
 pub struct AtaxxResolution<const T: usize>;
 
 impl<const T: usize> Resolution<T> for AtaxxResolution<T> {

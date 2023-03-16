@@ -1,5 +1,6 @@
 use crate::{board::{fen::PostProcess, Board, actions::Action}, bitboard::BitBoard};
 
+#[derive(Debug)]
 pub struct ChessPostProcess;
 impl<const T: usize> PostProcess<T> for ChessPostProcess {
     fn apply(&self, board: &mut Board<T>) {
