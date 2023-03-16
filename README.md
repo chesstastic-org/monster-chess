@@ -58,7 +58,7 @@ Despite all of that, this legality check is rather expensive. Fortunately, it wo
 You can initialize the chess board as follows:
 
 ```rust
-use monster-chess::games::chess::Chess;
+use monster_chess::games::chess::Chess;
 
 let chess = Chess::create();
 let mut board = chess.from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
@@ -94,7 +94,7 @@ It may be noted that `monster-chess` also aims to support [Fischer Random Chess]
 You can still create an Ataxx board as follows:
 
 ```rust
-use monster-chess::games::chess::Ataxx;
+use monster_chess::games::chess::Ataxx;
 
 let ataxx = Ataxx::create();
 let mut board = ataxx.from_fen("x5o/7/7/7/7/7/o5x x 0 1");

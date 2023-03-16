@@ -3,6 +3,7 @@ mod args;
 mod process;
 mod controller;
 mod resolution;
+mod zobrist;
 mod suite;
 pub mod pieces;
 

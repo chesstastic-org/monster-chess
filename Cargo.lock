@@ -301,7 +301,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "monster-chess"
+name = "monster_chess"
 version = "0.0.1"
 dependencies = [
  "arrayvec",

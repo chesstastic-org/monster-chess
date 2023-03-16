@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use super::{actions::Action, fen::FenOptions, pieces::Piece, Board, Rows, Cols};
+use super::{actions::Action, fen::FenOptions, pieces::Piece, Board, Rows, Cols, zobrist::ZobristHashTable};
 
 pub trait MoveController<const T: usize> : Debug {
     fn transform_moves(&self, board: &mut Board<T>, mode: u32, actions: Vec<Option<Action>>) -> Vec<Option<Action>>;
@@ -31,6 +31,15 @@ pub trait Resolution<const T: usize> : Debug {
     fn resolution(&self, board: &mut Board<T>, legal_moves: &Vec<Option<Action>>) -> GameResults;
 }
 
+pub trait ZobristController<const T: usize> : Debug {
+    fn get_extra_hashes(&self) -> usize { 0 }
+    fn apply(&self, hash: &mut u64, zobrist: &mut ZobristHashTable<T>, board: &mut Board<T>) {}
+}
+
+#[derive(Debug)]
+pub struct DefaultZobristController<const T: usize>;
+impl<const T: usize> ZobristController<T> for DefaultZobristController<T> {}
+
 #[derive(Debug)]
 pub struct Game<const T: usize> {
     pub pieces: Vec<&'static dyn Piece<T>>,
@@ -41,7 +50,11 @@ pub struct Game<const T: usize> {
     pub teams: u32,
     pub turns: u32,
     pub rows: Rows,
-    pub cols: Cols
+    pub cols: Cols,
+    pub squares: u32,
+    /// Anything not covered by first_moves, pieces, and gaps should be zobrist_info
+    pub zobrist_controller: Box<dyn ZobristController<T>>,
+    pub zobrist: ZobristHashTable<T>
 }
 
 impl<const T: usize> PartialEq for Game<T> {

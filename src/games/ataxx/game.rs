@@ -1,4 +1,4 @@
-use crate::{board::{game::Game, fen::{FenOptions, FenState, FenSubMoves, FenTeamArgument, FenFullMoves}, pieces::Piece, actions::Action}, games::ataxx::AtaxxMoveController};
+use crate::{board::{game::{Game, DefaultZobristController}, fen::{FenOptions, FenState, FenSubMoves, FenTeamArgument, FenFullMoves}, pieces::Piece, actions::Action, zobrist::ZobristHashTable}, games::ataxx::AtaxxMoveController};
 
 use super::{AtaxxPostProcess, AtaxxResolution, pieces::StonePiece};
 
@@ -25,6 +25,9 @@ impl Ataxx {
             turns: 1,
             rows: 7,
             cols: 7,
+            squares: 49,
+            zobrist_controller: Box::new(DefaultZobristController),
+            zobrist: ZobristHashTable::<1>::generate(49, 2, 1, 0, || fastrand::u64(0..u64::MAX)),
             name: String::from("Ataxx"),
             pieces: vec![ STONE ],
             controller: Box::new(AtaxxMoveController),

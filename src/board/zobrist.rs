@@ -1,24 +1,26 @@
-use super::Board;
+use super::{Board, game::Game};
 
+#[derive(Debug, Clone)]
 pub struct ZobristHashTable<const T: usize> {
     pub table: Vec<u64>,
-    pub positions: u32,
+    pub squares: u32,
     pub teams: u32,
     pub pieces: u32,
-    pub extra_len: u32
+    pub base_len: usize,
+    pub extra_len: usize
 }
 
 impl<const T: usize> ZobristHashTable<T> {
     fn get_gap_index(&self, position: u32) -> usize {
-        (position + (self.positions)) as usize
+        position as usize
     }
 
     fn get_first_move_index(&self, position: u32) -> usize {
-        (position + (self.positions * 2)) as usize
+        (position + (self.squares)) as usize
     }
 
     fn get_piece_index(&self, position: u32, piece_type: u32, team: u32) -> usize {
-        (position + (self.positions * (2 + (piece_type + (self.pieces * team))))) as usize
+        (position + (self.squares * (1 + (piece_type + (self.pieces * team))))) as usize
     }
 
     pub fn compute(&self, board: &Board<T>) -> u64 {
@@ -44,30 +46,24 @@ impl<const T: usize> ZobristHashTable<T> {
         hash
     }
 
-    pub fn generate(positions: u32, pieces: u32, teams: u32, extra_len: u32, get_random: impl Fn() -> u64) -> ZobristHashTable<T> {
+    pub fn generate(squares: u32, teams: u32, pieces: u32, extra_hashes: usize, get_random: impl Fn() -> u64) -> ZobristHashTable<T> {
+        let hashes = (squares * (2 + (pieces * teams))) as usize;
+        let base_len = (
+            (squares - 1) + (squares * (1 + ((pieces - 1) + (pieces * (teams - 1))))) + 1
+        ) as usize;
         let mut zobrist = ZobristHashTable {
-            table: vec![ 0; (positions * (1 + (pieces * teams))) as usize ],
-            positions,
+            table: vec![ 0; hashes ],
+            squares: squares,
             pieces,
-            teams,
-            extra_len
+            teams: teams,
+            base_len,
+            extra_len: extra_hashes
         };
-    
-        for position in 0..positions {
-            let gap_pos = zobrist.get_gap_index(position);
-            zobrist.table.insert(gap_pos, get_random());
 
-            let first_move_pos = zobrist.get_first_move_index(position);
-            zobrist.table.insert(first_move_pos, get_random());
-
-            for piece_type in 0..pieces {
-                for team in 0..teams {
-                    let piece_pos = zobrist.get_piece_index(position, piece_type, team);
-                    zobrist.table.insert(piece_pos, get_random());
-                }
-            }
+        for hash in 0..hashes {
+            zobrist.table[hash] = get_random();
         }
-    
+
         zobrist
     }
 }
@@ -83,13 +79,10 @@ mod tests {
     #[test]
     fn chess_zobrist_test() {
         let chess = Chess::create();
-        let zobrist = ZobristHashTable::<1>::generate(
-            chess.cols * chess.rows, chess.pieces.len() as u32, chess.teams, 0, || u64(0..u64::MAX)
-        );
         
         let startpos = chess.default();
         let kiwipete = chess.from_fen("rnbqkbnr/pppppppp/8/8/8/4P3/PPPP1PPP/RNBQKBNR w KQkq - 0 1");
 
-        assert_ne!(zobrist.compute(&startpos), zobrist.compute(&kiwipete), "Waaa?");
+        assert_ne!(chess.zobrist.compute(&startpos), chess.zobrist.compute(&kiwipete), "Waaa?");
     }
 }
