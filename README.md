@@ -6,6 +6,39 @@
 
 `monster-chess` is a fairy chess move generation library written in Rust. It was created as part of the Chesstastic project (which aims to allow for users to easily create chess variants, play against others in those chess variants and analyze games of said variants), or more specifically, the [Ampersand](https://github.com/chesstastic-org/Ampersand) chess engine. The library is meant to handle move generation and move validation logic that happens in chess variants and chess-adjacent games.
 
+### Quickstart
+
+Create a game.
+
+```rust
+let game = Chess::create();
+// OR
+let game = Ataxx::create();
+// OR
+let game = MyCustomGame::create();
+```
+
+Load a position.
+
+```rust
+let board = game.default();
+// OR
+let board = game.from_fen("r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 0 1");
+```
+
+Generate moves.
+
+```rust
+// `0` is the normal move generation of any game, other move generations generate specialized moves (eg. `1` to optimize checking for attacks on the king in chess)
+let moves = board.generate_legal_moves(0);
+```
+
+Hash a position.
+
+```rust
+let hash = game.zobrist.compute(board);
+```
+
 ### Compatibility
 
 When we say that we're compatible with a given game, that doesn't mean we'll necessarily be providing out-of-the-box support for it, but that the game will be implementable given the framework that `monster-chess` provides.
@@ -67,7 +100,6 @@ let mut board = chess.from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQ
 Then, we can generate the moves as follows:
 
 ```rust
-// We have to specify the mode because `ATTACKS_MODE` is used to optimizing checks, and we don't know what mode to generate for until you specify it.
 let legal_moves = board.generate_legal_moves(NORMAL_MODE);
 let pseudolegal_moves = board.generate_moves(NORMAL_MODE);
 ```
