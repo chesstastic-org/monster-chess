@@ -11,7 +11,7 @@ impl<const T: usize> MoveController<T> for AtaxxMoveController {
         return true;
     }
 
-    fn use_psuedolegal(&self) -> bool {
+    fn use_pseudolegal(&self) -> bool {
         return false;
     }
 

@@ -44,7 +44,7 @@ impl<const T: usize> MoveController<T> for ChessMoveController<T> {
         }
     }
 
-    fn use_psuedolegal(&self) -> bool {
+    fn use_pseudolegal(&self) -> bool {
         return true;
     }
 

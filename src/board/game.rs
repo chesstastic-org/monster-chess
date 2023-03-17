@@ -7,7 +7,7 @@ use super::{actions::Action, fen::FenOptions, pieces::Piece, Board, Rows, Cols, 
 pub trait MoveController<const T: usize> : Debug + Send + Sync {
     fn transform_moves(&self, board: &mut Board<T>, mode: u32, actions: Vec<Option<Action>>) -> Vec<Option<Action>>;
     fn is_legal(&self, board: &mut Board<T>, action: &Option<Action>) -> bool;
-    fn use_psuedolegal(&self) -> bool;
+    fn use_pseudolegal(&self) -> bool;
 
     fn add_moves(&self, board: &Board<T>, actions: &mut Vec<Option<Action>>) {}
     fn make_drop_move(&self, board: &mut Board<T>, action: &Action) {

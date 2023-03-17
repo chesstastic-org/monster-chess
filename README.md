@@ -8,16 +8,19 @@
 
 ### Quickstart
 
-Import `monster-chess`.
+`monster-chess` is a library that can be installed as a [cargo crate](https://crates.io/crates/monster_chess). You can install it as follows:
+
+```
+cargo add monster_chess
+```
+
+Then, you can import the library as follows:
 
 ```rust
 use monster_chess::{games::{chess::Chess, ataxx::Ataxx}, board::game::NORMAL_MODE};
-
-let chess = Chess::create();
-let mut board = chess.from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 ```
 
-Create a game.
+You can create a game of your choosing as follows:
 
 ```rust
 let game = Chess::create();
@@ -27,7 +30,7 @@ let game = Ataxx::create();
 let game = MyCustomGame::create();
 ```
 
-Load a position.
+You can load positions either from the default FEN, or from a FEN of your own choosing.
 
 ```rust
 let board = game.default();
@@ -35,18 +38,20 @@ let board = game.default();
 let board = game.from_fen("r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 0 1");
 ```
 
-Generate moves.
+You can generate legal moves as follows (you may want to generate somewhat differently for pseudolegal move generation of some games.)
 
 ```rust
 // `NORMAL_MODE` is the normal move generation of any game, other move generations generate specialized moves.
 let moves = board.generate_legal_moves(NORMAL_MODE);
 ```
 
-Hash a position.
+You can create a Zobrist hash of a position as follows:
 
 ```rust
 let hash = game.zobrist.compute(board);
 ```
+
+
 
 ### Compatibility
 
