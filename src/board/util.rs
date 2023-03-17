@@ -1,4 +1,7 @@
 use std::hash::{Hash, Hasher};
+use std::fmt::Display;
+use std::fmt::Error;
+use std::fmt::Formatter;
 
 use arrayvec::ArrayVec;
 use fastrand;
@@ -101,6 +104,12 @@ pub struct Board<'a, const T: usize> {
     pub game: &'a Game<T>,
     pub attack_lookup: Vec<AttackLookup<T>>,
     pub history: ArrayVec<HistoryMove<T>, 2048>
+}
+
+impl<'a, const T: usize> Display for Board<'a, T> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
+        write!(f, "Board<{}>({})", self.game.name, self.to_fen())
+    }
 }
 
 impl<'a, const T: usize> Hash for Board<'a, T> {
