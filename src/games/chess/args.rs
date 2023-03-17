@@ -152,6 +152,7 @@ impl<const T: usize> FenArgument<T> for ChessEnPassant {
                 team: previous_team,
                 piece_type: 0,
                 info: 0,
+                move_type: 0
             }),
             state: HistoryState::None,
         });

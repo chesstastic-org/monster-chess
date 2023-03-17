@@ -16,10 +16,13 @@ pub struct Action {
     pub team: u32,
     pub piece_type: PieceType,
 
-    /// Moves can store extra information both for optimizing `make_move` or for specifying additional variants of a move.
-    ///
+    /// Moves can store extra information both for specifying additional variants of a move.
     /// Eg. Pawn Promotion uses `info` to represent which piece is promoted to.
-    pub info: ActionInfo
+    pub info: ActionInfo,
+    /// Moves can also store a move type, which is used merely to tell what type of move it is (en passant, castling, etc.)
+    /// The difference between this and `info` is that this is for information that can be derived from the rest of the information.
+    /// For instance, you can tell if a move is an en passant based on the last move. That's not true for promotion.
+    pub move_type: ActionInfo
 }
 
 /// This is a theoretically possible action. It doesn't even have to be actually possible. 

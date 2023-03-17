@@ -14,7 +14,7 @@ use crate::{
 const NORMAL_PAWN_MOVE: usize = 0;
 const EN_PASSANT_MOVE: usize = 1;
 fn promotion_move(piece_type: PieceType) -> usize {
-    piece_type + 2
+    piece_type + 1
 }
 
 #[derive(Debug)] pub struct PawnPiece<const T: usize>;
@@ -140,13 +140,13 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
                 .expect(&format!(
                     "Could not find a promotion piece type from '{info}'"
                 ));
-            (piece_type as u32) + 2
+            (piece_type as u32) + 1
         }
     }
 
     fn format_info(&self, board: &Board<T>, info: usize) -> String {
-        if info > 1 {
-            let piece_trait = &board.game.pieces[info - 2];
+        if info > 0 {
+            let piece_trait = &board.game.pieces[info - 1];
             if let PieceSymbol::Char(char) = piece_trait.get_piece_symbol() {
                 char.to_string()
             } else {
@@ -273,8 +273,8 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
         };
 
         let mut promotion_piece_type: Option<usize> = None;
-        if action.info >= 2 {
-            let promotion_type = action.info - 2;
+        if action.info >= 1 {
+            let promotion_type = action.info - 1;
             promotion_piece_type = Some(promotion_type);
             if let HistoryState::Any { updates, .. } = &mut history_move.state {
                 updates.push(HistoryUpdate::Piece(IndexedPreviousBoard(
@@ -316,7 +316,7 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
         from: BitBoard<T>,
         to: BitBoard<T>,
     ) {
-        if action.info == EN_PASSANT_MOVE {
+        if action.move_type == EN_PASSANT_MOVE {
             self.make_en_passant_move(board, action, piece_type, from, to);
             return;
         }
@@ -333,8 +333,8 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
             },
         });
 
-        if action.info >= 2 {
-            let promotion_type = action.info - 2;
+        if action.info >= 1 {
+            let promotion_type = action.info - 1;
             let history_state = &mut board.history.last_mut().expect("Couldn't find the last move saved to history even though we just saved it (what)").state;
             *history_state = HistoryState::Any {
                 first_move: PreviousBoard(board.state.first_move),
@@ -405,6 +405,7 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
                         to: bit,
                         team,
                         info: promotion_move(promotion_piece_type),
+                        move_type: NORMAL_PAWN_MOVE,
                         piece_type,
                     }));
                 }
@@ -429,7 +430,8 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
                     from: Some(from),
                     to: bit,
                     team,
-                    info: if en_passant {
+                    info: NORMAL_PAWN_MOVE,
+                    move_type: if en_passant {
                         EN_PASSANT_MOVE
                     } else {
                         NORMAL_PAWN_MOVE

@@ -174,7 +174,7 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
         from: BitBoard<T>,
         to: BitBoard<T>,
     ) {
-        if action.info == CASTLING_MOVE {
+        if action.move_type == CASTLING_MOVE {
             self.make_castling_move(board, action, from, to);
 
             return;
@@ -260,6 +260,7 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
                 to: bit,
                 team,
                 info: NORMAL_KING_MOVE,
+                move_type: NORMAL_KING_MOVE,
                 piece_type,
             }));
         }
@@ -368,7 +369,8 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
                 from: Some(from),
                 to: rook,
                 team,
-                info: CASTLING_MOVE,
+                info: NORMAL_KING_MOVE,
+                move_type: CASTLING_MOVE,
                 piece_type,
             }));
         }

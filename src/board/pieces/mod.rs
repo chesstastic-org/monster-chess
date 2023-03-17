@@ -233,6 +233,7 @@ pub trait Piece<const T: usize> : Debug + Send + Sync {
                 to: bit,
                 team,
                 info: NORMAL_MOVE,
+                move_type: NORMAL_MOVE,
                 piece_type,
             }));
         }
