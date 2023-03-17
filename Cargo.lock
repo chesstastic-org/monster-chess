@@ -302,7 +302,7 @@ dependencies = [
 
 [[package]]
 name = "monster_chess"
-version = "0.0.4"
+version = "0.0.5"
 dependencies = [
  "arrayvec",
  "criterion",
