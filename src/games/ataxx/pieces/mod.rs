@@ -62,7 +62,7 @@ impl<const T: usize> Piece<T> for StonePiece {
             Some(lookup) => lookup[from.bitscan_reverse() as usize][0],
             None => self.generate_lookup_moves(board, from)[0],
         };
-        base_moves & !board.state.all_pieces & !board.state.gaps
+        base_moves & !(board.state.all_pieces | board.state.gaps)
     }
 
     fn make_move(&self, board: &mut Board<T>, action: &Action) {

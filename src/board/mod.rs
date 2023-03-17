@@ -7,6 +7,7 @@ pub mod perft;
 pub mod pieces;
 pub mod positions;
 pub mod tests;
+pub mod zobrist;
 mod util;
 
 pub use util::*;

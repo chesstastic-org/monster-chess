@@ -1,6 +1,6 @@
 [package]
-name = "monster-chess"
-version = "0.0.1"
+name = "monster_chess"
+version = "0.0.3"
 edition = "2021"
 license = "MIT"
 description = "A fairy chess movegen library that can be easily extended to new chess-adjacent games."
@@ -14,6 +14,7 @@ debug = true
 
 [dependencies]
 arrayvec = "0.7.2"
+fastrand = "1.9.0"
 shell-words = "1.1.0"
 
 [dev-dependencies]

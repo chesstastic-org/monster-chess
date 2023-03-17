@@ -110,7 +110,7 @@ pub enum FenDecodeError {
     InvalidArgument(String),
 }
 
-pub trait FenArgument<const T: usize> : Debug {
+pub trait FenArgument<const T: usize> : Debug + Send + Sync {
     /// `encode` takes in a board, and outputs what this FEN argument's encoded result would be (eg. for a team argument, it could be `"b"`)
     fn encode(&self, board: &Board<T>) -> String;
 

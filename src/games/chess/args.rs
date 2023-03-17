@@ -86,7 +86,7 @@ impl<const T: usize> FenArgument<T> for ChessCastlingRights {
 
             let rooks = board.state.pieces[3] & board.state.teams[team] & board.state.first_move;
             let mut one_bits = rooks
-                .iter_one_bits(board.state.rows * board.state.cols)
+                .iter_set_bits(board.state.rows * board.state.cols)
                 .collect::<Vec<_>>();
             if one_bits.len() == 1 {
                 let mut side_castling_rights = if rooks > king { 'k' } else { 'q' };
@@ -180,7 +180,10 @@ impl<const T: usize> FenArgument<T> for ChessEnPassant {
                             return "-".to_string();
                         }
     
-                        return board.encode_position(last_action.to);
+                        let to_bitboard = BitBoard::<1>::from_lsb(last_action.to);
+                        let en_passant = down(&to_bitboard, 1, board.state.cols, board.state.team_reverse_lookup[board.state.moving_team as usize]);
+
+                        return board.encode_position(en_passant.bitscan_forward());
                     }
                     None => "-".to_string()
                 }

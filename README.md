@@ -6,6 +6,53 @@
 
 `monster-chess` is a fairy chess move generation library written in Rust. It was created as part of the Chesstastic project (which aims to allow for users to easily create chess variants, play against others in those chess variants and analyze games of said variants), or more specifically, the [Ampersand](https://github.com/chesstastic-org/Ampersand) chess engine. The library is meant to handle move generation and move validation logic that happens in chess variants and chess-adjacent games.
 
+### Quickstart
+
+`monster-chess` is a library that can be installed as a [cargo crate](https://crates.io/crates/monster_chess). You can install it as follows:
+
+```
+cargo add monster_chess
+```
+
+Then, you can import the library as follows:
+
+```rust
+use monster_chess::{games::{chess::Chess, ataxx::Ataxx}, board::game::NORMAL_MODE};
+```
+
+You can create a game of your choosing as follows:
+
+```rust
+let game = Chess::create();
+// OR
+let game = Ataxx::create();
+// OR
+let game = MyCustomGame::create();
+```
+
+You can load positions either from the default FEN, or from a FEN of your own choosing.
+
+```rust
+let board = game.default();
+// OR
+let board = game.from_fen("r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 0 1");
+```
+
+You can generate legal moves as follows (you may want to generate somewhat differently for pseudolegal move generation of some games.)
+
+```rust
+// `NORMAL_MODE` is the normal move generation of any game, other move generations generate specialized moves.
+let moves = board.generate_legal_moves(NORMAL_MODE);
+```
+
+You can create a Zobrist hash of a position as follows:
+
+```rust
+let hash = game.zobrist.compute(board);
+```
+
+
+
 ### Compatibility
 
 When we say that we're compatible with a given game, that doesn't mean we'll necessarily be providing out-of-the-box support for it, but that the game will be implementable given the framework that `monster-chess` provides.
@@ -58,7 +105,7 @@ Despite all of that, this legality check is rather expensive. Fortunately, it wo
 You can initialize the chess board as follows:
 
 ```rust
-use monster-chess::games::chess::Chess;
+use monster_chess::games::chess::Chess;
 
 let chess = Chess::create();
 let mut board = chess.from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
@@ -67,7 +114,6 @@ let mut board = chess.from_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQ
 Then, we can generate the moves as follows:
 
 ```rust
-// We have to specify the mode because `ATTACKS_MODE` is used to optimizing checks, and we don't know what mode to generate for until you specify it.
 let legal_moves = board.generate_legal_moves(NORMAL_MODE);
 let pseudolegal_moves = board.generate_moves(NORMAL_MODE);
 ```
@@ -94,7 +140,7 @@ It may be noted that `monster-chess` also aims to support [Fischer Random Chess]
 You can still create an Ataxx board as follows:
 
 ```rust
-use monster-chess::games::chess::Ataxx;
+use monster_chess::games::chess::Ataxx;
 
 let ataxx = Ataxx::create();
 let mut board = ataxx.from_fen("x5o/7/7/7/7/7/o5x x 0 1");

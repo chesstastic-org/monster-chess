@@ -5,9 +5,9 @@ impl<const T: usize> Add<BitBoard<T>> for BitBoard<T> {
     type Output = Self;
 
     fn add(self, rhs: BitBoard<T>) -> BitBoard<T> {
-        let mut BitBoard = self.clone();
-        BitBoard += rhs;
-        BitBoard
+        let mut bit_board = self.clone();
+        bit_board += rhs;
+        bit_board
     }
 }
 
@@ -32,9 +32,9 @@ impl<const T: usize> Sub<BitBoard<T>> for BitBoard<T> {
     type Output = Self;
 
     fn sub(self, rhs: BitBoard<T>) -> BitBoard<T> {
-        let mut BitBoard = self.clone();
-        BitBoard -= rhs;
-        BitBoard
+        let mut bit_board = self.clone();
+        bit_board -= rhs;
+        bit_board
     }
 }
 

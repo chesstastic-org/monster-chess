@@ -1,6 +1,10 @@
-use std::hash::Hash;
+use std::hash::{Hash, Hasher};
+use std::fmt::Display;
+use std::fmt::Error;
+use std::fmt::Formatter;
 
 use arrayvec::ArrayVec;
+use fastrand;
 
 use crate::bitboard::BitBoard;
 
@@ -8,7 +12,7 @@ use super::{
     actions::{Action, HistoryMove, UndoMoveError, HistoryState},
     edges::{generate_edge_list, Edges},
     game::Game,
-    pieces::Piece,
+    pieces::Piece, zobrist::ZobristHashTable,
 };
 
 pub type PieceType = usize;
@@ -94,15 +98,31 @@ pub type AttackDirections<const T: usize> = Vec<BitBoard<T>>;
 
 pub type AttackLookup<const T: usize> = Vec<AttackDirections<T>>;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Eq)]
 pub struct Board<'a, const T: usize> {
     pub state: BoardState<T>,
     pub game: &'a Game<T>,
     pub attack_lookup: Vec<AttackLookup<T>>,
-    pub history: ArrayVec<HistoryMove<T>, 2048>,
+    pub history: ArrayVec<HistoryMove<T>, 2048>
 }
 
+impl<'a, const T: usize> Display for Board<'a, T> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
+        write!(f, "Board<{}>({})", self.game.name, self.to_fen())
+    }
+}
 
+impl<'a, const T: usize> Hash for Board<'a, T> {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.game.zobrist.compute(self).hash(state);
+    }
+}
+
+impl<'a, const T: usize> PartialEq for Board<'a, T> {
+    fn eq(&self, rhs: &Board<'a, T>) -> bool {
+        self.game.zobrist.compute(self) == self.game.zobrist.compute(rhs)
+    }
+}
 
 fn generate_forward_lookup(count: u32) -> ArrayVec<u32, 16> {
     let mut lookup = ArrayVec::new();
@@ -166,7 +186,7 @@ impl<'a, const T: usize> Board<'a, T> {
                 team_reverse_lookup,
                 turn_lookup,
                 turn_reverse_lookup,
-            },
+            }
         };
 
         board.generate_lookups();
@@ -182,7 +202,7 @@ impl<'a, const T: usize> Board<'a, T> {
             let board = *board & self.state.teams[team as usize];
             let piece = &self.game.pieces[ind];
 
-            for bit in board.iter_one_bits(board_len as u32) {
+            for bit in board.iter_set_bits(board_len as u32) {
                 bitboard |= piece.get_moves(self, BitBoard::from_lsb(bit), ind, team, mode);
             }
         }
@@ -200,7 +220,7 @@ impl<'a, const T: usize> Board<'a, T> {
             let board = *board & self.state.teams[team as usize];
             let piece = &self.game.pieces[ind];
 
-            for bit in board.iter_one_bits(board_len) {
+            for bit in board.iter_set_bits(board_len) {
                 mask |= piece.can_move_mask(
                     self,
                     BitBoard::from_lsb(bit),
@@ -226,7 +246,7 @@ impl<'a, const T: usize> Board<'a, T> {
             let board = *board & self.state.teams[team as usize];
             let piece = &self.game.pieces[ind];
 
-            for bit in board.iter_one_bits(board_len as u32) {
+            for bit in board.iter_set_bits(board_len as u32) {
                 piece.add_actions(&mut actions, self, ind, bit, team, mode);
             }
         }

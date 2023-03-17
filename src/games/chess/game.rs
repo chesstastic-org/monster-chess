@@ -7,9 +7,9 @@ use crate::{
             FenArgument, FenDecodeError, FenFullMoves, FenOptions, FenState, FenSubMoves,
             FenTeamArgument, PostProcess,
         },
-        game::{Game, MoveController},
+        game::{Game, MoveController, DefaultZobristController},
         pieces::{Piece, PieceSymbol},
-        AttackDirections, Board, Cols, PieceType,
+        AttackDirections, Board, Cols, PieceType, zobrist::ZobristHashTable,
     },
 };
 
@@ -17,7 +17,6 @@ use super::{pieces::{
     down, up, BishopPiece, KingPiece, KnightPiece, PawnPiece, QueenPiece, RookPiece,
 }, ChessMoveController, ChessPostProcess, ChessCastlingRights, ChessEnPassant, ChessResolution};
 
-pub const NORMAL_MODE: u32 = 0;
 pub const ATTACKS_MODE: u32 = 1;
 
 const PAWN: &dyn Piece<1> = &PawnPiece;
@@ -36,6 +35,9 @@ impl Chess {
             turns: 1,
             rows: 8,
             cols: 8,
+            squares: 64,
+            zobrist_controller: Box::new(DefaultZobristController),
+            zobrist: ZobristHashTable::<1>::generate(64, 2, 6, 65, || fastrand::u64(0..u64::MAX)),
             name: String::from("Chess"),
             pieces: vec![PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING],
             controller: Box::new(ChessMoveController),

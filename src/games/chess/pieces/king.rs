@@ -254,7 +254,7 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
             return;
         }
 
-        for bit in bit_actions.iter_one_bits(board_len) {
+        for bit in bit_actions.iter_set_bits(board_len) {
             actions.push(Some(Action {
                 from: Some(from),
                 to: bit,
@@ -313,7 +313,7 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
         let castle_left = castle_left_king | castle_left_rook;
         let castle_right = castle_right_king | castle_right_rook;
 
-        for rook in rooks.iter_one_bits(board_len) {
+        for rook in rooks.iter_set_bits(board_len) {
             let rook_board = BitBoard::from_lsb(rook);
 
             /*
