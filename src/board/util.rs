@@ -237,6 +237,34 @@ impl<'a, const T: usize> Board<'a, T> {
         (mask & target).is_set()
     }
 
+    pub fn generate_from_moves(&self, mode: u32, from: u32) -> Vec<Move> {
+        let team = self.state.moving_team;
+        let from_board = BitBoard::from_lsb(from);
+        let mut piece_type = usize::MAX;
+        for i in 0..self.game.pieces.len() {
+            if (from_board & self.state.pieces[i]).is_set() {
+                piece_type = i;
+                break;
+            }
+        }
+
+        let mut actions: Vec<Move> = Vec::with_capacity(self.state.squares as usize);
+
+        let piece = &self.game.pieces[piece_type];
+        piece.add_actions(&mut actions, self, piece_type, from, team, mode);
+
+        vec![]
+    }
+
+    pub fn generate_drop_moves(&self, mode: u32) -> Vec<Move> {
+        let team = self.state.moving_team;
+        let mut actions: Vec<Move> = Vec::with_capacity(self.state.squares as usize);
+
+        self.game.controller.add_moves(self, &mut actions);
+
+        vec![]
+    }
+
     pub fn generate_moves(&self, mode: u32) -> Vec<Move> {
         let board_len = self.state.squares;
         let mut actions: Vec<Move> = Vec::with_capacity(board_len as usize);

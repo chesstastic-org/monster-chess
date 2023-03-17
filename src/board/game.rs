@@ -59,17 +59,37 @@ pub trait MoveController<const T: usize> : Debug + Send + Sync {
     fn get_theoretical_moves(&self, board: &Board<T>) -> Vec<TheoreticalMove>;
 
     fn find_theoretical_action(&self, board: &Board<T>, action: TheoreticalMove) -> Option<Move> {
-        board.generate_moves(NORMAL_MODE).iter().find(|el| match el {
-            Move::Pass => action.is_pass(),
-            Move::Action(true_action) => match action {
-                TheoreticalMove::Pass => false,
-                TheoreticalMove::Action(action) => {
-                    action.info == true_action.info &&
-                    action.from == true_action.from &&
-                    action.to == true_action.to
+        match action {
+            TheoreticalMove::Action(action) => {
+                match action.from {
+                    Some(from) => {
+                        let moves = board.generate_from_moves(NORMAL_MODE, from);
+                        for true_action in moves {
+                            if let Move::Action(true_action) = true_action {
+                                if true_action.to == action.to && true_action.info == action.info {
+                                    return Some(Move::Action(true_action));
+                                }
+                            }
+                        }
+
+                        None
+                    }
+                    None => {
+                        let moves = board.generate_drop_moves(NORMAL_MODE);
+                        for true_action in moves {
+                            if let Move::Action(true_action) = true_action {
+                                if true_action.to == action.to && true_action.info == action.info {
+                                    return Some(Move::Action(true_action));
+                                }
+                            }
+                        }
+
+                        None
+                    }
                 }
             }
-        }).map(|el| *el)
+            TheoreticalMove::Pass => Some(Move::Pass)
+        }
     }
 
     /// This is an upper-bound of all max available moves from any given position.
