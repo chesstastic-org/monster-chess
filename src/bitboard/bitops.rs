@@ -77,10 +77,10 @@ impl<const T: usize> ops::Shl<u32> for BitBoard<T> {
             };
         }
 
-        let mut BitBoard = self.clone();
-        BitBoard <<= rhs;
+        let mut bit_board = self.clone();
+        bit_board <<= rhs;
 
-        BitBoard
+        bit_board
     }
 }
 
@@ -119,10 +119,10 @@ impl<const T: usize> ops::Shr<u32> for BitBoard<T> {
             };
         }
 
-        let mut BitBoard = self.clone();
-        BitBoard >>= rhs;
+        let mut bit_board = self.clone();
+        bit_board >>= rhs;
 
-        BitBoard
+        bit_board
     }
 }
 
