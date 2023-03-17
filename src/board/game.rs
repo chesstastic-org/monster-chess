@@ -2,7 +2,35 @@ use std::fmt::Debug;
 
 pub const NORMAL_MODE: u32 = 0;
 
-use super::{actions::Action, fen::FenOptions, pieces::Piece, Board, Rows, Cols, zobrist::ZobristHashTable};
+use super::{actions::{Action, ActionInfo, TheoreticalAction}, fen::FenOptions, pieces::Piece, Board, Rows, Cols, zobrist::ZobristHashTable};
+
+pub fn get_theoretical_moves_bound<const T: usize>(board: &Board<T>, max_info: ActionInfo) -> Vec<TheoreticalAction> {
+    let mut theoretical_moves = Vec::with_capacity((
+        (board.game.squares) + 1 * board.game.squares
+    ) as usize * max_info);
+
+    for to in 0..board.game.squares {
+        for info in 0..max_info {
+            theoretical_moves.push(TheoreticalAction {
+                from: None,
+                to,
+                info
+            });
+        }
+
+        for from in 0..board.game.squares {
+            for info in 0..max_info {
+                theoretical_moves.push(TheoreticalAction {
+                    from: Some(from),
+                    to,
+                    info
+                });
+            }
+        }
+    }
+
+    theoretical_moves
+}
 
 pub trait MoveController<const T: usize> : Debug + Send + Sync {
     fn transform_moves(&self, board: &mut Board<T>, mode: u32, actions: Vec<Option<Action>>) -> Vec<Option<Action>>;
@@ -21,6 +49,13 @@ pub trait MoveController<const T: usize> : Debug + Send + Sync {
             .find(|el| self.encode_action(board, el).contains(&action.to_string()))
             .map(|el| el.clone())
     }
+
+    /// This is fetches all theoretically possible moves. These moves might not even be actually possible, they're just used for indexing.
+    /// Ideally, this should be a list of all actually possible moves, but an upper bound is fine.
+    fn get_theoretical_moves(&self, board: &Board<T>) -> Vec<TheoreticalAction>;
+
+    /// This is an upper-bound of all max available moves from any given position.
+    fn get_max_available_moves(&self) -> u32;
 }
 
 pub enum GameResults {

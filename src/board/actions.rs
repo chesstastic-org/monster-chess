@@ -22,6 +22,15 @@ pub struct Action {
     pub info: ActionInfo
 }
 
+/// This is a theoretically possible action. It doesn't even have to be actually possible. 
+/// It's mainly there for Neural Networks to be able to index moves.
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+pub struct TheoreticalAction {
+    pub from: Option<u32>,
+    pub to: u32,
+    pub info: ActionInfo
+}
+
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub struct PreviousBoard<const T: usize>(pub BitBoard<T>);
 

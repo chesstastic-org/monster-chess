@@ -1,4 +1,4 @@
-use crate::{board::{game::MoveController, Board, actions::Action}, bitboard::BitBoard};
+use crate::{board::{game::{MoveController, get_theoretical_moves_bound}, Board, actions::{Action, TheoreticalAction}}, bitboard::BitBoard};
 
 use super::ATTACKS_MODE;
 
@@ -65,5 +65,13 @@ impl<const T: usize> MoveController<T> for ChessMoveController<T> {
                 None => "0000".to_string()
             }   
         ]
+    }
+
+    fn get_theoretical_moves(&self, board: &Board<T>) -> Vec<TheoreticalAction> {
+        get_theoretical_moves_bound(board, 4)
+    }
+
+    fn get_max_available_moves(&self) -> u32 {
+        220
     }
 }
