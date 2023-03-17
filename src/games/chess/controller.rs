@@ -67,8 +67,8 @@ impl<const T: usize> MoveController<T> for ChessMoveController<T> {
         ]
     }
 
-    fn get_theoretical_moves(&self, board: &Board<T>) -> Vec<TheoreticalAction> {
-        get_theoretical_moves_bound(board, 4)
+    fn get_theoretical_moves(&self, board: &Board<T>) -> Vec<Option<TheoreticalAction>> {
+        get_theoretical_moves_bound(board, 4, false)
     }
 
     fn get_max_available_moves(&self) -> u32 {

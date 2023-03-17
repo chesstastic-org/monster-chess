@@ -4,27 +4,31 @@ pub const NORMAL_MODE: u32 = 0;
 
 use super::{actions::{Action, ActionInfo, TheoreticalAction}, fen::FenOptions, pieces::Piece, Board, Rows, Cols, zobrist::ZobristHashTable};
 
-pub fn get_theoretical_moves_bound<const T: usize>(board: &Board<T>, max_info: ActionInfo) -> Vec<TheoreticalAction> {
-    let mut theoretical_moves = Vec::with_capacity((
+pub fn get_theoretical_moves_bound<const T: usize>(board: &Board<T>, max_info: ActionInfo, can_pass: bool) -> Vec<Option<TheoreticalAction>> {
+    let mut theoretical_moves = Vec::with_capacity(((
         (board.game.squares) + 1 * board.game.squares
-    ) as usize * max_info);
+    ) as usize * max_info) + (can_pass as usize));
+
+    if can_pass {
+        theoretical_moves.push(None);
+    }
 
     for to in 0..board.game.squares {
         for info in 0..max_info {
-            theoretical_moves.push(TheoreticalAction {
+            theoretical_moves.push(Some(TheoreticalAction {
                 from: None,
                 to,
                 info
-            });
+            }));
         }
 
         for from in 0..board.game.squares {
             for info in 0..max_info {
-                theoretical_moves.push(TheoreticalAction {
+                theoretical_moves.push(Some(TheoreticalAction {
                     from: Some(from),
                     to,
                     info
-                });
+                }));
             }
         }
     }
@@ -52,7 +56,21 @@ pub trait MoveController<const T: usize> : Debug + Send + Sync {
 
     /// This is fetches all theoretically possible moves. These moves might not even be actually possible, they're just used for indexing.
     /// Ideally, this should be a list of all actually possible moves, but an upper bound is fine.
-    fn get_theoretical_moves(&self, board: &Board<T>) -> Vec<TheoreticalAction>;
+    fn get_theoretical_moves(&self, board: &Board<T>) -> Vec<Option<TheoreticalAction>>;
+
+    fn find_theoretical_action(&self, board: &Board<T>, action: Option<TheoreticalAction>) -> Option<Option<Action>> {
+        board.generate_moves(NORMAL_MODE).iter().find(|el| match el {
+            None => action.is_none(),
+            Some(true_action) => match action {
+                None => false,
+                Some(action) => {
+                    action.info == true_action.info &&
+                    action.from == true_action.from &&
+                    action.to == true_action.to
+                }
+            }
+        }).map(|el| *el)
+    }
 
     /// This is an upper-bound of all max available moves from any given position.
     fn get_max_available_moves(&self) -> u32;

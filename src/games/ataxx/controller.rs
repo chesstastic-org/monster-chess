@@ -85,8 +85,8 @@ impl<const T: usize> MoveController<T> for AtaxxMoveController {
         ]
     }
 
-    fn get_theoretical_moves(&self, board: &Board<T>) -> Vec<TheoreticalAction> {
-        get_theoretical_moves_bound(board, 0)
+    fn get_theoretical_moves(&self, board: &Board<T>) -> Vec<Option<TheoreticalAction>> {
+        get_theoretical_moves_bound(board, 0, true)
     }
 
     fn get_max_available_moves(&self) -> u32 {
