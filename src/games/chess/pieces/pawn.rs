@@ -388,6 +388,9 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
 
         let piece_types = board.game.pieces.len();
 
+        let captures = self.get_attack_lookup(board, piece_type).expect("Could not find pawn attack lookup")
+            [from as usize][team as usize];
+
         for bit in bit_actions.iter_set_bits(board.state.squares) {
             if (BitBoard::from_lsb(bit) & promotion_rows).is_set() {
                 for promotion_piece_type in 0..piece_types {
@@ -413,7 +416,7 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
                             let conditions = last_action.piece_type == 0
                                 && (last_action.to.abs_diff(from) == (2 * (cols)))
                                 && (last_action.to.abs_diff(bit) == (cols))
-                                && (from.abs_diff(bit) % cols != 0);
+                                && (captures & BitBoard::from_lsb(bit)).is_set();
 
                             if conditions {
                                 en_passant = true;

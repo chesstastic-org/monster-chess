@@ -180,7 +180,10 @@ impl<const T: usize> FenArgument<T> for ChessEnPassant {
                             return "-".to_string();
                         }
     
-                        return board.encode_position(last_action.to);
+                        let to_bitboard = BitBoard::<1>::from_lsb(last_action.to);
+                        let en_passant = down(&to_bitboard, 1, board.state.cols, board.state.team_reverse_lookup[board.state.moving_team as usize]);
+
+                        return board.encode_position(en_passant.bitscan_forward());
                     }
                     None => "-".to_string()
                 }
