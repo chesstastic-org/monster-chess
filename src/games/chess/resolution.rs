@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 
-use crate::board::{game::{Resolution, GameResults}, Board, actions::Action};
+use crate::board::{game::{Resolution, GameResults}, Board, actions::{Action, Move}};
 
 use super::ATTACKS_MODE;
 
@@ -8,7 +8,7 @@ use super::ATTACKS_MODE;
 pub struct ChessResolution<const T: usize>;
 
 impl<const T: usize> Resolution<T> for ChessResolution<T> {
-    fn resolution(&self, board: &mut Board<T>, legal_moves: &Vec<Option<Action>>) -> GameResults {
+    fn resolution(&self, board: &mut Board<T>, legal_moves: &Vec<Move>) -> GameResults {
         if legal_moves.len() == 0 {
             let kings = board.state.pieces[5];
             let king_board = board.state.teams[board.state.moving_team as usize] & kings;

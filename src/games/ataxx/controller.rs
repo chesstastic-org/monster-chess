@@ -1,13 +1,13 @@
 use std::collections::HashSet;
 
-use crate::{board::{game::{MoveController, NORMAL_MODE, get_theoretical_moves_bound}, Board, actions::{Action, TheoreticalAction}}, bitboard::BitBoard};
+use crate::{board::{game::{MoveController, NORMAL_MODE, get_theoretical_moves_bound}, Board, actions::{Action, TheoreticalAction, Move, TheoreticalMove}}, bitboard::BitBoard};
 
 use super::is_single_move;
 
 #[derive(Debug)]
 pub struct AtaxxMoveController;
 impl<const T: usize> MoveController<T> for AtaxxMoveController {
-    fn is_legal(&self, board: &mut Board<T>, action: &Option<Action>) -> bool {
+    fn is_legal(&self, board: &mut Board<T>, action: &Move) -> bool {
         return true;
     }
 
@@ -15,7 +15,7 @@ impl<const T: usize> MoveController<T> for AtaxxMoveController {
         return false;
     }
 
-    fn transform_moves(&self, board: &mut Board<T>, mode: u32, actions: Vec<Option<Action>>) -> Vec<Option<Action>> {
+    fn transform_moves(&self, board: &mut Board<T>, mode: u32, actions: Vec<Move>) -> Vec<Move> {
         // No Legal Moves
         if actions.len() == 0 {
             let board_mask = BitBoard::starting_at_lsb(0, 49);
@@ -24,11 +24,11 @@ impl<const T: usize> MoveController<T> for AtaxxMoveController {
 
             let team_squares = board.state.teams[board.state.moving_team as usize];
 
-            board.make_move(&None);
+            board.make_move(&Move::Pass);
             let opposing_moves = board.generate_moves(NORMAL_MODE).len();
             board.undo_move();
             if opposing_moves > 0 && empty_squares.count_ones() > 0 && team_squares.count_ones() > 0  {
-                vec![ None ]
+                vec![ Move::Pass ]
             } else {
                 actions
             }
@@ -38,7 +38,7 @@ impl<const T: usize> MoveController<T> for AtaxxMoveController {
             let mut new_actions = Vec::with_capacity(actions.len());
 
             for action in actions {
-                if let Some(action) = action {
+                if let Move::Action(action) = action {
                     if is_single_move(&action) {
                         // Single Move
 
@@ -57,10 +57,10 @@ impl<const T: usize> MoveController<T> for AtaxxMoveController {
         }
     }
 
-    fn encode_action(&self, board: &Board<T>, action: &Option<Action>) -> Vec<String> {
+    fn encode_action(&self, board: &Board<T>, action: &Move) -> Vec<String> {
         vec![
             match action {
-                Some(action) => {
+                Move::Action(action) => {
                     if is_single_move(&action) {
                         format!(
                             "{}{}",
@@ -80,12 +80,12 @@ impl<const T: usize> MoveController<T> for AtaxxMoveController {
                         }
                     }
                 },
-                None => "0000".to_string()
+                Move::Pass => "0000".to_string()
             }   
         ]
     }
 
-    fn get_theoretical_moves(&self, board: &Board<T>) -> Vec<Option<TheoreticalAction>> {
+    fn get_theoretical_moves(&self, board: &Board<T>) -> Vec<TheoreticalMove> {
         get_theoretical_moves_bound(board, 0, true)
     }
 

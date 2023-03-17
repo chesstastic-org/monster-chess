@@ -8,6 +8,7 @@ use fastrand;
 
 use crate::bitboard::BitBoard;
 
+use super::actions::Move;
 use super::{
     actions::{Action, HistoryMove, UndoMoveError, HistoryState},
     edges::{generate_edge_list, Edges},
@@ -236,9 +237,9 @@ impl<'a, const T: usize> Board<'a, T> {
         (mask & target).is_set()
     }
 
-    pub fn generate_moves(&self, mode: u32) -> Vec<Option<Action>> {
+    pub fn generate_moves(&self, mode: u32) -> Vec<Move> {
         let board_len = self.state.squares;
-        let mut actions: Vec<Option<Action>> = Vec::with_capacity(board_len as usize);
+        let mut actions: Vec<Move> = Vec::with_capacity(board_len as usize);
 
         let team = self.state.moving_team;
 
@@ -259,7 +260,7 @@ impl<'a, const T: usize> Board<'a, T> {
     /*
         Don't use when writing an engine directly; use `generate_moves` and `move_restrictions.is_legal` to avoid extra legality checks during pruning.
     */
-    pub fn generate_legal_moves(&mut self, mode: u32) -> Vec<Option<Action>> {
+    pub fn generate_legal_moves(&mut self, mode: u32) -> Vec<Move> {
         let moves = self.generate_moves(mode);
         self.game.controller.transform_moves(self, mode, moves)
     }
@@ -284,18 +285,18 @@ impl<'a, const T: usize> Board<'a, T> {
         }
     }
 
-    pub fn make_move(&mut self, action: &Option<Action>) {
+    pub fn make_move(&mut self, action: &Move) {
         match action {
-            Some(action) => {
+            Move::Action(action) => {
                 if action.from.is_some() {
                     self.game.pieces[action.piece_type].make_move(self, action);
                 } else {
                     self.game.controller.make_drop_move(self, action);
                 }
             }
-            None => {
+            Move::Pass => {
                 self.history.push(HistoryMove {
-                    action: None,
+                    action: Move::Pass,
                     state: HistoryState::None
                 });
                 update_turns(&mut self.state);
@@ -309,14 +310,14 @@ impl<'a, const T: usize> Board<'a, T> {
         match self.history.last() {
             Some(history_move) => {
                 match history_move.action {
-                    Some(history_action) => {
+                    Move::Action(history_action) => {
                         self.game.pieces[history_action.piece_type].undo_move(
                             &mut self.state,
                             self.game,
                             history_move,
                         );
                     }
-                    None => {
+                    Move::Pass => {
                         reverse_turns(&mut self.state, &self.game);
                     }
                 };

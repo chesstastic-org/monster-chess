@@ -1,6 +1,6 @@
 use std::usize;
 
-use crate::{board::{pieces::{Piece, PieceSymbol}, Board, AttackLookup, AttackDirections, actions::{Action, PreviousBoard, HistoryMove, HistoryState, HistoryUpdate, IndexedPreviousBoard}, edges::Edges, Cols, update_turns}, bitboard::BitBoard};
+use crate::{board::{pieces::{Piece, PieceSymbol}, Board, AttackLookup, AttackDirections, actions::{Action, PreviousBoard, HistoryMove, HistoryState, HistoryUpdate, IndexedPreviousBoard, Move}, edges::Edges, Cols, update_turns}, bitboard::BitBoard};
 
 use super::is_single_move;
 
@@ -75,7 +75,7 @@ impl<const T: usize> Piece<T> for StonePiece {
             let other_team = board.state.team_lookup[team] as usize;
 
             board.history.push(HistoryMove {
-                action: Some(*action),
+                action: Move::Action(*action),
                 state: HistoryState::Any {
                     all_pieces: PreviousBoard(board.state.all_pieces),
                     first_move: PreviousBoard(board.state.first_move),

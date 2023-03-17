@@ -66,6 +66,31 @@ pub enum HistoryState<const T: usize> {
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct HistoryMove<const T: usize> {
-    pub action: Option<Action>,
+    pub action: Move,
     pub state: HistoryState<T>,
 }
+
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+pub enum SimpleMove<T> {
+    Pass,
+    Action(T)
+}
+
+impl<T> SimpleMove<T> {
+    pub fn is_pass(&self) -> bool {
+        match self {
+            SimpleMove::Pass => true,
+            SimpleMove::Action(_) => false
+        }
+    }
+
+    pub fn is_action(&self) -> bool {
+        match self {
+            SimpleMove::Pass => false,
+            SimpleMove::Action(_) => true
+        }
+    }
+}
+
+pub type Move = SimpleMove<Action>;
+pub type TheoreticalMove = SimpleMove<TheoreticalAction>;

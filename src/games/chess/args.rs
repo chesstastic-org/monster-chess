@@ -1,7 +1,7 @@
 use crate::{
     bitboard::{Direction, BitBoard},
     board::{
-        actions::{Action, HistoryMove, HistoryState, IndexedPreviousBoard, PreviousBoard},
+        actions::{Action, HistoryMove, HistoryState, IndexedPreviousBoard, PreviousBoard, Move},
         edges::Edges,
         fen::{
             FenArgument, FenDecodeError, FenFullMoves, FenOptions, FenState, FenSubMoves,
@@ -146,7 +146,7 @@ impl<const T: usize> FenArgument<T> for ChessEnPassant {
         let from = down::<T>(&to, 2, cols, previous_team);
 
         board.history.push(HistoryMove {
-            action: Some(Action {
+            action: Move::Action(Action {
                 from: Some(from.bitscan_forward()),
                 to: to.bitscan_forward(),
                 team: previous_team,
@@ -170,7 +170,7 @@ impl<const T: usize> FenArgument<T> for ChessEnPassant {
             last_move.expect("The last move for exporting an en passant FEN must be Some.");
 
         match last_move.action {
-            Some(last_action) => {
+            Move::Action(last_action) => {
                 if last_action.piece_type != 0 {
                     return "-".to_string();
                 }
@@ -189,7 +189,7 @@ impl<const T: usize> FenArgument<T> for ChessEnPassant {
                     None => "-".to_string()
                 }
             }
-            None => {
+            Move::Pass => {
                 return "-".to_string();
             }
         }

@@ -5,7 +5,7 @@ use crate::bitboard::BitBoard;
 use super::{
     actions::{
         Action, HistoryMove, HistoryState, HistoryUpdate, IndexedPreviousBoard, PreviousBoard,
-        UndoMoveError,
+        UndoMoveError, Move,
     },
     game::Game,
     AttackDirections, AttackLookup, Board, BoardState, Cols, PieceType, Rows, update_turns, reverse_turns,
@@ -87,7 +87,7 @@ pub trait Piece<const T: usize> : Debug + Send + Sync {
         }
 
         let history_move = HistoryMove {
-            action: Some(*action),
+            action: Move::Action(*action),
             state: HistoryState::Any {
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 first_move: PreviousBoard(board.state.first_move),
@@ -136,7 +136,7 @@ pub trait Piece<const T: usize> : Debug + Send + Sync {
         let color: usize = action.team as usize;
 
         board.history.push(HistoryMove {
-            action: Some(*action),
+            action: Move::Action(*action),
             state: HistoryState::Single {
                 team: IndexedPreviousBoard(color, board.state.teams[color]),
                 piece: IndexedPreviousBoard(piece_type, board.state.pieces[piece_type]),
@@ -211,7 +211,7 @@ pub trait Piece<const T: usize> : Debug + Send + Sync {
 
     fn add_actions(
         &self,
-        actions: &mut Vec<Option<Action>>,
+        actions: &mut Vec<Move>,
         board: &Board<T>,
         piece_type: usize,
         from: u32,
@@ -228,7 +228,7 @@ pub trait Piece<const T: usize> : Debug + Send + Sync {
         }
 
         for bit in bit_actions.iter_set_bits(board.state.squares) {
-            actions.push(Some(Action {
+            actions.push(Move::Action(Action {
                 from: Some(from),
                 to: bit,
                 team,

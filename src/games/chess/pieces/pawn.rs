@@ -2,7 +2,7 @@ use crate::{
     bitboard::{Direction, BitBoard},
     board::{
         actions::{
-            Action, HistoryMove, HistoryState, HistoryUpdate, IndexedPreviousBoard, PreviousBoard,
+            Action, HistoryMove, HistoryState, HistoryUpdate, IndexedPreviousBoard, PreviousBoard, Move,
         },
         edges::Edges,
         pieces::{Piece, PieceSymbol},
@@ -57,7 +57,7 @@ impl<const T: usize> PawnPiece<T> {
         };
 
         board.history.push(HistoryMove {
-            action: Some(*action),
+            action: Move::Action(*action),
             state: HistoryState::Any {
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 first_move: PreviousBoard(board.state.first_move),
@@ -203,7 +203,7 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
         }
 
         if let Some(last_move) = board.history.last() {
-            if let Some(last_action) = last_move.action {
+            if let Move::Action(last_action) = last_move.action {
                 if let Some(from) = last_action.from {
                     let conditions = last_action.piece_type == 0
                         && (last_action.to.abs_diff(from) == (2 * (cols)));
@@ -250,7 +250,7 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
         }
 
         let mut history_move = HistoryMove {
-            action: Some(*action),
+            action: Move::Action(*action),
             state: HistoryState::Any {
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 first_move: PreviousBoard(board.state.first_move),
@@ -324,7 +324,7 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
         let color: usize = action.team as usize;
 
         board.history.push(HistoryMove {
-            action: Some(*action),
+            action: Move::Action(*action),
             state: HistoryState::Single {
                 team: IndexedPreviousBoard(color, board.state.teams[color]),
                 piece: IndexedPreviousBoard(piece_type, board.state.pieces[piece_type]),
@@ -367,7 +367,7 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
 
     fn add_actions(
         &self,
-        actions: &mut Vec<Option<Action>>,
+        actions: &mut Vec<Move>,
         board: &Board<T>,
         piece_type: usize,
         from: u32,
@@ -400,7 +400,7 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
                     if promotion_piece_type == 5 {
                         continue;
                     }
-                    actions.push(Some(Action {
+                    actions.push(Move::Action(Action {
                         from: Some(from),
                         to: bit,
                         team,
@@ -412,7 +412,7 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
             } else {
                 let mut en_passant = false;
                 if let Some(last_move) = board.history.last() {
-                    if let Some(last_action) = last_move.action {
+                    if let Move::Action(last_action) = last_move.action {
                         if let Some(from) = last_action.from {
                             let conditions = last_action.piece_type == 0
                                 && (last_action.to.abs_diff(from) == (2 * (cols)))
@@ -426,7 +426,7 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
                     }
                 }
 
-                actions.push(Some(Action {
+                actions.push(Move::Action(Action {
                     from: Some(from),
                     to: bit,
                     team,

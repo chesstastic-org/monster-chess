@@ -2,7 +2,7 @@ use crate::{
     bitboard::{Direction, BitBoard},
     board::{
         actions::{
-            Action, HistoryMove, HistoryState, HistoryUpdate, IndexedPreviousBoard, PreviousBoard,
+            Action, HistoryMove, HistoryState, HistoryUpdate, IndexedPreviousBoard, PreviousBoard, Move,
         },
         edges::Edges,
         pieces::{Piece, PieceSymbol},
@@ -62,7 +62,7 @@ impl<const T: usize> KingPiece<T> {
         let piece_type = action.piece_type;
 
         let history_move = HistoryMove {
-            action: Some(*action),
+            action: Move::Action(*action),
             state: HistoryState::Any {
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 first_move: PreviousBoard(board.state.first_move),
@@ -195,7 +195,7 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
         }
 
         let history_move = HistoryMove {
-            action: Some(*action),
+            action: Move::Action(*action),
             state: HistoryState::Any {
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 first_move: PreviousBoard(board.state.first_move),
@@ -235,7 +235,7 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
 
     fn add_actions(
         &self,
-        actions: &mut Vec<Option<Action>>,
+        actions: &mut Vec<Move>,
         board: &Board<T>,
         piece_type: usize,
         from: u32,
@@ -255,7 +255,7 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
         }
 
         for bit in bit_actions.iter_set_bits(board_len) {
-            actions.push(Some(Action {
+            actions.push(Move::Action(Action {
                 from: Some(from),
                 to: bit,
                 team,
@@ -365,7 +365,7 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
                 continue;
             }
 
-            actions.push(Some(Action {
+            actions.push(Move::Action(Action {
                 from: Some(from),
                 to: rook,
                 team,

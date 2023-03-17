@@ -1,5 +1,5 @@
 use super::{
-    actions::{Action, HistoryMove, UndoMoveError},
+    actions::{Action, HistoryMove, UndoMoveError, Move},
     edges::Edges,
     game::Game,
     pieces::Piece,
@@ -39,11 +39,11 @@ impl<'a, const T: usize> Board<'a, T> {
         Ok(col + (self.state.cols * row))
     }
 
-    pub fn encode_action(&self, action: &Option<Action>) -> String {
+    pub fn encode_action(&self, action: &Move) -> String {
         self.game.controller.encode_action(self, action)[0].clone()
     }
 
-    pub fn decode_action(&mut self, action: &str, mode: u32) -> Option<Option<Action>> {
+    pub fn decode_action(&mut self, action: &str, mode: u32) -> Option<Move> {
         self.game.controller.decode_action(self, action, mode)
     }
 }

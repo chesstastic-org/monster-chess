@@ -1,4 +1,4 @@
-use crate::board::{game::ZobristController, Board, zobrist::ZobristHashTable};
+use crate::board::{game::ZobristController, Board, zobrist::ZobristHashTable, actions::Move};
 
 #[derive(Debug)]
 pub struct ChessZobrist<const T: usize>;
@@ -15,7 +15,7 @@ impl<const T: usize> ZobristController<T> for ChessZobrist<T> {
             last_move.expect("The last move for exporting an en passant FEN must be Some.");
 
         match last_move.action {
-            Some(last_action) => {
+            Move::Action(last_action) => {
                 if last_action.piece_type != 0 {
                     *hash ^= zobrist.table[zobrist.base_len];
                     return;
@@ -34,7 +34,7 @@ impl<const T: usize> ZobristController<T> for ChessZobrist<T> {
                     }
                 }
             }
-            None => {
+            Move::Pass => {
                 *hash ^= zobrist.table[zobrist.base_len];
             }
         }
