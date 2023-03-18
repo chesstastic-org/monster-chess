@@ -24,9 +24,9 @@ impl<const T: usize> MoveController<T> for AtaxxMoveController {
 
             let team_squares = board.state.teams[board.state.moving_team as usize];
 
-            board.make_move(&None);
+            let undo = board.make_move(&None);
             let opposing_moves = board.generate_moves(NORMAL_MODE).len();
-            board.undo_move();
+            board.undo_move(&undo);
             if opposing_moves > 0 && empty_squares.count_ones() > 0 && team_squares.count_ones() > 0  {
                 vec![ None ]
             } else {

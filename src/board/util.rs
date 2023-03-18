@@ -102,8 +102,7 @@ pub type AttackLookup<const T: usize> = Vec<AttackDirections<T>>;
 pub struct Board<'a, const T: usize> {
     pub state: BoardState<T>,
     pub game: &'a Game<T>,
-    pub attack_lookup: Vec<AttackLookup<T>>,
-    pub history: ArrayVec<HistoryMove<T>, 2048>
+    pub attack_lookup: Vec<AttackLookup<T>>
 }
 
 impl<'a, const T: usize> Display for Board<'a, T> {
@@ -166,7 +165,6 @@ impl<'a, const T: usize> Board<'a, T> {
         let mut board = Board {
             attack_lookup: vec![],
             game,
-            history: ArrayVec::new(),
             state: BoardState {
                 all_pieces: BitBoard::new(),
                 first_move: BitBoard::new(),
@@ -284,52 +282,38 @@ impl<'a, const T: usize> Board<'a, T> {
         }
     }
 
-    pub fn make_move(&mut self, action: &Option<Action>) {
+    pub fn make_move(&mut self, action: &Option<Action>) -> Option<HistoryMove<T>> {
         match action {
             Some(action) => {
                 if action.from.is_some() {
-                    self.game.pieces[action.piece_type].make_move(self, action);
+                    self.game.pieces[action.piece_type].make_move(self, action)
                 } else {
-                    self.game.controller.make_drop_move(self, action);
+                    self.game.controller.make_drop_move(self, action)
                 }
             }
             None => {
-                self.history.push(HistoryMove {
+                update_turns(&mut self.state);
+                return Some(HistoryMove {
                     action: None,
                     state: HistoryState::None
                 });
-                update_turns(&mut self.state);
-                return;
             }
         }
     }
 
     #[inline(never)]
-    pub fn undo_move(&mut self) {
-        match self.history.last() {
-            Some(history_move) => {
-                match history_move.action {
-                    Some(history_action) => {
-                        self.game.pieces[history_action.piece_type].undo_move(
-                            &mut self.state,
-                            self.game,
-                            history_move,
-                        );
-                    }
-                    None => {
-                        reverse_turns(&mut self.state, &self.game);
-                    }
-                };
-                self.history.pop();
+    pub fn undo_move(&mut self, history_move: HistoryMove<T>) {
+        match history_move.action {
+            Some(history_action) => {
+                self.game.pieces[history_action.piece_type].undo_move(
+                    &mut self.state,
+                    self.game,
+                    &history_move
+                );
             }
             None => {
-                // We panic instead of making it an error because this is an incredible unlikely error that almost 
-                // certainly won't happen in monster-chess's code, and consumers would easily be able 
-                // to come across and handle this.
-                // It isn't worth the effort having to propagate the error through so many functions.
-
-                panic!("Can't undo move when there's no history moves.");
+                reverse_turns(&mut self.state, &self.game);
             }
-        }
+        };
     }
 }

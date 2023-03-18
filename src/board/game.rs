@@ -2,7 +2,7 @@ use std::fmt::Debug;
 
 pub const NORMAL_MODE: u32 = 0;
 
-use super::{actions::{Action, ActionInfo, TheoreticalAction}, fen::FenOptions, pieces::Piece, Board, Rows, Cols, zobrist::ZobristHashTable};
+use super::{actions::{Action, ActionInfo, TheoreticalAction, HistoryMove}, fen::FenOptions, pieces::Piece, Board, Rows, Cols, zobrist::ZobristHashTable};
 
 pub fn get_theoretical_moves_bound<const T: usize>(board: &Board<T>, max_info: ActionInfo) -> Vec<TheoreticalAction> {
     let mut theoretical_moves = Vec::with_capacity((
@@ -38,7 +38,7 @@ pub trait MoveController<const T: usize> : Debug + Send + Sync {
     fn use_pseudolegal(&self) -> bool;
 
     fn add_moves(&self, board: &Board<T>, actions: &mut Vec<Option<Action>>) {}
-    fn make_drop_move(&self, board: &mut Board<T>, action: &Action) {
+    fn make_drop_move(&self, board: &mut Board<T>, action: &Action) -> Option<HistoryMove<T>> {
         panic!("Drop moves aren't supported. Make sure to override `make_drop_move` in your game's MoveController to support them.");
     }
 
