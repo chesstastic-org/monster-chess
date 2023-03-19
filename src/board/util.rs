@@ -104,7 +104,7 @@ pub struct Board<'a, const T: usize> {
     pub state: BoardState<T>,
     pub game: &'a Game<T>,
     pub attack_lookup: Vec<AttackLookup<T>>,
-    pub history: ArrayVec<HistoryMove<T>, 2048>
+    pub history: ArrayVec<Move, 64>
 }
 
 impl<'a, const T: usize> Display for Board<'a, T> {
@@ -313,43 +313,69 @@ impl<'a, const T: usize> Board<'a, T> {
         }
     }
 
-    pub fn make_move(&mut self, action: &Move) {
+    pub fn retrieve_first_history_move(&mut self, action: Move) -> Option<Move> {
+        if self.game.saved_last_moves == 0 {
+            return None;
+        }
+
+        self.history.push(action);
+
+        if self.history.len() > self.game.saved_last_moves.into() {
+            self.history.swap_pop(0)
+        } else {
+            None
+        }
+    }
+
+    pub fn reset_first_history_move(&mut self, first_history_move: Option<Move>) {
+        if self.game.saved_last_moves == 0 {
+            return;
+        }
+
+        if let Some(first_history_move) = first_history_move {
+            self.history.pop();
+            self.history.insert(0, first_history_move);
+        }
+    }
+
+    pub fn make_move(&mut self, action: &Move) -> Option<HistoryMove<T>> {
         match action {
             Move::Action(action) => {
                 if action.from.is_some() {
-                    self.game.pieces[action.piece_type].make_move(self, action);
+                    self.game.pieces[action.piece_type].make_move(self, action)
                 } else {
-                    self.game.controller.make_drop_move(self, action);
+                    self.game.controller.make_drop_move(self, action)
                 }
             }
             Move::Pass => {
-                self.history.push(HistoryMove {
+                let history = HistoryMove {
                     action: Move::Pass,
-                    state: HistoryState::None
-                });
+                    state: HistoryState::None,
+                    first_history_move: self.retrieve_first_history_move(Move::Pass)
+                };
                 update_turns(&mut self.state);
-                return;
+                Some(history)
             }
         }
     }
 
     #[inline(never)]
-    pub fn undo_move(&mut self) {
-        match self.history.last() {
+    pub fn undo_move(&mut self, undo: Option<HistoryMove<T>>) {
+        match undo {
             Some(history_move) => {
+                self.reset_first_history_move(history_move.first_history_move);
                 match history_move.action {
                     Move::Action(history_action) => {
                         self.game.pieces[history_action.piece_type].undo_move(
                             &mut self.state,
                             self.game,
-                            history_move,
+                            &history_move
                         );
                     }
                     Move::Pass => {
                         reverse_turns(&mut self.state, &self.game);
                     }
                 };
-                self.history.pop();
             }
             None => {
                 // We panic instead of making it an error because this is an incredible unlikely error that almost 
@@ -357,7 +383,7 @@ impl<'a, const T: usize> Board<'a, T> {
                 // to come across and handle this.
                 // It isn't worth the effort having to propagate the error through so many functions.
 
-                panic!("Can't undo move when there's no history moves.");
+                panic!("Can't undo move when `undo` is None.");
             }
         }
     }

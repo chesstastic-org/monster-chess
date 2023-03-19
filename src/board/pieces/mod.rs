@@ -71,7 +71,7 @@ pub trait Piece<const T: usize> : Debug + Send + Sync {
         piece_type: usize,
         from: BitBoard<T>,
         to: BitBoard<T>,
-    ) {
+    ) -> Option<HistoryMove<T>> {
         let color: usize = action.team as usize;
         let captured_color: usize = if (to & board.state.teams[0]).is_set() {
             0
@@ -85,9 +85,12 @@ pub trait Piece<const T: usize> : Debug + Send + Sync {
                 break;
             }
         }
+        
+        
 
         let history_move = HistoryMove {
             action: Move::Action(*action),
+            first_history_move: board.retrieve_first_history_move(Move::Action(*action)),
             state: HistoryState::Any {
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 first_move: PreviousBoard(board.state.first_move),
@@ -106,9 +109,8 @@ pub trait Piece<const T: usize> : Debug + Send + Sync {
                         board.state.pieces[captured_piece_type],
                     )),
                 ],
-            },
+            }
         };
-        board.history.push(history_move);
 
         board.state.teams[captured_color] ^= to;
         board.state.teams[color] ^= from;
@@ -123,6 +125,8 @@ pub trait Piece<const T: usize> : Debug + Send + Sync {
         board.state.first_move &= !from;
         board.state.first_move &= !to;
         // We actually don't need to swap the blockers. A blocker will still exist on `to`, just not on `from`.
+
+        Some(history_move)
     }
 
     fn make_normal_move(
@@ -132,18 +136,19 @@ pub trait Piece<const T: usize> : Debug + Send + Sync {
         piece_type: usize,
         from: BitBoard<T>,
         to: BitBoard<T>,
-    ) {
+    ) -> Option<HistoryMove<T>> {
         let color: usize = action.team as usize;
 
-        board.history.push(HistoryMove {
+        let history_move = HistoryMove {
             action: Move::Action(*action),
+            first_history_move: board.retrieve_first_history_move(Move::Action(*action)),
             state: HistoryState::Single {
                 team: IndexedPreviousBoard(color, board.state.teams[color]),
                 piece: IndexedPreviousBoard(piece_type, board.state.pieces[piece_type]),
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 first_move: PreviousBoard(board.state.first_move),
             },
-        });
+        };
 
         board.state.teams[color] ^= from;
         board.state.teams[color] |= to;
@@ -155,20 +160,26 @@ pub trait Piece<const T: usize> : Debug + Send + Sync {
         board.state.all_pieces |= to;
 
         board.state.first_move &= !from;
+
+        Some(history_move)
     }
 
-    fn make_move(&self, board: &mut Board<T>, action: &Action) {
+    fn make_move(&self, board: &mut Board<T>, action: &Action) -> Option<HistoryMove<T>> {
         if let Some(from) = action.from {
             let from = BitBoard::from_lsb(from);
             let to = BitBoard::from_lsb(action.to);
 
-            if (board.state.all_pieces & to).is_empty() {
-                self.make_normal_move(board, action, action.piece_type, from, to);
+            let history_move = if (board.state.all_pieces & to).is_empty() {
+                self.make_normal_move(board, action, action.piece_type, from, to)
             } else {
-                self.make_capture_move(board, action, action.piece_type, from, to);
-            }
+                self.make_capture_move(board, action, action.piece_type, from, to)
+            };
 
             update_turns(&mut board.state);
+
+            history_move
+        } else {
+            None
         }
     }
 

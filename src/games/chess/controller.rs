@@ -28,11 +28,11 @@ impl<const T: usize> MoveController<T> for ChessMoveController<T> {
 
                 let current_team = board.state.moving_team;
 
-                board.make_move(&Move::Action(*action));
+                let undo = board.make_move(&Move::Action(*action));
                 let kings = board.state.pieces[5];
                 let king_board = board.state.teams[current_team as usize] & kings;
                 let in_check = board.can_move(board.state.moving_team, king_board, ATTACKS_MODE);
-                board.undo_move();
+                board.undo_move(undo);
                 !in_check
             }
             Move::Pass => {

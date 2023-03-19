@@ -36,6 +36,7 @@ impl Chess {
             rows: 8,
             cols: 8,
             squares: 64,
+            saved_last_moves: 1,
             zobrist_controller: Box::new(DefaultZobristController),
             zobrist: ZobristHashTable::<1>::generate(64, 2, 6, 65, || fastrand::u64(0..u64::MAX)),
             name: String::from("Chess"),

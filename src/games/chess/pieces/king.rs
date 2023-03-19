@@ -35,7 +35,7 @@ fn down_one<const T: usize>(from: BitBoard<T>, cols: Cols, edges: &Edges<T>) -> 
 }
 
 impl<const T: usize> KingPiece<T> {
-    fn make_castling_move(&self, board: &mut Board<T>, action: &Action, from: BitBoard<T>, to: BitBoard<T>) {
+    fn make_castling_move(&self, board: &mut Board<T>, action: &Action, from: BitBoard<T>, to: BitBoard<T>) -> Option<HistoryMove<T>> {
         let cols = board.state.cols;
         let mut left_center = BitBoard::from_lsb(if cols % 2 == 0 {
             (cols / 2) - 1
@@ -63,6 +63,7 @@ impl<const T: usize> KingPiece<T> {
 
         let history_move = HistoryMove {
             action: Move::Action(*action),
+            first_history_move: board.retrieve_first_history_move(Move::Action(*action)),
             state: HistoryState::Any {
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 first_move: PreviousBoard(board.state.first_move),
@@ -79,7 +80,6 @@ impl<const T: usize> KingPiece<T> {
                 ],
             },
         };
-        board.history.push(history_move);
 
         board.state.teams[color] ^= from;
         board.state.teams[color] ^= to;
@@ -115,6 +115,8 @@ impl<const T: usize> KingPiece<T> {
 
         board.state.first_move &= !from;
         board.state.first_move &= !to;
+
+        Some(history_move)
     }
 }
 
@@ -173,11 +175,9 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
         piece_type: usize,
         from: BitBoard<T>,
         to: BitBoard<T>,
-    ) {
+    ) -> Option<HistoryMove<T>> {
         if action.move_type == CASTLING_MOVE {
-            self.make_castling_move(board, action, from, to);
-
-            return;
+            return self.make_castling_move(board, action, from, to);
         }
 
         let color: usize = action.team as usize;
@@ -196,6 +196,7 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
 
         let history_move = HistoryMove {
             action: Move::Action(*action),
+            first_history_move: board.retrieve_first_history_move(Move::Action(*action)),
             state: HistoryState::Any {
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 first_move: PreviousBoard(board.state.first_move),
@@ -216,7 +217,6 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
                 ],
             },
         };
-        board.history.push(history_move);
 
         board.state.teams[captured_color] ^= to;
         board.state.teams[color] ^= from;
@@ -231,6 +231,8 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
         board.state.first_move &= !from;
         board.state.first_move &= !to;
         // We actually don't need to swap the blockers. A blocker will still exist on `to`, just not on `from`.
+
+        Some(history_move)
     }
 
     fn add_actions(

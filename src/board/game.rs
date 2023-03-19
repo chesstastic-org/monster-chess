@@ -2,7 +2,7 @@ use std::fmt::Debug;
 
 pub const NORMAL_MODE: u16 = 0;
 
-use super::{actions::{Action, ActionInfo, TheoreticalAction, Move, TheoreticalMove}, fen::FenOptions, pieces::Piece, Board, Rows, Cols, zobrist::ZobristHashTable};
+use super::{actions::{Action, ActionInfo, TheoreticalAction, Move, TheoreticalMove, HistoryMove}, fen::FenOptions, pieces::Piece, Board, Rows, Cols, zobrist::ZobristHashTable};
 
 pub fn get_theoretical_moves_bound<const T: usize>(board: &Board<T>, max_info: ActionInfo, can_pass: bool) -> Vec<TheoreticalMove> {
     let mut theoretical_moves = Vec::with_capacity(((
@@ -42,7 +42,7 @@ pub trait MoveController<const T: usize> : Debug + Send + Sync {
     fn use_pseudolegal(&self) -> bool;
 
     fn add_moves(&self, board: &Board<T>, actions: &mut Vec<Move>) {}
-    fn make_drop_move(&self, board: &mut Board<T>, action: &Action) {
+    fn make_drop_move(&self, board: &mut Board<T>, action: &Action) -> Option<HistoryMove<T>> {
         panic!("Drop moves aren't supported. Make sure to override `make_drop_move` in your game's MoveController to support them.");
     }
 
@@ -128,6 +128,7 @@ pub struct Game<const T: usize> {
     pub rows: Rows,
     pub cols: Cols,
     pub squares: u16,
+    pub saved_last_moves: u16,
     /// Anything not covered by first_moves, pieces, and gaps should be zobrist_info
     pub zobrist_controller: Box<dyn ZobristController<T>>,
     pub zobrist: ZobristHashTable<T>
