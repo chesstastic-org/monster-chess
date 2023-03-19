@@ -9,7 +9,7 @@ use fastrand;
 
 use crate::bitboard::BitBoard;
 
-use super::actions::Move;
+use super::actions::{Move, TurnInfo, CounterUpdate};
 use super::{
     actions::{Action, HistoryMove, UndoMoveError, HistoryState},
     edges::{generate_edge_list, Edges},
@@ -24,7 +24,9 @@ pub type PieceType = u16;
 pub type Rows = u16;
 pub type Cols = u16;
 
-pub fn update_turns<const T: usize>(state: &mut BoardState<T>) {
+pub fn update_turns<const T: usize>(state: &mut BoardState<T>, game: &Game<T>, action: &Move) {
+    let update = game.controller.update(action, state);
+
     state.turns += 1;
     state.current_turn = state.turn_lookup[state.current_turn as usize];
     if state.current_turn == 0 {
@@ -35,18 +37,28 @@ pub fn update_turns<const T: usize>(state: &mut BoardState<T>) {
         }
         state.moving_team = state.team_lookup[state.moving_team as usize];
     };
+
+    if let CounterUpdate::To(turns_update) = update.turns {
+        state.turns = turns_update;
+    }
+
+    if let CounterUpdate::To(sub_moves_update) = update.sub_moves {
+        state.sub_moves = sub_moves_update;
+    }
+
+    if let CounterUpdate::To(full_moves_update) = update.full_moves {
+        state.full_moves = full_moves_update;
+    }
 }
 
-pub fn reverse_turns<const T: usize>(state: &mut BoardState<T>, game: &Game<T>) {
-    state.turns -= 1;
+pub fn reverse_turns<const T: usize>(state: &mut BoardState<T>, game: &Game<T>, action: &HistoryMove<T>) {
+    state.turns = action.turn_info.turns;
+    state.sub_moves = action.turn_info.sub_moves;
+    state.full_moves = action.turn_info.full_moves;
+
     state.current_turn = state.turn_reverse_lookup[state.current_turn as usize];
     if state.current_turn == game.turns - 1 {
         state.moving_team = state.team_reverse_lookup[state.moving_team as usize];
-        state.sub_moves -= 1;
-
-        if state.moving_team == 0 {
-            state.full_moves -= 1;
-        }
     }
 }
 
@@ -341,6 +353,14 @@ impl<'a, const T: usize> Board<'a, T> {
         }
     }
 
+    pub fn get_turn_info(&self) -> TurnInfo {
+        TurnInfo {
+            turns: self.state.turns,
+            sub_moves: self.state.sub_moves,
+            full_moves: self.state.sub_moves
+        }
+    }
+
     pub fn make_move(&mut self, action: &Move) -> Option<HistoryMove<T>> {
         match action {
             Move::Action(action) => {
@@ -354,9 +374,10 @@ impl<'a, const T: usize> Board<'a, T> {
                 let history = HistoryMove {
                     action: Move::Pass,
                     state: HistoryState::None,
+                    turn_info: self.get_turn_info(),
                     first_history_move: self.retrieve_first_history_move(Move::Pass)
                 };
-                update_turns(&mut self.state);
+                update_turns(&mut self.state, &self.game, action);
                 Some(history)
             }
         }
@@ -376,7 +397,7 @@ impl<'a, const T: usize> Board<'a, T> {
                         );
                     }
                     Move::Pass => {
-                        reverse_turns(&mut self.state, &self.game);
+                        reverse_turns(&mut self.state, &self.game, &history_move);
                     }
                 };
             }

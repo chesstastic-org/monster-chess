@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use crate::{board::{game::{MoveController, NORMAL_MODE, get_theoretical_moves_bound}, Board, actions::{Action, TheoreticalAction, Move, TheoreticalMove}}, bitboard::BitBoard};
+use crate::{board::{game::{MoveController, NORMAL_MODE, get_theoretical_moves_bound}, Board, actions::{Action, TheoreticalAction, Move, TheoreticalMove, TurnUpdate, CounterUpdate}, BoardState}, bitboard::BitBoard};
 
 use super::is_single_move;
 
@@ -83,6 +83,21 @@ impl<const T: usize> MoveController<T> for AtaxxMoveController {
                 Move::Pass => "0000".to_string()
             }   
         ]
+    }
+
+    fn update(&self, action: &Move, state: &BoardState<T>) -> TurnUpdate {
+        TurnUpdate {
+            turns: CounterUpdate::Next,
+            sub_moves: match action {
+                Move::Action(action) => if is_single_move(action) {
+                    CounterUpdate::To(0)
+                } else {
+                    CounterUpdate::Next
+                },
+                Move::Pass => CounterUpdate::Next
+            },
+            full_moves: CounterUpdate::Next
+        }
     }
 
     fn get_theoretical_moves(&self, board: &Board<T>) -> Vec<TheoreticalMove> {

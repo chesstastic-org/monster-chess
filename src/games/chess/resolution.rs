@@ -8,7 +8,7 @@ use super::ATTACKS_MODE;
 pub struct ChessResolution<const T: usize>;
 
 impl<const T: usize> Resolution<T> for ChessResolution<T> {
-    fn resolution(&self, board: &mut Board<T>, legal_moves: &Vec<Move>) -> GameResults {
+    fn resolve(&self, board: &mut Board<T>, legal_moves: &Vec<Move>) -> GameResults {
         if legal_moves.len() == 0 {
             let kings = board.state.pieces[5];
             let king_board = board.state.teams[board.state.moving_team as usize] & kings;
@@ -21,6 +21,8 @@ impl<const T: usize> Resolution<T> for ChessResolution<T> {
             } else {
                 GameResults::Draw
             }
+        } else if board.state.sub_moves == 100 {
+            GameResults::Draw
         } else {
             GameResults::Ongoing
         }

@@ -1,4 +1,4 @@
-use crate::{board::{game::{MoveController, get_theoretical_moves_bound}, Board, actions::{Action, TheoreticalAction, Move, TheoreticalMove}}, bitboard::BitBoard};
+use crate::{board::{game::{MoveController, get_theoretical_moves_bound}, Board, actions::{Action, TheoreticalAction, Move, TheoreticalMove, CounterUpdate, TurnUpdate}, BoardState}, bitboard::BitBoard};
 
 use super::ATTACKS_MODE;
 
@@ -65,6 +65,26 @@ impl<const T: usize> MoveController<T> for ChessMoveController<T> {
                 Move::Pass => "0000".to_string()
             }   
         ]
+    }
+
+    fn update(&self, action: &Move, state: &BoardState<T>) -> TurnUpdate {
+        TurnUpdate {
+            turns: CounterUpdate::Next,
+            sub_moves: match action {
+                Move::Action(action) => {
+                    let is_pawn_move = action.piece_type == 0;
+                    let is_capture = (BitBoard::<T>::from_lsb(action.to) & state.all_pieces).is_set() && !(action.piece_type == 5 && action.move_type == 1);
+
+                    if is_pawn_move || is_capture {
+                        CounterUpdate::To(0)
+                    } else {
+                        CounterUpdate::Next
+                    }
+                },
+                Move::Pass => CounterUpdate::Next
+            },
+            full_moves: CounterUpdate::Next
+        }
     }
 
     fn get_theoretical_moves(&self, board: &Board<T>) -> Vec<TheoreticalMove> {

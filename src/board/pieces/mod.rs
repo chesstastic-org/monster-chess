@@ -92,6 +92,7 @@ pub trait Piece<const T: usize> : Debug + Send + Sync {
         let history_move = HistoryMove {
             action: Move::Action(*action),
             first_history_move: board.retrieve_first_history_move(Move::Action(*action)),
+            turn_info: board.get_turn_info(),
             state: HistoryState::Any {
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 first_move: PreviousBoard(board.state.first_move),
@@ -144,6 +145,7 @@ pub trait Piece<const T: usize> : Debug + Send + Sync {
         let history_move = HistoryMove {
             action: Move::Action(*action),
             first_history_move: board.retrieve_first_history_move(Move::Action(*action)),
+            turn_info: board.get_turn_info(),
             state: HistoryState::Single {
                 team: IndexedPreviousBoard(color, board.state.teams[color]),
                 piece: IndexedPreviousBoard(piece_type, board.state.pieces[piece_type]),
@@ -177,7 +179,7 @@ pub trait Piece<const T: usize> : Debug + Send + Sync {
                 self.make_capture_move(board, action, action.piece_type, from, to)
             };
 
-            update_turns(&mut board.state);
+            update_turns(&mut board.state, &board.game, &Move::Action(*action));
 
             history_move
         } else {
@@ -186,7 +188,7 @@ pub trait Piece<const T: usize> : Debug + Send + Sync {
     }
 
     fn undo_move(&self, state: &mut BoardState<T>, game: &Game<T>, history_move: &HistoryMove<T>) {
-        reverse_turns(state, game);
+        reverse_turns(state, game, &history_move);
 
         match &history_move.state {
             HistoryState::Single {
