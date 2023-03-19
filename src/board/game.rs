@@ -2,7 +2,7 @@ use std::fmt::Debug;
 
 pub const NORMAL_MODE: u16 = 0;
 
-use super::{actions::{Action, ActionInfo, TheoreticalAction, Move, TheoreticalMove, HistoryMove, TurnUpdate, CounterUpdate}, fen::FenOptions, pieces::Piece, Board, Rows, Cols, zobrist::ZobristHashTable};
+use super::{actions::{Action, ActionInfo, TheoreticalAction, Move, TheoreticalMove, HistoryMove, TurnUpdate, CounterUpdate}, fen::FenOptions, pieces::Piece, Board, Rows, Cols, zobrist::ZobristHashTable, BoardState};
 
 pub fn get_theoretical_moves_bound<const T: usize>(board: &Board<T>, max_info: ActionInfo, can_pass: bool) -> Vec<TheoreticalMove> {
     let mut theoretical_moves = Vec::with_capacity(((
@@ -92,7 +92,7 @@ pub trait MoveController<const T: usize> : Debug + Send + Sync {
         }
     }
 
-    fn update(&self, action: &Move) -> TurnUpdate {
+    fn update(&self, action: &Move, state: &BoardState<T>) -> TurnUpdate {
         TurnUpdate {
             turns: CounterUpdate::Next,
             sub_moves: CounterUpdate::Next,
@@ -112,7 +112,7 @@ pub enum GameResults {
 }
 
 pub trait Resolution<const T: usize> : Debug + Send + Sync {
-    fn resolution(&self, board: &mut Board<T>, legal_moves: &Vec<Move>) -> GameResults;
+    fn resolve(&self, board: &mut Board<T>, legal_moves: &Vec<Move>) -> GameResults;
 }
 
 pub trait ZobristController<const T: usize> : Debug + Send + Sync {

@@ -6,8 +6,12 @@ use crate::board::{game::{Resolution, GameResults}, Board, actions::{Action, Mov
 pub struct AtaxxResolution<const T: usize>;
 
 impl<const T: usize> Resolution<T> for AtaxxResolution<T> {
-    fn resolution(&self, board: &mut Board<T>, legal_moves: &Vec<Move>) -> GameResults {
+    fn resolve(&self, board: &mut Board<T>, legal_moves: &Vec<Move>) -> GameResults {
         if legal_moves.len() > 0 {
+            if board.state.sub_moves == 100 {
+                return GameResults::Draw;
+            }
+
             return GameResults::Ongoing;
         }
 

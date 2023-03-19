@@ -25,7 +25,7 @@ pub type Rows = u16;
 pub type Cols = u16;
 
 pub fn update_turns<const T: usize>(state: &mut BoardState<T>, game: &Game<T>, action: &Move) {
-    let update = game.controller.update(action);
+    let update = game.controller.update(action, state);
 
     state.turns += 1;
     state.current_turn = state.turn_lookup[state.current_turn as usize];
