@@ -1,6 +1,6 @@
 use std::usize;
 
-use crate::{board::{pieces::{Piece, PieceSymbol}, Board, AttackLookup, AttackDirections, actions::{Action, PreviousBoard, HistoryMove, HistoryState, HistoryUpdate, IndexedPreviousBoard, Move}, edges::Edges, Cols, update_turns}, bitboard::BitBoard};
+use crate::{board::{pieces::{Piece, PieceSymbol}, Board, AttackLookup, AttackDirections, actions::{Action, PreviousBoard, HistoryMove, HistoryState, HistoryUpdate, IndexedPreviousBoard, Move}, edges::Edges, Cols, update_turns, PieceType}, bitboard::BitBoard};
 
 use super::is_single_move;
 
@@ -53,7 +53,7 @@ impl<const T: usize> Piece<T> for StonePiece {
         &self,
         board: &Board<T>,
         from: BitBoard<T>,
-        piece_type: usize,
+        piece_type: PieceType,
         team: u16,
         mode: u16,
     ) -> BitBoard<T> {
@@ -82,8 +82,8 @@ impl<const T: usize> Piece<T> for StonePiece {
                     first_move: PreviousBoard(board.state.first_move),
                     updates: vec![
                         HistoryUpdate::Piece(IndexedPreviousBoard(
-                            piece_type,
-                            board.state.pieces[piece_type],
+                            piece_type as usize,
+                            board.state.pieces[piece_type as usize],
                         )),
                         HistoryUpdate::Team(IndexedPreviousBoard(
                             team,
@@ -100,15 +100,15 @@ impl<const T: usize> Piece<T> for StonePiece {
             if is_single_move(action) {
                 // Single Moves
                 
-                board.state.pieces[piece_type] |= to;
+                board.state.pieces[piece_type as usize] |= to;
                 board.state.teams[team] |= to;
                 board.state.all_pieces |= to;
                 board.state.first_move &= !from;
             } else {
                 // Double Moves
 
-                board.state.pieces[piece_type] ^= from;
-                board.state.pieces[piece_type] |= to;
+                board.state.pieces[piece_type as usize] ^= from;
+                board.state.pieces[piece_type as usize] |= to;
                 board.state.teams[team] ^= from;
                 board.state.teams[team] |= to;
                 board.state.all_pieces ^= from;

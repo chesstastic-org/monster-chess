@@ -2,7 +2,7 @@ use crate::{
     bitboard::{Direction, BitBoard},
     board::{
         actions::{
-            Action, HistoryMove, HistoryState, HistoryUpdate, IndexedPreviousBoard, PreviousBoard, Move,
+            Action, HistoryMove, HistoryState, HistoryUpdate, IndexedPreviousBoard, PreviousBoard, Move, ActionInfo,
         },
         edges::Edges,
         pieces::{Piece, PieceSymbol},
@@ -11,9 +11,9 @@ use crate::{
     games::chess::game::ATTACKS_MODE,
 };
 
-const NORMAL_PAWN_MOVE: usize = 0;
-const EN_PASSANT_MOVE: usize = 1;
-fn promotion_move(piece_type: PieceType) -> usize {
+const NORMAL_PAWN_MOVE: u16 = 0;
+const EN_PASSANT_MOVE: u16 = 1;
+fn promotion_move(piece_type: PieceType) -> u16 {
     piece_type + 1
 }
 
@@ -40,13 +40,14 @@ impl<const T: usize> PawnPiece<T> {
         &self,
         board: &mut Board<T>,
         action: &Action,
-        piece_type: usize,
+        piece_type: PieceType,
         from: BitBoard<T>,
         to: BitBoard<T>,
     ) -> Option<HistoryMove<T>> {
         let cols = board.state.cols;
 
         let color: usize = action.team as usize;
+        let piece_type = piece_type as usize;
         let en_passant_target = down(&to, 1, cols, color as u16);
 
         let en_passant_target_color: usize = if (en_passant_target & board.state.teams[0]).is_set()
@@ -147,9 +148,9 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
         }
     }
 
-    fn format_info(&self, board: &Board<T>, info: usize) -> String {
+    fn format_info(&self, board: &Board<T>, info: ActionInfo) -> String {
         if info > 0 {
-            let piece_trait = &board.game.pieces[info - 1];
+            let piece_trait = &board.game.pieces[(info as usize) - 1];
             if let PieceSymbol::Char(char) = piece_trait.get_piece_symbol() {
                 char.to_string()
             } else {
@@ -165,7 +166,7 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
         board: &Board<T>,
         from: BitBoard<T>,
         from_bit: u16,
-        piece_type: usize,
+        piece_type: PieceType,
         team: u16,
         mode: u16,
         to: BitBoard<T>,
@@ -177,7 +178,7 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
         &self,
         board: &Board<T>,
         from: BitBoard<T>,
-        piece_type: usize,
+        piece_type: PieceType,
         team: u16,
         mode: u16,
     ) -> BitBoard<T> {
@@ -234,11 +235,12 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
         &self,
         board: &mut Board<T>,
         action: &Action,
-        piece_type: usize,
+        piece_type: PieceType,
         from: BitBoard<T>,
         to: BitBoard<T>,
     ) -> Option<HistoryMove<T>> {
         let color: usize = action.team as usize;
+        let piece_type = piece_type as usize;
         let captured_color: usize = if (to & board.state.teams[0]).is_set() {
             0
         } else {
@@ -276,14 +278,14 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
             },
         };
 
-        let mut promotion_piece_type: Option<usize> = None;
+        let mut promotion_piece_type: Option<u16> = None;
         if action.info >= 1 {
             let promotion_type = action.info - 1;
             promotion_piece_type = Some(promotion_type);
             if let HistoryState::Any { updates, .. } = &mut history_move.state {
                 updates.push(HistoryUpdate::Piece(IndexedPreviousBoard(
-                    promotion_type,
-                    board.state.pieces[promotion_type],
+                    promotion_type as usize,
+                    board.state.pieces[promotion_type as usize],
                 )));
             }
         }
@@ -299,7 +301,7 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
                 board.state.pieces[piece_type] |= to;
             }
             Some(promotion_piece_type) => {
-                board.state.pieces[promotion_piece_type] |= to;
+                board.state.pieces[promotion_piece_type as usize] |= to;
             }
         }
 
@@ -316,7 +318,7 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
         &self,
         board: &mut Board<T>,
         action: &Action,
-        piece_type: usize,
+        piece_type: PieceType,
         from: BitBoard<T>,
         to: BitBoard<T>,
     ) -> Option<HistoryMove<T>> {
@@ -325,6 +327,7 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
         }
 
         let color: usize = action.team as usize;
+        let piece_type = action.piece_type as usize;
 
         let mut history_move = HistoryMove {
             action: Move::Action(*action),
@@ -349,12 +352,12 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
                         board.state.pieces[piece_type],
                     )),
                     HistoryUpdate::Piece(IndexedPreviousBoard(
-                        promotion_type,
-                        board.state.pieces[promotion_type],
+                        promotion_type as usize,
+                        board.state.pieces[promotion_type as usize],
                     )),
                 ],
             };
-            board.state.pieces[promotion_type] |= to;
+            board.state.pieces[promotion_type as usize] |= to;
             board.state.pieces[piece_type] ^= from;
         } else {
             board.state.pieces[piece_type] = (board.state.pieces[piece_type] ^ from) | to;
@@ -374,7 +377,7 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
         &self,
         actions: &mut Vec<Move>,
         board: &Board<T>,
-        piece_type: usize,
+        piece_type: PieceType,
         from: u16,
         team: u16,
         mode: u16,
@@ -409,7 +412,7 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
                         from: Some(from),
                         to: bit,
                         team,
-                        info: promotion_move(promotion_piece_type),
+                        info: promotion_move(promotion_piece_type as u16),
                         move_type: NORMAL_PAWN_MOVE,
                         piece_type,
                     }));

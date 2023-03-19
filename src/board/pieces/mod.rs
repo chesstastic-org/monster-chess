@@ -5,7 +5,7 @@ use crate::bitboard::BitBoard;
 use super::{
     actions::{
         Action, HistoryMove, HistoryState, HistoryUpdate, IndexedPreviousBoard, PreviousBoard,
-        UndoMoveError, Move,
+        UndoMoveError, Move, ActionInfo,
     },
     game::Game,
     AttackDirections, AttackLookup, Board, BoardState, Cols, PieceType, Rows, update_turns, reverse_turns,
@@ -16,12 +16,12 @@ pub enum PieceSymbol {
     TeamSymbol(Vec<char>),
 }
 
-const NORMAL_MOVE: usize = 0;
+const NORMAL_MOVE: u16 = 0;
 
 pub trait Piece<const T: usize> : Debug + Send + Sync {
     fn get_piece_symbol(&self) -> PieceSymbol;
 
-    fn format_info(&self, board: &Board<T>, info: usize) -> String {
+    fn format_info(&self, board: &Board<T>, info: ActionInfo) -> String {
         "".to_string()
     }
     fn parse_info(&self, board: &Board<T>, info: String) -> u32 {
@@ -33,16 +33,16 @@ pub trait Piece<const T: usize> : Debug + Send + Sync {
     fn get_attack_lookup<'a>(
         &self,
         board: &'a Board<T>,
-        piece_type: usize,
+        piece_type: PieceType,
     ) -> Option<&'a AttackLookup<T>> {
-        board.attack_lookup.get(piece_type)
+        board.attack_lookup.get(piece_type as usize)
     }
 
     fn get_moves(
         &self,
         board: &Board<T>,
         from: BitBoard<T>,
-        piece_type: usize,
+        piece_type: PieceType,
         team: u16,
         mode: u16,
     ) -> BitBoard<T>;
@@ -51,7 +51,7 @@ pub trait Piece<const T: usize> : Debug + Send + Sync {
         board: &Board<T>,
         from: BitBoard<T>,
         from_bit: u16,
-        piece_type: usize,
+        piece_type: PieceType,
         team: u16,
         mode: u16,
         to: BitBoard<T>,
@@ -68,20 +68,21 @@ pub trait Piece<const T: usize> : Debug + Send + Sync {
         &self,
         board: &mut Board<T>,
         action: &Action,
-        piece_type: usize,
+        piece_type: PieceType,
         from: BitBoard<T>,
         to: BitBoard<T>,
     ) -> Option<HistoryMove<T>> {
-        let color: usize = action.team as usize;
+        let color = action.team as usize;
+        let piece_type = piece_type as usize;
         let captured_color: usize = if (to & board.state.teams[0]).is_set() {
             0
         } else {
             1
         };
-        let mut captured_piece_type: usize = 0;
+        let mut captured_piece_type: PieceType = 0;
         for i in 0..(board.game.pieces.len()) {
             if (board.state.pieces[i] & to).is_set() {
-                captured_piece_type = i;
+                captured_piece_type = i as u16;
                 break;
             }
         }
@@ -105,8 +106,8 @@ pub trait Piece<const T: usize> : Debug + Send + Sync {
                         board.state.pieces[piece_type],
                     )),
                     HistoryUpdate::Piece(IndexedPreviousBoard(
-                        captured_piece_type,
-                        board.state.pieces[captured_piece_type],
+                        captured_piece_type as usize,
+                        board.state.pieces[captured_piece_type as usize],
                     )),
                 ],
             }
@@ -116,7 +117,7 @@ pub trait Piece<const T: usize> : Debug + Send + Sync {
         board.state.teams[color] ^= from;
         board.state.teams[color] |= to;
 
-        board.state.pieces[captured_piece_type] ^= to;
+        board.state.pieces[captured_piece_type as usize] ^= to;
         board.state.pieces[piece_type] ^= from;
         board.state.pieces[piece_type] |= to;
 
@@ -133,11 +134,12 @@ pub trait Piece<const T: usize> : Debug + Send + Sync {
         &self,
         board: &mut Board<T>,
         action: &Action,
-        piece_type: usize,
+        piece_type: PieceType,
         from: BitBoard<T>,
         to: BitBoard<T>,
     ) -> Option<HistoryMove<T>> {
-        let color: usize = action.team as usize;
+        let color = action.team as usize;
+        let piece_type = piece_type as usize;
 
         let history_move = HistoryMove {
             action: Move::Action(*action),
@@ -224,7 +226,7 @@ pub trait Piece<const T: usize> : Debug + Send + Sync {
         &self,
         actions: &mut Vec<Move>,
         board: &Board<T>,
-        piece_type: usize,
+        piece_type: PieceType,
         from: u16,
         team: u16,
         mode: u16,

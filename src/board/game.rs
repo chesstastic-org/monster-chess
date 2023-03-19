@@ -7,7 +7,7 @@ use super::{actions::{Action, ActionInfo, TheoreticalAction, Move, TheoreticalMo
 pub fn get_theoretical_moves_bound<const T: usize>(board: &Board<T>, max_info: ActionInfo, can_pass: bool) -> Vec<TheoreticalMove> {
     let mut theoretical_moves = Vec::with_capacity(((
         (board.game.squares) + 1 * board.game.squares
-    ) as usize * max_info) + (can_pass as usize));
+    ) as usize * (max_info as usize)) + (can_pass as usize));
 
     if can_pass {
         theoretical_moves.push(TheoreticalMove::Pass);

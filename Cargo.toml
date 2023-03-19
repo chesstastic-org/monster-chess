@@ -13,8 +13,8 @@ keywords = ["chess", "ataxx", "movegen"]
 debug = true
 
 [dependencies]
-arrayvec = "0.7.2"
 fastrand = "1.9.0"
+heapless = "0.7.16"
 shell-words = "1.1.0"
 
 [dev-dependencies]

@@ -3,7 +3,7 @@ use std::fmt::Display;
 use std::fmt::Error;
 use std::fmt::Formatter;
 
-use arrayvec::ArrayVec;
+use heapless::{Vec as HeapVec, Deque as HeapDeque};
 use std::collections::VecDeque;
 use fastrand;
 
@@ -17,7 +17,7 @@ use super::{
     pieces::Piece, zobrist::ZobristHashTable,
 };
 
-pub type PieceType = usize;
+pub type PieceType = u16;
 
 /// I doubt anyone would be practically creating boards of 4,294,967,296 x 4,294,967,296.
 /// However, storing these as u32s makes it much easier to interface the bitboards with (particularly, shifting bits with them.)
@@ -78,10 +78,10 @@ pub struct BoardState<const T: usize> {
     pub cols: Cols,
     pub squares: u16,
 
-    pub turn_lookup: ArrayVec<u16, 16>,
-    pub team_lookup: ArrayVec<u16, 16>,
-    pub turn_reverse_lookup: ArrayVec<u16, 16>,
-    pub team_reverse_lookup: ArrayVec<u16, 16>,
+    pub turn_lookup: HeapVec<u16, 16>,
+    pub team_lookup: HeapVec<u16, 16>,
+    pub turn_reverse_lookup: HeapVec<u16, 16>,
+    pub team_reverse_lookup: HeapVec<u16, 16>,
 }
 
 impl<const T: usize> BoardState<T> {
@@ -100,12 +100,12 @@ pub type AttackDirections<const T: usize> = Vec<BitBoard<T>>;
 
 pub type AttackLookup<const T: usize> = Vec<AttackDirections<T>>;
 
-#[derive(Debug, Clone, Eq)]
+#[derive(Debug, Clone)]
 pub struct Board<'a, const T: usize> {
     pub state: BoardState<T>,
     pub game: &'a Game<T>,
     pub attack_lookup: Vec<AttackLookup<T>>,
-    pub history: VecDeque<Move>
+    pub history: HeapDeque<Move, 4>
 }
 
 impl<'a, const T: usize> Display for Board<'a, T> {
@@ -126,8 +126,10 @@ impl<'a, const T: usize> PartialEq for Board<'a, T> {
     }
 }
 
-fn generate_forward_lookup(count: u16) -> ArrayVec<u16, 16> {
-    let mut lookup = ArrayVec::new();
+impl<'a, const T: usize> Eq for Board<'a, T> {}
+
+fn generate_forward_lookup(count: u16) -> HeapVec<u16, 16> {
+    let mut lookup = HeapVec::new();
     for i in 0..count {
         let mut new_val = i + 1;
         if new_val >= count {
@@ -138,8 +140,8 @@ fn generate_forward_lookup(count: u16) -> ArrayVec<u16, 16> {
     lookup
 }
 
-fn generate_reverse_lookup(count: u16) -> ArrayVec<u16, 16> {
-    let mut lookup = ArrayVec::new();
+fn generate_reverse_lookup(count: u16) -> HeapVec<u16, 16> {
+    let mut lookup = HeapVec::new();
     for i in 0..count {
         let i = i as i16;
         let mut new_val = i - 1;
@@ -168,7 +170,7 @@ impl<'a, const T: usize> Board<'a, T> {
         let mut board = Board {
             attack_lookup: vec![],
             game,
-            history: VecDeque::with_capacity(1),
+            history: HeapDeque::new(),
             state: BoardState {
                 all_pieces: BitBoard::new(),
                 first_move: BitBoard::new(),
@@ -205,7 +207,7 @@ impl<'a, const T: usize> Board<'a, T> {
             let piece = &self.game.pieces[ind];
 
             for bit in board.iter_set_bits(board_len) {
-                bitboard |= piece.get_moves(self, BitBoard::from_lsb(bit), ind, team, mode);
+                bitboard |= piece.get_moves(self, BitBoard::from_lsb(bit), ind as PieceType, team, mode);
             }
         }
 
@@ -227,7 +229,7 @@ impl<'a, const T: usize> Board<'a, T> {
                     self,
                     BitBoard::from_lsb(bit),
                     bit,
-                    ind,
+                    ind as PieceType,
                     team,
                     mode,
                     target,
@@ -252,7 +254,7 @@ impl<'a, const T: usize> Board<'a, T> {
         let mut actions: Vec<Move> = Vec::with_capacity(self.state.squares as usize);
 
         let piece = &self.game.pieces[piece_type];
-        piece.add_actions(&mut actions, self, piece_type, from, team, mode);
+        piece.add_actions(&mut actions, self, piece_type as PieceType, from, team, mode);
 
         vec![]
     }
@@ -277,7 +279,7 @@ impl<'a, const T: usize> Board<'a, T> {
             let piece = &self.game.pieces[ind];
 
             for bit in board.iter_set_bits(board_len) {
-                piece.add_actions(&mut actions, self, ind, bit, team, mode);
+                piece.add_actions(&mut actions, self, ind as PieceType, bit, team, mode);
             }
         }
 
@@ -343,7 +345,7 @@ impl<'a, const T: usize> Board<'a, T> {
         match action {
             Move::Action(action) => {
                 if action.from.is_some() {
-                    self.game.pieces[action.piece_type].make_move(self, action)
+                    self.game.pieces[action.piece_type as usize].make_move(self, action)
                 } else {
                     self.game.controller.make_drop_move(self, action)
                 }
@@ -367,7 +369,7 @@ impl<'a, const T: usize> Board<'a, T> {
                 self.reset_first_history_move(history_move.first_history_move);
                 match history_move.action {
                     Move::Action(history_action) => {
-                        self.game.pieces[history_action.piece_type].undo_move(
+                        self.game.pieces[history_action.piece_type as usize].undo_move(
                             &mut self.state,
                             self.game,
                             &history_move

@@ -7,7 +7,7 @@ pub enum UndoMoveError {
     NoHistoryMoves,
 }
 
-pub type ActionInfo = usize;
+pub type ActionInfo = u16;
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub struct Action {

@@ -74,7 +74,7 @@ impl<const T: usize> Piece<T> for QueenPiece {
         board: &Board<T>,
         from: BitBoard<T>,
         from_bit: u16,
-        piece_type: usize,
+        piece_type: PieceType,
         team: u16,
         mode: u16,
         to: BitBoard<T>,
@@ -103,7 +103,7 @@ impl<const T: usize> Piece<T> for QueenPiece {
         &self,
         board: &Board<T>,
         from: BitBoard<T>,
-        piece_type: usize,
+        piece_type: PieceType,
         team: u16,
         mode: u16,
     ) -> BitBoard<T> {

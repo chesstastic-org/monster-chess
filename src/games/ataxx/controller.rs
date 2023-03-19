@@ -65,7 +65,7 @@ impl<const T: usize> MoveController<T> for AtaxxMoveController {
                         format!(
                             "{}{}",
                             board.encode_position(action.to),
-                            board.game.pieces[action.piece_type].format_info(board, action.info)
+                            board.game.pieces[action.piece_type as usize].format_info(board, action.info)
                         )
                     } else {
                         if let Some(from) = action.from {
@@ -73,7 +73,7 @@ impl<const T: usize> MoveController<T> for AtaxxMoveController {
                                 "{}{}{}",
                                 board.encode_position(from),
                                 board.encode_position(action.to),
-                                board.game.pieces[action.piece_type].format_info(board, action.info)
+                                board.game.pieces[action.piece_type as usize].format_info(board, action.info)
                             )
                         } else {
                             "----".to_string()
