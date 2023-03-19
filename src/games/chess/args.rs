@@ -154,13 +154,13 @@ impl<const T: usize> FenArgument<T> for ChessEnPassant {
             move_type: 0
         };
 
-        board.history.push(Move::Action(action));
+        board.history.push_back(Move::Action(action));
 
         Ok(())
     }
 
     fn encode(&self, board: &Board<T>) -> String {
-        let last_move = (&board.history).last();
+        let last_move = (&board.history).iter().last();
         if let None = last_move {
             return "-".to_string();
         }

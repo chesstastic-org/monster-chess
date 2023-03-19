@@ -4,6 +4,7 @@ use std::fmt::Error;
 use std::fmt::Formatter;
 
 use arrayvec::ArrayVec;
+use std::collections::VecDeque;
 use fastrand;
 
 use crate::bitboard::BitBoard;
@@ -104,7 +105,7 @@ pub struct Board<'a, const T: usize> {
     pub state: BoardState<T>,
     pub game: &'a Game<T>,
     pub attack_lookup: Vec<AttackLookup<T>>,
-    pub history: ArrayVec<Move, 64>
+    pub history: VecDeque<Move>
 }
 
 impl<'a, const T: usize> Display for Board<'a, T> {
@@ -167,7 +168,7 @@ impl<'a, const T: usize> Board<'a, T> {
         let mut board = Board {
             attack_lookup: vec![],
             game,
-            history: ArrayVec::new(),
+            history: VecDeque::with_capacity(1),
             state: BoardState {
                 all_pieces: BitBoard::new(),
                 first_move: BitBoard::new(),
@@ -318,10 +319,10 @@ impl<'a, const T: usize> Board<'a, T> {
             return None;
         }
 
-        self.history.push(action);
+        self.history.push_back(action);
 
         if self.history.len() > self.game.saved_last_moves.into() {
-            self.history.swap_pop(0)
+            self.history.pop_front()
         } else {
             None
         }
@@ -333,8 +334,8 @@ impl<'a, const T: usize> Board<'a, T> {
         }
 
         if let Some(first_history_move) = first_history_move {
-            self.history.pop();
-            self.history.insert(0, first_history_move);
+            self.history.pop_back();
+            self.history.push_front(first_history_move);
         }
     }
 

@@ -205,7 +205,7 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
             moves |= double_moves;
         }
 
-        if let Some(last_move) = board.history.last() {
+        if let Some(last_move) = board.history.iter().last() {
             if let Move::Action(last_action) = last_move {
                 if let Some(from) = last_action.from {
                     let conditions = last_action.piece_type == 0
@@ -416,7 +416,7 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
                 }
             } else {
                 let mut en_passant = false;
-                if let Some(last_move) = board.history.last() {
+                if let Some(last_move) = board.history.iter().last() {
                     if let Move::Action(last_action) = last_move {
                         if let Some(from) = last_action.from {
                             let conditions = last_action.piece_type == 0
