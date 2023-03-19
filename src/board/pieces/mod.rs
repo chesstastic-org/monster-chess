@@ -172,14 +172,14 @@ pub trait Piece<const T: usize> : Debug + Send + Sync {
         if let Some(from) = action.from {
             let from = BitBoard::from_lsb(from);
             let to = BitBoard::from_lsb(action.to);
+            
+            update_turns(&mut board.state, &board.game, &Move::Action(*action));
 
             let history_move = if (board.state.all_pieces & to).is_empty() {
                 self.make_normal_move(board, action, action.piece_type, from, to)
             } else {
                 self.make_capture_move(board, action, action.piece_type, from, to)
             };
-
-            update_turns(&mut board.state, &board.game, &Move::Action(*action));
 
             history_move
         } else {
