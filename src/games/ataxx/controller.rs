@@ -15,7 +15,7 @@ impl<const T: usize> MoveController<T> for AtaxxMoveController {
         return false;
     }
 
-    fn transform_moves(&self, board: &mut Board<T>, mode: u32, actions: Vec<Move>) -> Vec<Move> {
+    fn transform_moves(&self, board: &mut Board<T>, mode: u16, actions: Vec<Move>) -> Vec<Move> {
         // No Legal Moves
         if actions.len() == 0 {
             let board_mask = BitBoard::starting_at_lsb(0, 49);
@@ -24,9 +24,9 @@ impl<const T: usize> MoveController<T> for AtaxxMoveController {
 
             let team_squares = board.state.teams[board.state.moving_team as usize];
 
-            board.make_move(&Move::Pass);
+            let undo = board.make_move(&Move::Pass);
             let opposing_moves = board.generate_moves(NORMAL_MODE).len();
-            board.undo_move();
+            board.undo_move(undo);
             if opposing_moves > 0 && empty_squares.count_ones() > 0 && team_squares.count_ones() > 0  {
                 vec![ Move::Pass ]
             } else {
@@ -34,7 +34,7 @@ impl<const T: usize> MoveController<T> for AtaxxMoveController {
             }
             
         } else {
-            let mut set = HashSet::<u32>::with_capacity(actions.len());
+            let mut set = HashSet::<u16>::with_capacity(actions.len());
             let mut new_actions = Vec::with_capacity(actions.len());
 
             for action in actions {
@@ -65,7 +65,7 @@ impl<const T: usize> MoveController<T> for AtaxxMoveController {
                         format!(
                             "{}{}",
                             board.encode_position(action.to),
-                            board.game.pieces[action.piece_type].format_info(board, action.info)
+                            board.game.pieces[action.piece_type as usize].format_info(board, action.info)
                         )
                     } else {
                         if let Some(from) = action.from {
@@ -73,7 +73,7 @@ impl<const T: usize> MoveController<T> for AtaxxMoveController {
                                 "{}{}{}",
                                 board.encode_position(from),
                                 board.encode_position(action.to),
-                                board.game.pieces[action.piece_type].format_info(board, action.info)
+                                board.game.pieces[action.piece_type as usize].format_info(board, action.info)
                             )
                         } else {
                             "----".to_string()

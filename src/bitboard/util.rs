@@ -17,19 +17,19 @@ impl<const T: usize> BitBoard<T> {
         BitBoard { bits: arr }
     }
 
-    pub fn from_lsb(bit: u32) -> BitBoard<T> {
+    pub fn from_lsb(bit: u16) -> BitBoard<T> {
         BitBoard::<T>::from_element(1) << bit
     }
 
-    pub fn from_msb(bit: u32) -> BitBoard<T> {
+    pub fn from_msb(bit: u16) -> BitBoard<T> {
         !(BitBoard::<T>::max() >> 1) >> bit
     }
 
-    pub fn starting_at_lsb(bit: u32, length: u32) -> BitBoard<T> {
+    pub fn starting_at_lsb(bit: u16, length: u16) -> BitBoard<T> {
         (BitBoard::<T>::from_lsb(length) - BitBoard::<T>::from_element(1)) << bit
     }
 
-    pub fn has_bit(self, bit: u32) -> bool {
+    pub fn has_bit(self, bit: u16) -> bool {
         (self & (BitBoard::<T>::from_element(1) << bit)).is_set()
     }
 
@@ -121,7 +121,7 @@ impl<const T: usize> BitBoard<T> {
         bits
     }
 
-    pub fn iter_set_bits(mut self, end: u32) -> BitIterator<T> {
+    pub fn iter_set_bits(mut self, end: u16) -> BitIterator<T> {
         BitIterator(self, end)
     }
 
@@ -144,10 +144,10 @@ impl<const T: usize> BitBoard<T> {
     }
 }
 
-pub struct BitIterator<const T: usize>(pub BitBoard<T>, u32);
+pub struct BitIterator<const T: usize>(pub BitBoard<T>, u16);
 
 impl<const T: usize> Iterator for BitIterator<T> {
-    type Item = u32;
+    type Item = u16;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.0.is_set() {

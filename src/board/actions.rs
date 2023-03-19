@@ -7,13 +7,13 @@ pub enum UndoMoveError {
     NoHistoryMoves,
 }
 
-pub type ActionInfo = usize;
+pub type ActionInfo = u16;
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub struct Action {
-    pub from: Option<u32>,
-    pub to: u32,
-    pub team: u32,
+    pub from: Option<u16>,
+    pub to: u16,
+    pub team: u16,
     pub piece_type: PieceType,
 
     /// Moves can store extra information both for specifying additional variants of a move.
@@ -29,8 +29,8 @@ pub struct Action {
 /// It's mainly there for Neural Networks to be able to index moves.
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub struct TheoreticalAction {
-    pub from: Option<u32>,
-    pub to: u32,
+    pub from: Option<u16>,
+    pub to: u16,
     pub info: ActionInfo
 }
 
@@ -67,7 +67,12 @@ pub enum HistoryState<const T: usize> {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct HistoryMove<const T: usize> {
     pub action: Move,
-    pub state: HistoryState<T>,
+    // When undoing moves, we need to make sure we don't mess up our `history` information with the last `n` moves, because movegen will still be using it for say, en passant.
+    // If we look say, 10 ply ahead, and get rid of all previous history moves, we won't remember our en passant info at say 1 ply.
+    // To solve this, we store `first_history_move`.
+    // If we need to get rid of `history[0]` to make space for our latest move, we'll put it here, so once we undo it, we can remember what it originally was.
+    pub first_history_move: Option<Move>,
+    pub state: HistoryState<T>
 }
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]

@@ -3,7 +3,8 @@ use std::fmt::Display;
 use std::fmt::Error;
 use std::fmt::Formatter;
 
-use arrayvec::ArrayVec;
+use heapless::{Vec as HeapVec, Deque as HeapDeque};
+use std::collections::VecDeque;
 use fastrand;
 
 use crate::bitboard::BitBoard;
@@ -16,12 +17,12 @@ use super::{
     pieces::Piece, zobrist::ZobristHashTable,
 };
 
-pub type PieceType = usize;
+pub type PieceType = u16;
 
 /// I doubt anyone would be practically creating boards of 4,294,967,296 x 4,294,967,296.
 /// However, storing these as u32s makes it much easier to interface the bitboards with (particularly, shifting bits with them.)
-pub type Rows = u32;
-pub type Cols = u32;
+pub type Rows = u16;
+pub type Cols = u16;
 
 pub fn update_turns<const T: usize>(state: &mut BoardState<T>) {
     state.turns += 1;
@@ -59,28 +60,28 @@ pub struct BoardState<const T: usize> {
     pub pieces: Vec<BitBoard<T>>,
     pub teams: Vec<BitBoard<T>>,
 
-    pub moving_team: u32,
-    pub current_turn: u32,
+    pub moving_team: u16,
+    pub current_turn: u16,
 
     /// Full Moves is one full move, where each team completes one sub move (or all of their turns)
-    pub full_moves: u32,
+    pub full_moves: u16,
 
     /// Sub Moves is one sub move, where a single team completes all of their turns
-    pub sub_moves: u32,
+    pub sub_moves: u16,
 
     /// A turn is a single movement of a piece. Chess only has one turn, but games like duck chess have two (move the piece, then move the duck)
-    pub turns: u32,
+    pub turns: u16,
 
     /// Edges is a list of "boundary bitboards" for validating the movement of delta pieces (pieces that move in a fixed way everytime)
     pub edges: Vec<Edges<T>>,
     pub rows: Rows,
     pub cols: Cols,
-    pub squares: u32,
+    pub squares: u16,
 
-    pub turn_lookup: ArrayVec<u32, 16>,
-    pub team_lookup: ArrayVec<u32, 16>,
-    pub turn_reverse_lookup: ArrayVec<u32, 16>,
-    pub team_reverse_lookup: ArrayVec<u32, 16>,
+    pub turn_lookup: HeapVec<u16, 16>,
+    pub team_lookup: HeapVec<u16, 16>,
+    pub turn_reverse_lookup: HeapVec<u16, 16>,
+    pub team_reverse_lookup: HeapVec<u16, 16>,
 }
 
 impl<const T: usize> BoardState<T> {
@@ -99,12 +100,12 @@ pub type AttackDirections<const T: usize> = Vec<BitBoard<T>>;
 
 pub type AttackLookup<const T: usize> = Vec<AttackDirections<T>>;
 
-#[derive(Debug, Clone, Eq)]
+#[derive(Debug, Clone)]
 pub struct Board<'a, const T: usize> {
     pub state: BoardState<T>,
     pub game: &'a Game<T>,
     pub attack_lookup: Vec<AttackLookup<T>>,
-    pub history: ArrayVec<HistoryMove<T>, 2048>
+    pub history: HeapDeque<Move, 4>
 }
 
 impl<'a, const T: usize> Display for Board<'a, T> {
@@ -125,8 +126,10 @@ impl<'a, const T: usize> PartialEq for Board<'a, T> {
     }
 }
 
-fn generate_forward_lookup(count: u32) -> ArrayVec<u32, 16> {
-    let mut lookup = ArrayVec::new();
+impl<'a, const T: usize> Eq for Board<'a, T> {}
+
+fn generate_forward_lookup(count: u16) -> HeapVec<u16, 16> {
+    let mut lookup = HeapVec::new();
     for i in 0..count {
         let mut new_val = i + 1;
         if new_val >= count {
@@ -137,15 +140,15 @@ fn generate_forward_lookup(count: u32) -> ArrayVec<u32, 16> {
     lookup
 }
 
-fn generate_reverse_lookup(count: u32) -> ArrayVec<u32, 16> {
-    let mut lookup = ArrayVec::new();
+fn generate_reverse_lookup(count: u16) -> HeapVec<u16, 16> {
+    let mut lookup = HeapVec::new();
     for i in 0..count {
-        let i = i as i32;
+        let i = i as i16;
         let mut new_val = i - 1;
         if new_val < 0 {
-            new_val = (count - 1) as i32;
+            new_val = (count - 1) as i16;
         }
-        lookup.push(new_val as u32);
+        lookup.push(new_val as u16);
     }
     lookup
 }
@@ -167,7 +170,7 @@ impl<'a, const T: usize> Board<'a, T> {
         let mut board = Board {
             attack_lookup: vec![],
             game,
-            history: ArrayVec::new(),
+            history: HeapDeque::new(),
             state: BoardState {
                 all_pieces: BitBoard::new(),
                 first_move: BitBoard::new(),
@@ -195,7 +198,7 @@ impl<'a, const T: usize> Board<'a, T> {
         board
     }
 
-    pub fn get_move_mask(&self, team: u32, mode: u32) -> BitBoard<T> {
+    pub fn get_move_mask(&self, team: u16, mode: u16) -> BitBoard<T> {
         let board_len = self.state.squares;
         let mut bitboard = BitBoard::new();
 
@@ -203,15 +206,15 @@ impl<'a, const T: usize> Board<'a, T> {
             let board = *board & self.state.teams[team as usize];
             let piece = &self.game.pieces[ind];
 
-            for bit in board.iter_set_bits(board_len as u32) {
-                bitboard |= piece.get_moves(self, BitBoard::from_lsb(bit), ind, team, mode);
+            for bit in board.iter_set_bits(board_len) {
+                bitboard |= piece.get_moves(self, BitBoard::from_lsb(bit), ind as PieceType, team, mode);
             }
         }
 
         bitboard
     }
 
-    pub fn can_move(&self, team: u32, target: BitBoard<T>, mode: u32) -> bool {
+    pub fn can_move(&self, team: u16, target: BitBoard<T>, mode: u16) -> bool {
         let board_len = self.state.squares;
 
         let team = self.state.moving_team;
@@ -226,7 +229,7 @@ impl<'a, const T: usize> Board<'a, T> {
                     self,
                     BitBoard::from_lsb(bit),
                     bit,
-                    ind,
+                    ind as PieceType,
                     team,
                     mode,
                     target,
@@ -237,7 +240,7 @@ impl<'a, const T: usize> Board<'a, T> {
         (mask & target).is_set()
     }
 
-    pub fn generate_from_moves(&self, mode: u32, from: u32) -> Vec<Move> {
+    pub fn generate_from_moves(&self, mode: u16, from: u16) -> Vec<Move> {
         let team = self.state.moving_team;
         let from_board = BitBoard::from_lsb(from);
         let mut piece_type = usize::MAX;
@@ -251,12 +254,12 @@ impl<'a, const T: usize> Board<'a, T> {
         let mut actions: Vec<Move> = Vec::with_capacity(self.state.squares as usize);
 
         let piece = &self.game.pieces[piece_type];
-        piece.add_actions(&mut actions, self, piece_type, from, team, mode);
+        piece.add_actions(&mut actions, self, piece_type as PieceType, from, team, mode);
 
         vec![]
     }
 
-    pub fn generate_drop_moves(&self, mode: u32) -> Vec<Move> {
+    pub fn generate_drop_moves(&self, mode: u16) -> Vec<Move> {
         let team = self.state.moving_team;
         let mut actions: Vec<Move> = Vec::with_capacity(self.state.squares as usize);
 
@@ -265,7 +268,7 @@ impl<'a, const T: usize> Board<'a, T> {
         vec![]
     }
 
-    pub fn generate_moves(&self, mode: u32) -> Vec<Move> {
+    pub fn generate_moves(&self, mode: u16) -> Vec<Move> {
         let board_len = self.state.squares;
         let mut actions: Vec<Move> = Vec::with_capacity(board_len as usize);
 
@@ -275,8 +278,8 @@ impl<'a, const T: usize> Board<'a, T> {
             let board = *board & self.state.teams[team as usize];
             let piece = &self.game.pieces[ind];
 
-            for bit in board.iter_set_bits(board_len as u32) {
-                piece.add_actions(&mut actions, self, ind, bit, team, mode);
+            for bit in board.iter_set_bits(board_len) {
+                piece.add_actions(&mut actions, self, ind as PieceType, bit, team, mode);
             }
         }
 
@@ -288,68 +291,94 @@ impl<'a, const T: usize> Board<'a, T> {
     /*
         Don't use when writing an engine directly; use `generate_moves` and `move_restrictions.is_legal` to avoid extra legality checks during pruning.
     */
-    pub fn generate_legal_moves(&mut self, mode: u32) -> Vec<Move> {
+    pub fn generate_legal_moves(&mut self, mode: u16) -> Vec<Move> {
         let moves = self.generate_moves(mode);
         self.game.controller.transform_moves(self, mode, moves)
     }
 
-    pub fn get_next_team(&self, mut team: u32) -> u32 {
+    pub fn get_next_team(&self, mut team: u16) -> u16 {
         team += 1;
 
-        if team >= self.state.teams.len() as u32 {
+        if team >= self.state.teams.len() as u16 {
             0
         } else {
             team
         }
     }
 
-    pub fn get_previous_team(&self, mut team: u32) -> u32 {
+    pub fn get_previous_team(&self, mut team: u16) -> u16 {
         team -= 1;
 
-        if team == u32::MAX {
-            (self.state.teams.len() - 1) as u32
+        if team == u16::MAX {
+            (self.state.teams.len() - 1) as u16
         } else {
             team
         }
     }
 
-    pub fn make_move(&mut self, action: &Move) {
+    pub fn retrieve_first_history_move(&mut self, action: Move) -> Option<Move> {
+        if self.game.saved_last_moves == 0 {
+            return None;
+        }
+
+        self.history.push_back(action);
+
+        if self.history.len() > self.game.saved_last_moves.into() {
+            self.history.pop_front()
+        } else {
+            None
+        }
+    }
+
+    pub fn reset_first_history_move(&mut self, first_history_move: Option<Move>) {
+        if self.game.saved_last_moves == 0 {
+            return;
+        }
+
+        if let Some(first_history_move) = first_history_move {
+            self.history.pop_back();
+            self.history.push_front(first_history_move);
+        }
+    }
+
+    pub fn make_move(&mut self, action: &Move) -> Option<HistoryMove<T>> {
         match action {
             Move::Action(action) => {
                 if action.from.is_some() {
-                    self.game.pieces[action.piece_type].make_move(self, action);
+                    self.game.pieces[action.piece_type as usize].make_move(self, action)
                 } else {
-                    self.game.controller.make_drop_move(self, action);
+                    self.game.controller.make_drop_move(self, action)
                 }
             }
             Move::Pass => {
-                self.history.push(HistoryMove {
+                let history = HistoryMove {
                     action: Move::Pass,
-                    state: HistoryState::None
-                });
+                    state: HistoryState::None,
+                    first_history_move: self.retrieve_first_history_move(Move::Pass)
+                };
                 update_turns(&mut self.state);
-                return;
+                Some(history)
             }
         }
     }
 
     #[inline(never)]
-    pub fn undo_move(&mut self) {
-        match self.history.last() {
+    pub fn undo_move(&mut self, undo: Option<HistoryMove<T>>) {
+        match undo {
             Some(history_move) => {
+                self.reset_first_history_move(history_move.first_history_move);
                 match history_move.action {
                     Move::Action(history_action) => {
-                        self.game.pieces[history_action.piece_type].undo_move(
+                        self.game.pieces[history_action.piece_type as usize].undo_move(
                             &mut self.state,
                             self.game,
-                            history_move,
+                            &history_move
                         );
                     }
                     Move::Pass => {
                         reverse_turns(&mut self.state, &self.game);
                     }
                 };
-                self.history.pop();
             }
             None => {
                 // We panic instead of making it an error because this is an incredible unlikely error that almost 
@@ -357,7 +386,7 @@ impl<'a, const T: usize> Board<'a, T> {
                 // to come across and handle this.
                 // It isn't worth the effort having to propagate the error through so many functions.
 
-                panic!("Can't undo move when there's no history moves.");
+                panic!("Can't undo move when `undo` is None.");
             }
         }
     }

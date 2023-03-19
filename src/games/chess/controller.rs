@@ -6,7 +6,7 @@ use super::ATTACKS_MODE;
 pub struct ChessMoveController<const T: usize>;
 
 impl<const T: usize> MoveController<T> for ChessMoveController<T> {
-    fn transform_moves(&self, board: &mut Board<T>, mode: u32, actions: Vec<Move>) -> Vec<Move> {
+    fn transform_moves(&self, board: &mut Board<T>, mode: u16, actions: Vec<Move>) -> Vec<Move> {
         let moves = board.generate_moves(mode);
         let mut legal_moves = Vec::with_capacity(moves.len());
         for action in moves {
@@ -28,11 +28,11 @@ impl<const T: usize> MoveController<T> for ChessMoveController<T> {
 
                 let current_team = board.state.moving_team;
 
-                board.make_move(&Move::Action(*action));
+                let undo = board.make_move(&Move::Action(*action));
                 let kings = board.state.pieces[5];
                 let king_board = board.state.teams[current_team as usize] & kings;
                 let in_check = board.can_move(board.state.moving_team, king_board, ATTACKS_MODE);
-                board.undo_move();
+                board.undo_move(undo);
                 !in_check
             }
             Move::Pass => {
@@ -57,7 +57,7 @@ impl<const T: usize> MoveController<T> for ChessMoveController<T> {
                             "{}{}{}",
                             board.encode_position(from),
                             board.encode_position(action.to),
-                            board.game.pieces[action.piece_type].format_info(board, action.info)
+                            board.game.pieces[action.piece_type as usize].format_info(board, action.info)
                         ),
                         None => "----".to_string()
                     }

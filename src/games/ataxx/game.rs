@@ -24,6 +24,7 @@ impl Ataxx {
             rows: 7,
             cols: 7,
             squares: 49,
+            saved_last_moves: 0,
             zobrist_controller: Box::new(DefaultZobristController),
             zobrist: ZobristHashTable::<1>::generate(49, 2, 1, 0, || fastrand::u64(0..u64::MAX)),
             name: String::from("Ataxx"),

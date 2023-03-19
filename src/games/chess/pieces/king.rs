@@ -11,10 +11,10 @@ use crate::{
     games::chess::game::ATTACKS_MODE,
 };
 
-const NORMAL_KING_MOVE: usize = 0;
-const CASTLING_MOVE: usize = 1;
+const NORMAL_KING_MOVE: u16 = 0;
+const CASTLING_MOVE: u16 = 1;
 
-const ROOK_PIECE_TYPE: usize = 3;
+const ROOK_PIECE_TYPE: PieceType = 3;
 
 #[derive(Debug)] pub struct KingPiece<const T: usize>;
 
@@ -35,7 +35,7 @@ fn down_one<const T: usize>(from: BitBoard<T>, cols: Cols, edges: &Edges<T>) -> 
 }
 
 impl<const T: usize> KingPiece<T> {
-    fn make_castling_move(&self, board: &mut Board<T>, action: &Action, from: BitBoard<T>, to: BitBoard<T>) {
+    fn make_castling_move(&self, board: &mut Board<T>, action: &Action, from: BitBoard<T>, to: BitBoard<T>) -> Option<HistoryMove<T>> {
         let cols = board.state.cols;
         let mut left_center = BitBoard::from_lsb(if cols % 2 == 0 {
             (cols / 2) - 1
@@ -59,10 +59,11 @@ impl<const T: usize> KingPiece<T> {
         };
 
         let color: usize = action.team as usize;
-        let piece_type = action.piece_type;
+        let piece_type = action.piece_type as usize;
 
         let history_move = HistoryMove {
             action: Move::Action(*action),
+            first_history_move: board.retrieve_first_history_move(Move::Action(*action)),
             state: HistoryState::Any {
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 first_move: PreviousBoard(board.state.first_move),
@@ -73,19 +74,18 @@ impl<const T: usize> KingPiece<T> {
                         board.state.pieces[piece_type],
                     )),
                     HistoryUpdate::Piece(IndexedPreviousBoard(
-                        ROOK_PIECE_TYPE,
-                        board.state.pieces[ROOK_PIECE_TYPE],
+                        ROOK_PIECE_TYPE as usize,
+                        board.state.pieces[ROOK_PIECE_TYPE as usize],
                     )),
                 ],
             },
         };
-        board.history.push(history_move);
 
         board.state.teams[color] ^= from;
         board.state.teams[color] ^= to;
 
         board.state.pieces[piece_type] ^= from;
-        board.state.pieces[ROOK_PIECE_TYPE] ^= to;
+        board.state.pieces[ROOK_PIECE_TYPE as usize] ^= to;
 
         board.state.all_pieces ^= from;
         board.state.all_pieces ^= to;
@@ -93,7 +93,7 @@ impl<const T: usize> KingPiece<T> {
         match dir {
             Direction::LEFT => {
                 board.state.pieces[piece_type] |= castle_left_king;
-                board.state.pieces[ROOK_PIECE_TYPE] |= castle_left_rook;
+                board.state.pieces[ROOK_PIECE_TYPE as usize] |= castle_left_rook;
 
                 board.state.teams[color] |= castle_left_king;
                 board.state.teams[color] |= castle_left_rook;
@@ -103,7 +103,7 @@ impl<const T: usize> KingPiece<T> {
             }
             Direction::RIGHT => {
                 board.state.pieces[piece_type] |= castle_right_king;
-                board.state.pieces[ROOK_PIECE_TYPE] |= castle_right_rook;
+                board.state.pieces[ROOK_PIECE_TYPE as usize] |= castle_right_rook;
 
                 board.state.teams[color] |= castle_right_king;
                 board.state.teams[color] |= castle_right_rook;
@@ -115,6 +115,8 @@ impl<const T: usize> KingPiece<T> {
 
         board.state.first_move &= !from;
         board.state.first_move &= !to;
+
+        Some(history_move)
     }
 }
 
@@ -141,10 +143,10 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
         &self,
         board: &Board<T>,
         from: BitBoard<T>,
-        from_bit: u32,
-        piece_type: usize,
-        team: u32,
-        mode: u32,
+        from_bit: u16,
+        piece_type: PieceType,
+        team: u16,
+        mode: u16,
         to: BitBoard<T>,
     ) -> BitBoard<T> {
         self.get_attack_lookup(board, piece_type).expect("Could not find move lookup table for king")[from_bit as usize][0]
@@ -155,9 +157,9 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
         &self,
         board: &Board<T>,
         from: BitBoard<T>,
-        piece_type: usize,
-        team: u32,
-        mode: u32,
+        piece_type: PieceType,
+        team: u16,
+        mode: u16,
     ) -> BitBoard<T> {
         let lookup = self.get_attack_lookup(board, piece_type);
         match lookup {
@@ -170,17 +172,16 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
         &self,
         board: &mut Board<T>,
         action: &Action,
-        piece_type: usize,
+        piece_type: PieceType,
         from: BitBoard<T>,
         to: BitBoard<T>,
-    ) {
+    ) -> Option<HistoryMove<T>> {
         if action.move_type == CASTLING_MOVE {
-            self.make_castling_move(board, action, from, to);
-
-            return;
+            return self.make_castling_move(board, action, from, to);
         }
 
         let color: usize = action.team as usize;
+        let piece_type = piece_type as usize;
         let captured_color: usize = if (to & board.state.teams[0]).is_set() {
             0
         } else {
@@ -196,6 +197,7 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
 
         let history_move = HistoryMove {
             action: Move::Action(*action),
+            first_history_move: board.retrieve_first_history_move(Move::Action(*action)),
             state: HistoryState::Any {
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 first_move: PreviousBoard(board.state.first_move),
@@ -216,7 +218,6 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
                 ],
             },
         };
-        board.history.push(history_move);
 
         board.state.teams[captured_color] ^= to;
         board.state.teams[color] ^= from;
@@ -231,16 +232,18 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
         board.state.first_move &= !from;
         board.state.first_move &= !to;
         // We actually don't need to swap the blockers. A blocker will still exist on `to`, just not on `from`.
+
+        Some(history_move)
     }
 
     fn add_actions(
         &self,
         actions: &mut Vec<Move>,
         board: &Board<T>,
-        piece_type: usize,
-        from: u32,
-        team: u32,
-        mode: u32,
+        piece_type: PieceType,
+        from: u16,
+        team: u16,
+        mode: u16,
     ) {
         let rows = board.state.rows;
         let cols = board.state.cols;
@@ -285,7 +288,7 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
             return;
         }
 
-        let rooks = board.state.pieces[ROOK_PIECE_TYPE] & team_board & first_move & bottom_row;
+        let rooks = board.state.pieces[ROOK_PIECE_TYPE as usize] & team_board & first_move & bottom_row;
 
         /*
             FRC Castling brings us to the same positions that traditional chess castling would.

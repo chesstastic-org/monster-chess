@@ -17,20 +17,20 @@ impl Direction {
 
 impl<const T: usize> BitBoard<T> {
     /// A forward bitscan, which finds the least significant 1-bit.
-    pub fn bitscan_forward(&self) -> u32 {
+    pub fn bitscan_forward(&self) -> u16 {
         assert!(
             self.is_set(),
             "Bitscan Forward only works for non-empty BitBoards."
         );
 
         if T == 1 {
-            self.bits[0].trailing_zeros()
+            self.bits[0].trailing_zeros() as u16
         } else {
-            let mut zeros: u32 = 0;
+            let mut zeros: u16 = 0;
             for i in (0..T).rev() {
                 let data = self.bits[i];
                 if data != 0 {
-                    zeros += data.trailing_zeros();
+                    zeros += data.trailing_zeros() as u16;
                     break;
                 }
 
@@ -41,30 +41,30 @@ impl<const T: usize> BitBoard<T> {
     }
 
     /// A reverse bitscan, which finds the most significant 1-bit.
-    pub fn bitscan_reverse(&self) -> u32 {
+    pub fn bitscan_reverse(&self) -> u16 {
         assert!(
             self.is_set(),
             "Bitscan Reverse only works for non-empty BitBoards."
         );
 
         if T == 1 {
-            127 - self.bits[0].leading_zeros()
+            127 - self.bits[0].leading_zeros() as u16
         } else {
-            let mut zeros: u32 = 0;
+            let mut zeros: u16 = 0;
             for i in 0..T {
                 let data = self.bits[i];
                 if data != 0 {
-                    zeros += data.leading_zeros();
+                    zeros += data.leading_zeros() as u16;
                     break;
                 }
 
                 zeros += 128;
             }
-            (((T as u32) * 128) - 1) - zeros
+            (((T as u16) * 128) - 1) - zeros
         }
     }
 
-    pub fn bitscan(&self, direction: Direction) -> u32 {
+    pub fn bitscan(&self, direction: Direction) -> u16 {
         match direction {
             Direction::LEFT => self.bitscan_forward(),
             Direction::RIGHT => self.bitscan_reverse(),
