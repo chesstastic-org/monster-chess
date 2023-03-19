@@ -67,6 +67,8 @@ impl<const T: usize> Piece<T> for StonePiece {
 
     fn make_move(&self, board: &mut Board<T>, action: &Action) -> Option<HistoryMove<T>> {
         if let Some(from) = action.from {
+            update_turns(&mut board.state, &board.game, &Move::Action(*action));
+            
             let from = BitBoard::<T>::from_lsb(from);
             let to = BitBoard::<T>::from_lsb(action.to);
 
@@ -127,8 +129,6 @@ impl<const T: usize> Piece<T> for StonePiece {
 
             board.state.teams[other_team] ^= to_update;
             board.state.teams[team] |= to_update;
-
-            update_turns(&mut board.state, &board.game, &Move::Action(*action));
 
             Some(history_move)
         } else {
