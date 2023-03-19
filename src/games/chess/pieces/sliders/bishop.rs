@@ -53,10 +53,10 @@ impl<const T: usize> Piece<T> for BishopPiece {
         &self,
         board: &Board<T>,
         from: BitBoard<T>,
-        from_bit: u32,
+        from_bit: u16,
         piece_type: usize,
-        team: u32,
-        mode: u32,
+        team: u16,
+        mode: u16,
         to: BitBoard<T>,
     ) -> BitBoard<T> {
         let lookup = self
@@ -84,8 +84,8 @@ impl<const T: usize> Piece<T> for BishopPiece {
         board: &Board<T>,
         from: BitBoard<T>,
         piece_type: usize,
-        team: u32,
-        mode: u32,
+        team: u16,
+        mode: u16,
     ) -> BitBoard<T> {
         let lookup = self
             .get_attack_lookup(board, piece_type)

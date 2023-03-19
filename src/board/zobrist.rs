@@ -3,23 +3,23 @@ use super::{Board, game::Game};
 #[derive(Debug, Clone)]
 pub struct ZobristHashTable<const T: usize> {
     pub table: Vec<u64>,
-    pub squares: u32,
-    pub teams: u32,
-    pub pieces: u32,
+    pub squares: u16,
+    pub teams: u16,
+    pub pieces: u16,
     pub base_len: usize,
     pub extra_len: usize
 }
 
 impl<const T: usize> ZobristHashTable<T> {
-    fn get_gap_index(&self, position: u32) -> usize {
+    fn get_gap_index(&self, position: u16) -> usize {
         position as usize
     }
 
-    fn get_first_move_index(&self, position: u32) -> usize {
+    fn get_first_move_index(&self, position: u16) -> usize {
         (position + (self.squares)) as usize
     }
 
-    fn get_piece_index(&self, position: u32, piece_type: u32, team: u32) -> usize {
+    fn get_piece_index(&self, position: u16, piece_type: u16, team: u16) -> usize {
         (position + (self.squares * (1 + (piece_type + (self.pieces * team))))) as usize
     }
 
@@ -46,7 +46,7 @@ impl<const T: usize> ZobristHashTable<T> {
         hash
     }
 
-    pub fn generate(squares: u32, teams: u32, pieces: u32, extra_hashes: usize, get_random: impl Fn() -> u64) -> ZobristHashTable<T> {
+    pub fn generate(squares: u16, teams: u16, pieces: u16, extra_hashes: usize, get_random: impl Fn() -> u64) -> ZobristHashTable<T> {
         let hashes = (squares * (2 + (pieces * teams))) as usize;
         let base_len = (
             (squares - 1) + (squares * (1 + ((pieces - 1) + (pieces * (teams - 1))))) + 1

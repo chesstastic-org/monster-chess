@@ -15,7 +15,7 @@ impl<const T: usize> MoveController<T> for AtaxxMoveController {
         return false;
     }
 
-    fn transform_moves(&self, board: &mut Board<T>, mode: u32, actions: Vec<Move>) -> Vec<Move> {
+    fn transform_moves(&self, board: &mut Board<T>, mode: u16, actions: Vec<Move>) -> Vec<Move> {
         // No Legal Moves
         if actions.len() == 0 {
             let board_mask = BitBoard::starting_at_lsb(0, 49);
@@ -34,7 +34,7 @@ impl<const T: usize> MoveController<T> for AtaxxMoveController {
             }
             
         } else {
-            let mut set = HashSet::<u32>::with_capacity(actions.len());
+            let mut set = HashSet::<u16>::with_capacity(actions.len());
             let mut new_actions = Vec::with_capacity(actions.len());
 
             for action in actions {

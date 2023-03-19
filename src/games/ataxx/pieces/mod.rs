@@ -54,8 +54,8 @@ impl<const T: usize> Piece<T> for StonePiece {
         board: &Board<T>,
         from: BitBoard<T>,
         piece_type: usize,
-        team: u32,
-        mode: u32,
+        team: u16,
+        mode: u16,
     ) -> BitBoard<T> {
         let lookup = self.get_attack_lookup(board, piece_type);
         let base_moves = match lookup {

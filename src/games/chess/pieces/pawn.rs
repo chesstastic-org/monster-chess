@@ -19,7 +19,7 @@ fn promotion_move(piece_type: PieceType) -> usize {
 
 #[derive(Debug)] pub struct PawnPiece<const T: usize>;
 
-pub fn up<const T: usize>(bitboard: &BitBoard<T>, shift: u32, cols: Cols, team: u32) -> BitBoard<T> {
+pub fn up<const T: usize>(bitboard: &BitBoard<T>, shift: u16, cols: Cols, team: u16) -> BitBoard<T> {
     match team {
         0 => bitboard.up(shift, cols),
         1 => bitboard.down(shift, cols),
@@ -27,7 +27,7 @@ pub fn up<const T: usize>(bitboard: &BitBoard<T>, shift: u32, cols: Cols, team: 
     }
 }
 
-pub fn down<const T: usize>(bitboard: &BitBoard<T>, shift: u32, cols: Cols, team: u32) -> BitBoard<T> {
+pub fn down<const T: usize>(bitboard: &BitBoard<T>, shift: u16, cols: Cols, team: u16) -> BitBoard<T> {
     match team {
         0 => bitboard.down(shift, cols),
         1 => bitboard.up(shift, cols),
@@ -47,7 +47,7 @@ impl<const T: usize> PawnPiece<T> {
         let cols = board.state.cols;
 
         let color: usize = action.team as usize;
-        let en_passant_target = down(&to, 1, cols, color as u32);
+        let en_passant_target = down(&to, 1, cols, color as u16);
 
         let en_passant_target_color: usize = if (en_passant_target & board.state.teams[0]).is_set()
         {
@@ -161,10 +161,10 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
         &self,
         board: &Board<T>,
         from: BitBoard<T>,
-        from_bit: u32,
+        from_bit: u16,
         piece_type: usize,
-        team: u32,
-        mode: u32,
+        team: u16,
+        mode: u16,
         to: BitBoard<T>,
     ) -> BitBoard<T> {
         self.get_attack_lookup(board, piece_type).expect("Could not find pawn attack lookup")[from_bit as usize][team as usize]
@@ -175,8 +175,8 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
         board: &Board<T>,
         from: BitBoard<T>,
         piece_type: usize,
-        team: u32,
-        mode: u32,
+        team: u16,
+        mode: u16,
     ) -> BitBoard<T> {
         let cols = board.state.cols;
         let edges = &board.state.edges[0];
@@ -370,9 +370,9 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
         actions: &mut Vec<Move>,
         board: &Board<T>,
         piece_type: usize,
-        from: u32,
-        team: u32,
-        mode: u32,
+        from: u16,
+        team: u16,
+        mode: u16,
     ) {
         let promotion_rows = board.state.edges[0].bottom | board.state.edges[0].top;
 

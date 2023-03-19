@@ -24,7 +24,7 @@ impl<const T: usize> FenArgument<T> for FenTeamArgument {
     fn decode(&self, board: &mut Board<T>, arg: &str) -> Result<(), FenDecodeError> {
         match self {
             FenTeamArgument::Number => {
-                board.state.moving_team = arg.parse::<u32>().map_err(|_| {
+                board.state.moving_team = arg.parse::<u16>().map_err(|_| {
                     FenDecodeError::InvalidArgument(format!(
                         "{} is not a valid numerical team value",
                         arg
@@ -35,7 +35,7 @@ impl<const T: usize> FenArgument<T> for FenTeamArgument {
                 let team = teams.iter().position(|el| el.to_string() == arg);
                 match team {
                     Some(team) => {
-                        board.state.moving_team = team as u32;
+                        board.state.moving_team = team as u16;
                     }
                     None => {
                         return Err(FenDecodeError::InvalidArgument(format!(
@@ -60,7 +60,7 @@ impl<const T: usize> FenArgument<T> for FenTurns {
     }
 
     fn decode(&self, board: &mut Board<T>, arg: &str) -> Result<(), FenDecodeError> {
-        board.state.turns = arg.parse::<u32>().map_err(|_| {
+        board.state.turns = arg.parse::<u16>().map_err(|_| {
             FenDecodeError::InvalidArgument(format!(
                 "'{arg}' is not a valid amount of turns, as it isn't a positive integer."
             ))
@@ -78,7 +78,7 @@ impl<const T: usize> FenArgument<T> for FenSubMoves {
     }
 
     fn decode(&self, board: &mut Board<T>, arg: &str) -> Result<(), FenDecodeError> {
-        board.state.sub_moves = arg.parse::<u32>().map_err(|_| {
+        board.state.sub_moves = arg.parse::<u16>().map_err(|_| {
             FenDecodeError::InvalidArgument(format!(
                 "'{arg}' is not a valid amount of sub moves, as it isn't a positive integer."
             ))
@@ -96,7 +96,7 @@ impl<const T: usize> FenArgument<T> for FenFullMoves {
     }
 
     fn decode(&self, board: &mut Board<T>, arg: &str) -> Result<(), FenDecodeError> {
-        board.state.full_moves = arg.parse::<u32>().map_err(|_| {
+        board.state.full_moves = arg.parse::<u16>().map_err(|_| {
             FenDecodeError::InvalidArgument(format!(
                 "'{arg}' is not a valid amount of full moves, as it isn't a positive integer."
             ))

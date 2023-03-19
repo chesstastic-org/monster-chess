@@ -6,7 +6,7 @@ use super::ATTACKS_MODE;
 pub struct ChessMoveController<const T: usize>;
 
 impl<const T: usize> MoveController<T> for ChessMoveController<T> {
-    fn transform_moves(&self, board: &mut Board<T>, mode: u32, actions: Vec<Move>) -> Vec<Move> {
+    fn transform_moves(&self, board: &mut Board<T>, mode: u16, actions: Vec<Move>) -> Vec<Move> {
         let moves = board.generate_moves(mode);
         let mut legal_moves = Vec::with_capacity(moves.len());
         for action in moves {

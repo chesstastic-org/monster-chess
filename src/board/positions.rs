@@ -13,7 +13,7 @@ const COLS: [char; 52] = [
 ];
 
 impl<'a, const T: usize> Board<'a, T> {
-    pub fn encode_position(&self, pos: u32) -> String {
+    pub fn encode_position(&self, pos: u16) -> String {
         let base_row = pos / self.state.cols;
         let col = pos - (self.state.cols * base_row);
         let row = self.state.rows - base_row;
@@ -21,7 +21,7 @@ impl<'a, const T: usize> Board<'a, T> {
         return format!("{}{}", COLS[col as usize], row);
     }
 
-    pub fn decode_position(&self, text: String) -> Result<u32, String> {
+    pub fn decode_position(&self, text: String) -> Result<u16, String> {
         let col = text
             .chars()
             .nth(0)
@@ -30,10 +30,10 @@ impl<'a, const T: usize> Board<'a, T> {
         let col = COLS
             .iter()
             .position(|el| el == &col)
-            .ok_or(format!("Cannot find board column from char '{col}'"))? as u32;
+            .ok_or(format!("Cannot find board column from char '{col}'"))? as u16;
         let row = self.state.rows
             - text[1..]
-                .parse::<u32>()
+                .parse::<u16>()
                 .map_err(|_| format!("Cannot find board row from char '{}'", &text[1..]))?;
 
         Ok(col + (self.state.cols * row))
@@ -43,7 +43,7 @@ impl<'a, const T: usize> Board<'a, T> {
         self.game.controller.encode_action(self, action)[0].clone()
     }
 
-    pub fn decode_action(&mut self, action: &str, mode: u32) -> Option<Move> {
+    pub fn decode_action(&mut self, action: &str, mode: u16) -> Option<Move> {
         self.game.controller.decode_action(self, action, mode)
     }
 }

@@ -11,9 +11,9 @@ pub type ActionInfo = usize;
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub struct Action {
-    pub from: Option<u32>,
-    pub to: u32,
-    pub team: u32,
+    pub from: Option<u16>,
+    pub to: u16,
+    pub team: u16,
     pub piece_type: PieceType,
 
     /// Moves can store extra information both for specifying additional variants of a move.
@@ -29,8 +29,8 @@ pub struct Action {
 /// It's mainly there for Neural Networks to be able to index moves.
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub struct TheoreticalAction {
-    pub from: Option<u32>,
-    pub to: u32,
+    pub from: Option<u16>,
+    pub to: u16,
     pub info: ActionInfo
 }
 

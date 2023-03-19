@@ -77,10 +77,10 @@ impl<const T: usize> Piece<T> for KnightPiece<T> {
         &self,
         board: &Board<T>,
         from: BitBoard<T>,
-        from_bit: u32,
+        from_bit: u16,
         piece_type: usize,
-        team: u32,
-        mode: u32,
+        team: u16,
+        mode: u16,
         to: BitBoard<T>,
     ) -> BitBoard<T> {
         self.get_attack_lookup(board, piece_type).expect("Could not find move lookup table for Knight")[from_bit as usize][0]
@@ -92,8 +92,8 @@ impl<const T: usize> Piece<T> for KnightPiece<T> {
         board: &Board<T>,
         from: BitBoard<T>,
         piece_type: usize,
-        team: u32,
-        mode: u32,
+        team: u16,
+        mode: u16,
     ) -> BitBoard<T> {
         let lookup = self.get_attack_lookup(board, piece_type);
         match lookup {

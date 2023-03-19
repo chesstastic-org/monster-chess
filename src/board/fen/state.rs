@@ -27,7 +27,7 @@ impl<'a, const T: usize> Board<'a, T> {
                 if char.is_numeric() {
                     board_ind += char.to_digit(10).expect(&format!(
                         "Could not convert {char} to an integer in FEN state."
-                    ));
+                    )) as u16;
                     i += 1;
                     continue;
                 }

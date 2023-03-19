@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-pub const NORMAL_MODE: u32 = 0;
+pub const NORMAL_MODE: u16 = 0;
 
 use super::{actions::{Action, ActionInfo, TheoreticalAction, Move, TheoreticalMove}, fen::FenOptions, pieces::Piece, Board, Rows, Cols, zobrist::ZobristHashTable};
 
@@ -37,7 +37,7 @@ pub fn get_theoretical_moves_bound<const T: usize>(board: &Board<T>, max_info: A
 }
 
 pub trait MoveController<const T: usize> : Debug + Send + Sync {
-    fn transform_moves(&self, board: &mut Board<T>, mode: u32, actions: Vec<Move>) -> Vec<Move>;
+    fn transform_moves(&self, board: &mut Board<T>, mode: u16, actions: Vec<Move>) -> Vec<Move>;
     fn is_legal(&self, board: &mut Board<T>, action: &Move) -> bool;
     fn use_pseudolegal(&self) -> bool;
 
@@ -47,7 +47,7 @@ pub trait MoveController<const T: usize> : Debug + Send + Sync {
     }
 
     fn encode_action(&self, board: &Board<T>, action: &Move) -> Vec<String>;
-    fn decode_action(&self, board: &mut Board<T>, action: &str, mode: u32) -> Option<Move> {
+    fn decode_action(&self, board: &mut Board<T>, action: &str, mode: u16) -> Option<Move> {
         board.generate_moves(mode)
             .iter()
             .find(|el| self.encode_action(board, el).contains(&action.to_string()))
@@ -96,8 +96,9 @@ pub trait MoveController<const T: usize> : Debug + Send + Sync {
     fn get_max_available_moves(&self) -> u32;
 }
 
+#[derive(Debug, Copy, Clone)]
 pub enum GameResults {
-    Win(u32),
+    Win(u16),
     Draw,
     Ongoing
 }
@@ -122,11 +123,11 @@ pub struct Game<const T: usize> {
     pub resolution: Box<dyn Resolution<T>>,
     pub fen_options: FenOptions<T>,
     pub name: String,
-    pub teams: u32,
-    pub turns: u32,
+    pub teams: u16,
+    pub turns: u16,
     pub rows: Rows,
     pub cols: Cols,
-    pub squares: u32,
+    pub squares: u16,
     /// Anything not covered by first_moves, pieces, and gaps should be zobrist_info
     pub zobrist_controller: Box<dyn ZobristController<T>>,
     pub zobrist: ZobristHashTable<T>

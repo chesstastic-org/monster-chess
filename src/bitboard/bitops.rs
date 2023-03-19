@@ -67,10 +67,10 @@ impl<const T: usize> ops::BitXorAssign<BitBoard<T>> for BitBoard<T> {
     }
 }
 
-impl<const T: usize> ops::Shl<u32> for BitBoard<T> {
+impl<const T: usize> ops::Shl<u16> for BitBoard<T> {
     type Output = BitBoard<T>;
 
-    fn shl(self, rhs: u32) -> Self::Output {
+    fn shl(self, rhs: u16) -> Self::Output {
         if T == 1 {
             return BitBoard {
                 bits: [self.bits[0] << rhs; T],
@@ -84,8 +84,8 @@ impl<const T: usize> ops::Shl<u32> for BitBoard<T> {
     }
 }
 
-impl<const T: usize> ops::ShlAssign<u32> for BitBoard<T> {
-    fn shl_assign(&mut self, mut rhs: u32) {
+impl<const T: usize> ops::ShlAssign<u16> for BitBoard<T> {
+    fn shl_assign(&mut self, mut rhs: u16) {
         if T == 1 {
             self.bits = [self.bits[0] << rhs; T];
             return;
@@ -109,10 +109,10 @@ impl<const T: usize> ops::ShlAssign<u32> for BitBoard<T> {
     }
 }
 
-impl<const T: usize> ops::Shr<u32> for BitBoard<T> {
+impl<const T: usize> ops::Shr<u16> for BitBoard<T> {
     type Output = BitBoard<T>;
 
-    fn shr(self, rhs: u32) -> Self::Output {
+    fn shr(self, rhs: u16) -> Self::Output {
         if T == 1 {
             return BitBoard {
                 bits: [self.bits[0] >> rhs; T],
@@ -126,8 +126,8 @@ impl<const T: usize> ops::Shr<u32> for BitBoard<T> {
     }
 }
 
-impl<const T: usize> ops::ShrAssign<u32> for BitBoard<T> {
-    fn shr_assign(&mut self, mut rhs: u32) {
+impl<const T: usize> ops::ShrAssign<u16> for BitBoard<T> {
+    fn shr_assign(&mut self, mut rhs: u16) {
         if T == 1 {
             self.bits = [self.bits[0] >> rhs; T];
             return;

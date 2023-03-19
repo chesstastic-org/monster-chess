@@ -43,17 +43,17 @@ pub trait Piece<const T: usize> : Debug + Send + Sync {
         board: &Board<T>,
         from: BitBoard<T>,
         piece_type: usize,
-        team: u32,
-        mode: u32,
+        team: u16,
+        mode: u16,
     ) -> BitBoard<T>;
     fn can_move_mask(
         &self,
         board: &Board<T>,
         from: BitBoard<T>,
-        from_bit: u32,
+        from_bit: u16,
         piece_type: usize,
-        team: u32,
-        mode: u32,
+        team: u16,
+        mode: u16,
         to: BitBoard<T>,
     ) -> BitBoard<T> {
         self.get_moves(board, from, piece_type, team, mode)
@@ -214,9 +214,9 @@ pub trait Piece<const T: usize> : Debug + Send + Sync {
         actions: &mut Vec<Move>,
         board: &Board<T>,
         piece_type: usize,
-        from: u32,
-        team: u32,
-        mode: u32,
+        from: u16,
+        team: u16,
+        mode: u16,
     ) {
         let from_board = BitBoard::from_lsb(from);
 

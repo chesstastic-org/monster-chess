@@ -7,7 +7,7 @@ use super::{
     Board, Cols, Rows,
 };
 
-pub type EdgeBuffer = u32;
+pub type EdgeBuffer = u16;
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub struct Edges<const T: usize> {
@@ -19,15 +19,15 @@ pub struct Edges<const T: usize> {
 }
 
 pub fn generate_edges<const T: usize>(buffer: EdgeBuffer, rows: Rows, cols: Cols) -> Edges<T> {
-    let top = !(BitBoard::max() << (buffer * cols) as u32);
-    let bottom = BitBoard::max() << ((rows - buffer) * cols) as u32;
+    let top = !(BitBoard::max() << (buffer * cols));
+    let bottom = BitBoard::max() << ((rows - buffer) * cols);
 
-    let mut left = BitBoard::max() & (!(BitBoard::max() << (buffer as u32)));
+    let mut left = BitBoard::max() & (!(BitBoard::max() << (buffer)));
     for _ in 1..rows {
         left |= (left << (cols));
     }
 
-    let right = left << (cols - buffer) as u32;
+    let right = left << (cols - buffer);
 
     let edges = top | bottom | left | right;
 
