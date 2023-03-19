@@ -104,7 +104,7 @@ pub struct Board<'a, const T: usize> {
     pub state: BoardState<T>,
     pub game: &'a Game<T>,
     pub attack_lookup: Vec<AttackLookup<T>>,
-    pub history: ArrayVec<HistoryMove<T>, 2048>
+    pub history: ArrayVec<HistoryMove<T>, 65536>
 }
 
 impl<'a, const T: usize> Display for Board<'a, T> {
