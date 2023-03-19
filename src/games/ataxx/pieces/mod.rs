@@ -77,6 +77,7 @@ impl<const T: usize> Piece<T> for StonePiece {
             let history_move = HistoryMove {
                 action: Move::Action(*action),
                 first_history_move: board.retrieve_first_history_move(Move::Action(*action)),
+                turn_info: board.get_turn_info(),
                 state: HistoryState::Any {
                     all_pieces: PreviousBoard(board.state.all_pieces),
                     first_move: PreviousBoard(board.state.first_move),
@@ -127,7 +128,7 @@ impl<const T: usize> Piece<T> for StonePiece {
             board.state.teams[other_team] ^= to_update;
             board.state.teams[team] |= to_update;
 
-            update_turns(&mut board.state);
+            update_turns(&mut board.state, &board.game, &Move::Action(*action));
 
             Some(history_move)
         } else {

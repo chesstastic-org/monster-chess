@@ -64,6 +64,24 @@ pub enum HistoryState<const T: usize> {
     None,
 }
 
+pub enum CounterUpdate {
+    Next,
+    To(u16)
+}
+
+pub struct TurnUpdate {
+    pub turns: CounterUpdate,
+    pub sub_moves: CounterUpdate,
+    pub full_moves: CounterUpdate
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct TurnInfo {
+    pub turns: u16,
+    pub sub_moves: u16,
+    pub full_moves: u16,
+}
+
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct HistoryMove<const T: usize> {
     pub action: Move,
@@ -72,6 +90,7 @@ pub struct HistoryMove<const T: usize> {
     // To solve this, we store `first_history_move`.
     // If we need to get rid of `history[0]` to make space for our latest move, we'll put it here, so once we undo it, we can remember what it originally was.
     pub first_history_move: Option<Move>,
+    pub turn_info: TurnInfo,
     pub state: HistoryState<T>
 }
 
