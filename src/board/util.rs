@@ -7,7 +7,7 @@ use heapless::{Vec as HeapVec, Deque as HeapDeque};
 use std::collections::VecDeque;
 use fastrand;
 
-use crate::bitboard::BitBoard;
+use crate::bitboard::{BitBoard, generate_ranks, generate_files};
 
 use super::actions::{Move, TurnInfo, CounterUpdate};
 use super::{
@@ -94,6 +94,9 @@ pub struct BoardState<const T: usize> {
     pub team_lookup: HeapVec<u16, 16>,
     pub turn_reverse_lookup: HeapVec<u16, 16>,
     pub team_reverse_lookup: HeapVec<u16, 16>,
+
+    pub ranks: Vec<BitBoard<T>>,
+    pub files: Vec<BitBoard<T>>
 }
 
 impl<const T: usize> BoardState<T> {
@@ -202,6 +205,8 @@ impl<'a, const T: usize> Board<'a, T> {
                 team_reverse_lookup,
                 turn_lookup,
                 turn_reverse_lookup,
+                ranks: generate_ranks(cols, rows),
+                files: generate_files(cols, rows)
             }
         };
 
