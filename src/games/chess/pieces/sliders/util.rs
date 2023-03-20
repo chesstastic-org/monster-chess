@@ -34,8 +34,7 @@ pub fn get_ray_attacks<const T: usize>(
 ) -> BitBoard<T> {
     let dir_usize = dir as usize;
     let mut attacks = ray_attacks[from_bit][dir_usize];
-    let mut blocker = attacks;
-    blocker &= board.state.all_pieces;
+    let blocker = attacks & board.state.all_pieces;
     if blocker.is_set() {
         let square = if from < blocker {
             blocker.bitscan_forward()

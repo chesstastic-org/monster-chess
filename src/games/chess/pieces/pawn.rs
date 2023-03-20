@@ -2,7 +2,7 @@ use crate::{
     bitboard::{Direction, BitBoard},
     board::{
         actions::{
-            Action, HistoryMove, HistoryState, HistoryUpdate, IndexedPreviousBoard, PreviousBoard, Move, ActionInfo,
+            Action, HistoryMove, HistoryState, HistoryUpdate, IndexedPreviousBoard, PreviousBoard, Move, ActionInfo, TurnInfo,
         },
         edges::Edges,
         pieces::{Piece, PieceSymbol},
@@ -43,6 +43,7 @@ impl<const T: usize> PawnPiece<T> {
         piece_type: PieceType,
         from: BitBoard<T>,
         to: BitBoard<T>,
+        turn_info: TurnInfo
     ) -> Option<HistoryMove<T>> {
         let cols = board.state.cols;
 
@@ -60,7 +61,7 @@ impl<const T: usize> PawnPiece<T> {
         let history_move = HistoryMove {
             action: Move::Action(*action),
             first_history_move: board.retrieve_first_history_move(Move::Action(*action)),
-            turn_info: board.get_turn_info(),
+            turn_info,
             state: HistoryState::Any {
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 first_move: PreviousBoard(board.state.first_move),
@@ -239,6 +240,7 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
         piece_type: PieceType,
         from: BitBoard<T>,
         to: BitBoard<T>,
+        turn_info: TurnInfo
     ) -> Option<HistoryMove<T>> {
         let color: usize = action.team as usize;
         let piece_type = piece_type as usize;
@@ -258,7 +260,7 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
         let mut history_move = HistoryMove {
             action: Move::Action(*action),
             first_history_move: board.retrieve_first_history_move(Move::Action(*action)),
-            turn_info: board.get_turn_info(),
+            turn_info,
             state: HistoryState::Any {
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 first_move: PreviousBoard(board.state.first_move),
@@ -323,9 +325,10 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
         piece_type: PieceType,
         from: BitBoard<T>,
         to: BitBoard<T>,
+        turn_info: TurnInfo
     ) -> Option<HistoryMove<T>> {
         if action.move_type == EN_PASSANT_MOVE {
-            return self.make_en_passant_move(board, action, piece_type, from, to);
+            return self.make_en_passant_move(board, action, piece_type, from, to, turn_info);
         }
 
         let color: usize = action.team as usize;
@@ -334,7 +337,7 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
         let mut history_move = HistoryMove {
             action: Move::Action(*action),
             first_history_move: board.retrieve_first_history_move(Move::Action(*action)),
-            turn_info: board.get_turn_info(),
+            turn_info,
             state: HistoryState::Single {
                 team: IndexedPreviousBoard(color, board.state.teams[color]),
                 piece: IndexedPreviousBoard(piece_type, board.state.pieces[piece_type]),

@@ -2,7 +2,7 @@ use crate::{
     bitboard::{Direction, BitBoard},
     board::{
         actions::{
-            Action, HistoryMove, HistoryState, HistoryUpdate, IndexedPreviousBoard, PreviousBoard, Move,
+            Action, HistoryMove, HistoryState, HistoryUpdate, IndexedPreviousBoard, PreviousBoard, Move, TurnInfo,
         },
         edges::Edges,
         pieces::{Piece, PieceSymbol},
@@ -35,7 +35,7 @@ fn down_one<const T: usize>(from: BitBoard<T>, cols: Cols, edges: &Edges<T>) -> 
 }
 
 impl<const T: usize> KingPiece<T> {
-    fn make_castling_move(&self, board: &mut Board<T>, action: &Action, from: BitBoard<T>, to: BitBoard<T>) -> Option<HistoryMove<T>> {
+    fn make_castling_move(&self, board: &mut Board<T>, action: &Action, from: BitBoard<T>, to: BitBoard<T>, turn_info: TurnInfo) -> Option<HistoryMove<T>> {
         let cols = board.state.cols;
         let mut left_center = BitBoard::from_lsb(if cols % 2 == 0 {
             (cols / 2) - 1
@@ -63,7 +63,7 @@ impl<const T: usize> KingPiece<T> {
 
         let history_move = HistoryMove {
             action: Move::Action(*action),
-            turn_info: board.get_turn_info(),
+            turn_info,
             first_history_move: board.retrieve_first_history_move(Move::Action(*action)),
             state: HistoryState::Any {
                 all_pieces: PreviousBoard(board.state.all_pieces),
@@ -176,9 +176,10 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
         piece_type: PieceType,
         from: BitBoard<T>,
         to: BitBoard<T>,
+        turn_info: TurnInfo
     ) -> Option<HistoryMove<T>> {
         if action.move_type == CASTLING_MOVE {
-            return self.make_castling_move(board, action, from, to);
+            return self.make_castling_move(board, action, from, to, turn_info);
         }
 
         let color: usize = action.team as usize;
@@ -199,7 +200,7 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
         let history_move = HistoryMove {
             action: Move::Action(*action),
             first_history_move: board.retrieve_first_history_move(Move::Action(*action)),
-            turn_info: board.get_turn_info(),
+            turn_info,
             state: HistoryState::Any {
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 first_move: PreviousBoard(board.state.first_move),
