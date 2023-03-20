@@ -76,10 +76,11 @@ impl<const T: usize> Piece<T> for StonePiece {
             let team = action.team as usize;
             let other_team = board.state.team_lookup[team] as usize;
 
+            let turn_info = board.get_turn_info();
             let history_move = HistoryMove {
                 action: Move::Action(*action),
                 first_history_move: board.retrieve_first_history_move(Move::Action(*action)),
-                turn_info: board.get_turn_info(),
+                turn_info,
                 state: HistoryState::Any {
                     all_pieces: PreviousBoard(board.state.all_pieces),
                     first_move: PreviousBoard(board.state.first_move),

@@ -5,7 +5,7 @@ use crate::bitboard::BitBoard;
 use super::{
     actions::{
         Action, HistoryMove, HistoryState, HistoryUpdate, IndexedPreviousBoard, PreviousBoard,
-        UndoMoveError, Move, ActionInfo,
+        UndoMoveError, Move, ActionInfo, TurnInfo,
     },
     game::Game,
     AttackDirections, AttackLookup, Board, BoardState, Cols, PieceType, Rows, update_turns, reverse_turns,
@@ -71,6 +71,7 @@ pub trait Piece<const T: usize> : Debug + Send + Sync {
         piece_type: PieceType,
         from: BitBoard<T>,
         to: BitBoard<T>,
+        turn_info: TurnInfo
     ) -> Option<HistoryMove<T>> {
         let color = action.team as usize;
         let piece_type = piece_type as usize;
@@ -92,7 +93,7 @@ pub trait Piece<const T: usize> : Debug + Send + Sync {
         let history_move = HistoryMove {
             action: Move::Action(*action),
             first_history_move: board.retrieve_first_history_move(Move::Action(*action)),
-            turn_info: board.get_turn_info(),
+            turn_info,
             state: HistoryState::Any {
                 all_pieces: PreviousBoard(board.state.all_pieces),
                 first_move: PreviousBoard(board.state.first_move),
@@ -138,6 +139,7 @@ pub trait Piece<const T: usize> : Debug + Send + Sync {
         piece_type: PieceType,
         from: BitBoard<T>,
         to: BitBoard<T>,
+        turn_info: TurnInfo
     ) -> Option<HistoryMove<T>> {
         let color = action.team as usize;
         let piece_type = piece_type as usize;
@@ -145,7 +147,7 @@ pub trait Piece<const T: usize> : Debug + Send + Sync {
         let history_move = HistoryMove {
             action: Move::Action(*action),
             first_history_move: board.retrieve_first_history_move(Move::Action(*action)),
-            turn_info: board.get_turn_info(),
+            turn_info,
             state: HistoryState::Single {
                 team: IndexedPreviousBoard(color, board.state.teams[color]),
                 piece: IndexedPreviousBoard(piece_type, board.state.pieces[piece_type]),
@@ -172,13 +174,14 @@ pub trait Piece<const T: usize> : Debug + Send + Sync {
         if let Some(from) = action.from {
             let from = BitBoard::from_lsb(from);
             let to = BitBoard::from_lsb(action.to);
-            
+
+            let turn_info = board.get_turn_info();            
             update_turns(&mut board.state, &board.game, &Move::Action(*action));
 
             let history_move = if (board.state.all_pieces & to).is_empty() {
-                self.make_normal_move(board, action, action.piece_type, from, to)
+                self.make_normal_move(board, action, action.piece_type, from, to, turn_info)
             } else {
-                self.make_capture_move(board, action, action.piece_type, from, to)
+                self.make_capture_move(board, action, action.piece_type, from, to, turn_info)
             };
 
             history_move
