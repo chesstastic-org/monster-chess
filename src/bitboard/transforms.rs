@@ -3,6 +3,7 @@ use std::cmp::Ordering;
 
 use super::BitBoard;
 
+/// Generate `BitBoard`s for each rank of the board.
 pub fn generate_ranks<const T: usize>(cols: Cols, rows: Rows) -> Vec<BitBoard<T>> {
     let mut ranks: Vec<BitBoard<T>> = Vec::with_capacity(rows as usize);
     let mut rank = BitBoard::<T>::starting_at_lsb(0, cols);
@@ -15,6 +16,7 @@ pub fn generate_ranks<const T: usize>(cols: Cols, rows: Rows) -> Vec<BitBoard<T>
     ranks
 }
 
+/// Generate `BitBoard`s for each file of the board.
 pub fn generate_files<const T: usize>(cols: Cols, rows: Rows) -> Vec<BitBoard<T>> {
     let mut files: Vec<BitBoard<T>> = Vec::with_capacity(rows as usize);
     let mut file = BitBoard::<T>::from_lsb(0);
@@ -32,6 +34,7 @@ pub fn generate_files<const T: usize>(cols: Cols, rows: Rows) -> Vec<BitBoard<T>
 }
 
 impl<const T: usize> BitBoard<T> {
+    /// Flip the `BitBoard` vertically.
     pub fn flip_vertically(self, ranks: &Vec<BitBoard<T>>, cols: Cols, rows: Rows) -> BitBoard<T> {
         let mut new_board = BitBoard::<T>::new();
         let max_rank = rows - 1;
@@ -57,6 +60,7 @@ impl<const T: usize> BitBoard<T> {
         new_board
     }
 
+    /// Flip the `BitBoard` horizontally.
     pub fn flip_horizontally(self, files: &Vec<BitBoard<T>>, cols: Cols) -> BitBoard<T> {
         let mut new_board = BitBoard::<T>::new();
 

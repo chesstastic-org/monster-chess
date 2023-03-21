@@ -1,5 +1,6 @@
 use super::BitBoard;
 
+/// A direction of either `LEFT` or `RIGHT`, created primarily for bitscans of an arbitrary direction.
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum Direction {
     LEFT,
@@ -64,6 +65,7 @@ impl<const T: usize> BitBoard<T> {
         }
     }
 
+    /// A bitscan from either given direction, left or right.
     pub fn bitscan(&self, direction: Direction) -> u16 {
         match direction {
             Direction::LEFT => self.bitscan_forward(),

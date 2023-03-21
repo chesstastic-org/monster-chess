@@ -25,7 +25,7 @@ pub struct Action {
     pub move_type: ActionInfo
 }
 
-/// This is a theoretically possible action. It doesn't even have to be actually possible. 
+/// A theoretically possible action. It doesn't even have to be actually possible. 
 /// It's mainly there for Neural Networks to be able to index moves.
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub struct TheoreticalAction {
