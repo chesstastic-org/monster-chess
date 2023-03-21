@@ -8,6 +8,7 @@ use super::super::{
 };
 
 impl<const T: usize> Game<T> {
+    /// Initialize a `Board` from a given FEN.
     pub fn from_fen(&self, fen: &str) -> Board<T> {
         let args = split(fen).expect(&format!("{fen} cannot be split into arguments."));
         let mut board = Board::from_fen_state(self, (self.rows, self.cols), &args[0]);
@@ -44,6 +45,7 @@ impl<const T: usize> Game<T> {
 }
 
 impl<'a, const T: usize> Board<'a, T> {
+    /// Convert this `Board` to a FEN.
     pub fn to_fen(&self) -> String {
         let mut fen = self.to_fen_state();
         if fen.contains(" ") {

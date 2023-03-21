@@ -7,6 +7,7 @@ use super::super::{
     Board, Cols, Rows,
 };
 
+/// `FenTeamArgument` represents which team is going to move next in your FEN.
 #[derive(Clone, Debug)]
 pub enum FenTeamArgument {
     Number,
@@ -51,6 +52,9 @@ impl<const T: usize> FenArgument<T> for FenTeamArgument {
     }
 }
 
+/// `FenTurns` represents how many turns have been played in your game.
+/// This counter might not be a counter of all turns in the entire game, but how many since the last of a certain type of move, for instance.
+/// Games can manage what counters represent by handling `update` in `MoveController`.
 #[derive(Debug)]
 pub struct FenTurns;
 
@@ -69,6 +73,9 @@ impl<const T: usize> FenArgument<T> for FenTurns {
     }
 }
 
+/// `FenSubMoves` represents how many sub moves (or in the case of two players, half moves) have been played in your game.
+/// This counter might not be a counter of all sub moves in the entire game, but how many since the last of a certain type of move, for instance.
+/// Games can manage what counters represent by handling `update` in `MoveController`.
 #[derive(Debug)]
 pub struct FenSubMoves;
 
@@ -87,6 +94,9 @@ impl<const T: usize> FenArgument<T> for FenSubMoves {
     }
 }
 
+/// `FenFullMoves` represents how many sub moves (or in the case of two players, half moves) have been played in your game.
+/// This counter might not be a counter of all full moves in the entire game, but how many since the last of a certain type of move, for instance.
+/// Games can manage what counters represent by handling `update` in `MoveController`.
 #[derive(Debug)]
 pub struct FenFullMoves;
 
@@ -105,11 +115,15 @@ impl<const T: usize> FenArgument<T> for FenFullMoves {
     }
 }
 
+/// This is the error that is shown if a given `FenArgument` has an error when being parsed.
 #[derive(Debug, Clone)]
 pub enum FenDecodeError {
     InvalidArgument(String),
 }
 
+/// `FenArgument` represents a given argument in your FEN.
+/// All FENs will show the board state, but after that, games can specify a variety of arguments.
+/// In chess, the FEN arguments are `FenTeamArgument`, `ChessCastlingRights`, `ChessEnPassant`, `FebSubMoves` and `FenFullMoves`.
 pub trait FenArgument<const T: usize> : Debug + Send + Sync {
     /// `encode` takes in a board, and outputs what this FEN argument's encoded result would be (eg. for a team argument, it could be `"b"`)
     fn encode(&self, board: &Board<T>) -> String;
