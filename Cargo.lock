@@ -349,7 +349,7 @@ dependencies = [
 
 [[package]]
 name = "monster_chess"
-version = "0.0.12"
+version = "0.0.13"
 dependencies = [
  "criterion",
  "fastrand",

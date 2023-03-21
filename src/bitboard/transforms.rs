@@ -32,7 +32,7 @@ pub fn generate_files<const T: usize>(cols: Cols, rows: Rows) -> Vec<BitBoard<T>
 }
 
 impl<const T: usize> BitBoard<T> {
-    pub fn flip_vertically(self, ranks: Vec<BitBoard<T>>, cols: Cols, rows: Rows) -> BitBoard<T> {
+    pub fn flip_vertically(self, ranks: &Vec<BitBoard<T>>, cols: Cols, rows: Rows) -> BitBoard<T> {
         let mut new_board = BitBoard::<T>::new();
         let max_rank = rows - 1;
 
@@ -57,7 +57,7 @@ impl<const T: usize> BitBoard<T> {
         new_board
     }
 
-    pub fn flip_horizontally(self, files: Vec<BitBoard<T>>, cols: Cols) -> BitBoard<T> {
+    pub fn flip_horizontally(self, files: &Vec<BitBoard<T>>, cols: Cols) -> BitBoard<T> {
         let mut new_board = BitBoard::<T>::new();
 
         let max_file = cols - 1;
