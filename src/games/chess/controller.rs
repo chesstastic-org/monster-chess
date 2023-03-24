@@ -76,7 +76,7 @@ impl<const T: usize> MoveController<T> for ChessMoveController<T> {
                     moves.push(format!(
                         "{}{}{}",
                         board.encode_position(from),
-                        board.encode_position(action.to),
+                        board.encode_position(to),
                         board.game.pieces[action.piece_type as usize].format_info(board, action.info)
                     ))
                 }
