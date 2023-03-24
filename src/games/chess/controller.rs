@@ -71,7 +71,7 @@ impl<const T: usize> MoveController<T> for ChessMoveController<T> {
         if let Move::Action(action) = action {
             if action.piece_type == 5 && action.move_type == CASTLING_MOVE {
                 if let Some(from) = action.from {
-                    let dir = (action.to as i16) - (from as i16).signum();
+                    let dir = ((action.to as i16) - (from as i16)).signum();
                     let to = ((from as i16) + (2 * dir)) as u16;
                     moves.push(format!(
                         "{}{}{}",
