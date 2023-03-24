@@ -12,7 +12,7 @@ use crate::{
 };
 
 const NORMAL_KING_MOVE: u16 = 0;
-const CASTLING_MOVE: u16 = 1;
+pub const CASTLING_MOVE: u16 = 1;
 
 const ROOK_PIECE_TYPE: PieceType = 3;
 
