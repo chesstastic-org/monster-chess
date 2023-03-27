@@ -234,7 +234,6 @@ impl<'a, const T: usize> Board<'a, T> {
     pub fn can_move(&self, team: u16, target: BitBoard<T>, mode: u16) -> bool {
         let board_len = self.state.squares;
 
-        let team = self.state.moving_team;
         let mut mask = BitBoard::new();
 
         for (ind, board) in self.state.pieces.iter().enumerate() {

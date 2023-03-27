@@ -61,3 +61,18 @@ impl Chess {
         }
     }
 }
+
+mod tests {
+    use crate::board::game::{GameResults, NORMAL_MODE};
+
+    use super::{Chess, ATTACKS_MODE};
+
+    #[test]
+    fn checkmate() {
+        let chess = Chess::create();
+        let mut board = chess.from_fen("8/8/8/8/8/5p1k/5Knn/5r2 w - - 69 190");
+
+        let moves = board.generate_legal_moves(NORMAL_MODE);
+        assert!(if let GameResults::Win(_) = chess.resolution.resolve(&mut board, &moves) { true } else { false });
+    }
+}
