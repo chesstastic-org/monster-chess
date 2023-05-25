@@ -1,4 +1,4 @@
-use super::{Board, game::Game};
+use super::{Board};
 
 #[derive(Debug, Clone)]
 pub struct ZobristHashTable<const T: usize> {

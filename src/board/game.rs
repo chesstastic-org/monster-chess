@@ -112,7 +112,7 @@ pub enum GameResults {
 }
 
 pub trait Resolution<const T: usize> : Debug + Send + Sync {
-    fn resolve(&self, board: &mut Board<T>, legal_moves: &Vec<Move>) -> GameResults;
+    fn resolve(&self, board: &mut Board<T>, legal_moves: &[Move]) -> GameResults;
 }
 
 pub trait ZobristController<const T: usize> : Debug + Send + Sync {
