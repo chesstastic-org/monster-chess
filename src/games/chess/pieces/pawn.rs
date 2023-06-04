@@ -19,7 +19,7 @@ fn promotion_move(piece_type: PieceType) -> u16 {
 
 #[derive(Debug)] pub struct PawnPiece<const T: usize>;
 
-pub fn up<const T: usize>(bitboard: &BitBoard<T>, shift: u16, cols: Cols, team: u16) -> BitBoard<T> {
+pub(crate) fn up<const T: usize>(bitboard: &BitBoard<T>, shift: u16, cols: Cols, team: u16) -> BitBoard<T> {
     match team {
         0 => bitboard.up(shift, cols),
         1 => bitboard.down(shift, cols),
@@ -27,7 +27,7 @@ pub fn up<const T: usize>(bitboard: &BitBoard<T>, shift: u16, cols: Cols, team: 
     }
 }
 
-pub fn down<const T: usize>(bitboard: &BitBoard<T>, shift: u16, cols: Cols, team: u16) -> BitBoard<T> {
+pub(crate) fn down<const T: usize>(bitboard: &BitBoard<T>, shift: u16, cols: Cols, team: u16) -> BitBoard<T> {
     match team {
         0 => bitboard.down(shift, cols),
         1 => bitboard.up(shift, cols),

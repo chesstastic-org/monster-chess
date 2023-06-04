@@ -54,7 +54,7 @@ pub trait MoveController<const T: usize> : Debug + Send + Sync {
             .map(|el| el.clone())
     }
 
-    /// This is fetches all theoretically possible moves. These moves might not even be actually possible, they're just used for indexing.
+    /// Is fetches all theoretically possible moves. These moves might not even be actually possible, they're just used for indexing.
     /// Ideally, this should be a list of all actually possible moves, but an upper bound is fine.
     fn get_theoretical_moves(&self, board: &Board<T>) -> Vec<TheoreticalMove>;
 
@@ -100,7 +100,7 @@ pub trait MoveController<const T: usize> : Debug + Send + Sync {
         }
     }
 
-    /// This is an upper-bound of all max available moves from any given position.
+    /// An upper-bound of all max available moves from any given position.
     fn get_max_available_moves(&self) -> u32;
 }
 
@@ -112,7 +112,7 @@ pub enum GameResults {
 }
 
 pub trait Resolution<const T: usize> : Debug + Send + Sync {
-    fn resolve(&self, board: &mut Board<T>, legal_moves: &Vec<Move>) -> GameResults;
+    fn resolve(&self, board: &mut Board<T>, legal_moves: &[Move]) -> GameResults;
 }
 
 pub trait ZobristController<const T: usize> : Debug + Send + Sync {
