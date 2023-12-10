@@ -1,21 +1,24 @@
 use std::collections::HashSet;
 
-use crate::{board::{game::{MoveController, NORMAL_MODE, get_theoretical_moves_bound}, Board, actions::{Action, TheoreticalAction, Move, TheoreticalMove, TurnUpdate, CounterUpdate}, BoardState}, bitboard::BitBoard};
+use crate::{board::{game::{MoveController, NORMAL_MODE, get_theoretical_moves_bound, MoveLegalResponse}, Board, actions::{Move, TheoreticalMove, TurnUpdate, CounterUpdate}, BoardState}, bitboard::BitBoard};
 
 use super::is_single_move;
 
 #[derive(Debug)]
 pub struct AtaxxMoveController;
 impl<const T: usize> MoveController<T> for AtaxxMoveController {
-    fn is_legal(&self, board: &mut Board<T>, action: &Move) -> bool {
-        return true;
+    fn is_legal(&self, _board: &mut Board<T>, _action: &Move, _make_moves: bool) -> MoveLegalResponse<T> {
+        MoveLegalResponse {
+            is_legal: true,
+            made_move: None
+        }
     }
 
     fn use_pseudolegal(&self) -> bool {
         return false;
     }
 
-    fn transform_moves(&self, board: &mut Board<T>, mode: u16, actions: Vec<Move>) -> Vec<Move> {
+    fn transform_moves(&self, board: &mut Board<T>, _mode: u16, actions: Vec<Move>) -> Vec<Move> {
         // No Legal Moves
         if actions.len() == 0 {
             let board_mask = BitBoard::starting_at_lsb(0, 49);
@@ -32,7 +35,6 @@ impl<const T: usize> MoveController<T> for AtaxxMoveController {
             } else {
                 actions
             }
-            
         } else {
             let mut set = HashSet::<u16>::with_capacity(actions.len());
             let mut new_actions = Vec::with_capacity(actions.len());
@@ -85,7 +87,7 @@ impl<const T: usize> MoveController<T> for AtaxxMoveController {
         ]
     }
 
-    fn update(&self, action: &Move, state: &BoardState<T>) -> TurnUpdate {
+    fn update(&self, action: &Move, _state: &BoardState<T>) -> TurnUpdate {
         TurnUpdate {
             turns: CounterUpdate::Next,
             sub_moves: match action {

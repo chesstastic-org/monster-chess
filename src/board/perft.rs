@@ -1,9 +1,6 @@
 use super::{
-    actions::{Action, HistoryMove, UndoMoveError},
-    edges::Edges,
-    game::Game,
-    pieces::Piece,
-    Board,
+    game::{MoveLegalResponse, NORMAL_MODE},
+    Board, actions::HistoryMove,
 };
 
 pub type PerftBranch = (String, PerftResults);
@@ -32,13 +29,42 @@ impl<'a, const T: usize> Board<'a, T> {
         }
 
         let mut nodes = 0;
-        let moves = if legality {
-            self.generate_legal_moves(0)
+
+        let psuedolegal = self.game.controller.use_pseudolegal();
+        let psuedolegal_check = legality && psuedolegal;
+
+        let moves = if psuedolegal {
+            self.generate_moves(NORMAL_MODE)
         } else {
-            self.generate_moves(0)
+            self.generate_legal_moves(NORMAL_MODE)
         };
+
+        if depth == 1 && !psuedolegal_check {
+            return moves.len() as u64;   
+        }
+        
         for node in moves {
-            let undo = self.make_move(&node);
+            let mut undo: Option<HistoryMove<T>> = None;
+
+            if psuedolegal_check {
+                let MoveLegalResponse { is_legal, made_move } = self.game.controller.is_legal(self, &node, false);
+
+                if !is_legal {
+                    if let Some(made_move) = made_move {
+                        self.undo_move(made_move);
+                    }
+                    continue;
+                }  
+
+                if let Some(made_move) = made_move {
+                    undo = made_move;
+                }
+            }
+
+            if undo.is_none() {
+                undo = self.make_move(&node);
+            }
+
             nodes += self.perft(depth - 1, legality);
             self.undo_move(undo);
         }

@@ -70,11 +70,11 @@ impl<const T: usize> ZobristHashTable<T> {
 
 #[cfg(test)]
 mod tests {
-    use fastrand::u64;
+    
 
     use crate::games::chess::Chess;
 
-    use super::ZobristHashTable;
+    
 
     #[test]
     fn chess_zobrist_test() {

@@ -143,7 +143,7 @@ impl<const T: usize> BitBoard<T> {
     }
 
     /// Iterates over all set bits in the `BitBoard`.
-    pub fn iter_set_bits(mut self, end: u16) -> BitIterator<T> {
+    pub fn iter_set_bits(self, end: u16) -> BitIterator<T> {
         BitIterator(self, end)
     }
 

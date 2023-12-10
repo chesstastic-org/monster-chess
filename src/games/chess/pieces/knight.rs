@@ -1,12 +1,10 @@
 use crate::{
-    bitboard::{Direction, BitBoard},
+    bitboard::{BitBoard},
     board::{
-        actions::{Action, HistoryMove, HistoryState, IndexedPreviousBoard, PreviousBoard},
         edges::Edges,
         pieces::{Piece, PieceSymbol},
         AttackDirections, Board, Cols, PieceType,
     },
-    games::chess::game::ATTACKS_MODE,
 };
 
 #[derive(Debug)] pub struct KnightPiece<const T: usize>;
@@ -76,12 +74,12 @@ impl<const T: usize> Piece<T> for KnightPiece<T> {
     fn can_move_mask(
         &self,
         board: &Board<T>,
-        from: BitBoard<T>,
+        _from: BitBoard<T>,
         from_bit: u16,
         piece_type: PieceType,
-        team: u16,
-        mode: u16,
-        to: BitBoard<T>,
+        _team: u16,
+        _mode: u16,
+        _to: BitBoard<T>,
     ) -> BitBoard<T> {
         self.get_attack_lookup(board, piece_type).expect("Could not find move lookup table for Knight")[from_bit as usize][0]
     }

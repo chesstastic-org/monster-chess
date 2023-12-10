@@ -5,8 +5,8 @@ use super::{pieces::Piece, AttackLookup, Board, Cols, Rows};
 pub fn generate_lookups<const T: usize>(
     board: &Board<T>,
     piece: &&'static dyn Piece<T>,
-    rows: Rows,
-    cols: Cols,
+    _rows: Rows,
+    _cols: Cols,
 ) -> AttackLookup<T> {
     let mut lookups = Vec::with_capacity(board.state.squares as usize);
 

@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 
-use crate::board::{game::{Resolution, GameResults}, Board, actions::{Action, Move}};
+use crate::board::{game::{Resolution, GameResults}, Board, actions::{Move}};
 
 #[derive(Debug)]
 pub struct AtaxxResolution<const T: usize>;

@@ -1,20 +1,16 @@
 use crate::{
-    bitboard::{Direction, BitBoard},
     board::{
-        actions::{Action, HistoryMove, HistoryState, IndexedPreviousBoard, PreviousBoard},
-        edges::Edges,
         fen::{
-            FenArgument, FenDecodeError, FenFullMoves, FenOptions, FenState, FenSubMoves,
-            FenTeamArgument, PostProcess,
+            FenFullMoves, FenOptions, FenState, FenSubMoves,
+            FenTeamArgument,
         },
-        game::{Game, MoveController, DefaultZobristController},
-        pieces::{Piece, PieceSymbol},
-        AttackDirections, Board, Cols, PieceType, zobrist::ZobristHashTable,
+        game::{Game, DefaultZobristController},
+        pieces::{Piece}, zobrist::ZobristHashTable,
     },
 };
 
 use super::{pieces::{
-    down, up, BishopPiece, KingPiece, KnightPiece, PawnPiece, QueenPiece, RookPiece,
+    BishopPiece, KingPiece, KnightPiece, PawnPiece, QueenPiece, RookPiece,
 }, ChessMoveController, ChessPostProcess, ChessCastlingRights, ChessEnPassant, ChessResolution};
 
 pub const ATTACKS_MODE: u16 = 1;

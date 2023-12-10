@@ -4,11 +4,10 @@ use crate::bitboard::BitBoard;
 
 use super::{
     actions::{
-        Action, HistoryMove, HistoryState, HistoryUpdate, IndexedPreviousBoard, PreviousBoard,
-        UndoMoveError, Move, ActionInfo, TurnInfo,
+        Action, HistoryMove, HistoryState, HistoryUpdate, IndexedPreviousBoard, PreviousBoard, Move, ActionInfo, TurnInfo,
     },
     game::Game,
-    AttackDirections, AttackLookup, Board, BoardState, Cols, PieceType, Rows, update_turns, reverse_turns,
+    AttackDirections, AttackLookup, Board, BoardState, PieceType, update_turns, reverse_turns,
 };
 
 /// `PieceSymbol` shows how a piece will be displayed in FEN.
@@ -43,7 +42,7 @@ pub trait Piece<const T: usize> : Debug + Send + Sync {
     /// For instance, take pawns in chess. 
     /// If it's `0`, it'll be represented as nothing.
     /// However, for `1..5`, it'll show that piece is being promoted to (eg. `"q"`.)
-    fn format_info(&self, board: &Board<T>, info: ActionInfo) -> String {
+    fn format_info(&self, _board: &Board<T>, _info: ActionInfo) -> String {
         "".to_string()
     }
 
@@ -52,7 +51,7 @@ pub trait Piece<const T: usize> : Debug + Send + Sync {
     /// For instance, take pawns in chess.
     /// If it's nothing, it knows it'll be `0`. 
     /// However, for say, `"q"`, it'll know that's the 4th promotion piece and output `4`.
-    fn parse_info(&self, board: &Board<T>, info: String) -> u32 {
+    fn parse_info(&self, _board: &Board<T>, _info: String) -> u32 {
         0
     }
 
@@ -85,11 +84,11 @@ pub trait Piece<const T: usize> : Debug + Send + Sync {
         &self,
         board: &Board<T>,
         from: BitBoard<T>,
-        from_bit: u16,
+        _from_bit: u16,
         piece_type: PieceType,
         team: u16,
         mode: u16,
-        to: BitBoard<T>,
+        _to: BitBoard<T>,
     ) -> BitBoard<T> {
         self.get_moves(board, from, piece_type, team, mode)
     }

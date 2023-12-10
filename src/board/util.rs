@@ -4,17 +4,16 @@ use std::fmt::Error;
 use std::fmt::Formatter;
 
 use heapless::{Vec as HeapVec, Deque as HeapDeque};
-use std::collections::VecDeque;
-use fastrand;
+
+
 
 use crate::bitboard::{BitBoard, generate_ranks, generate_files};
 
 use super::actions::{Move, TurnInfo, CounterUpdate};
 use super::{
-    actions::{Action, HistoryMove, UndoMoveError, HistoryState},
+    actions::{HistoryMove, HistoryState},
     edges::{generate_edge_list, Edges},
-    game::Game,
-    pieces::Piece, zobrist::ZobristHashTable,
+    game::Game
 };
 
 pub type PieceType = u16;
@@ -150,7 +149,7 @@ fn generate_forward_lookup(count: u16) -> HeapVec<u16, 16> {
         if new_val >= count {
             new_val = 0;
         }
-        lookup.push(new_val);
+        lookup.push(new_val).expect("Can't exceed allocated space.");
     }
     lookup
 }
@@ -163,7 +162,7 @@ fn generate_reverse_lookup(count: u16) -> HeapVec<u16, 16> {
         if new_val < 0 {
             new_val = (count - 1) as i16;
         }
-        lookup.push(new_val as u16);
+        lookup.push(new_val as u16).expect("Can't exceed allocated space.");
     }
     lookup
 }
@@ -231,7 +230,7 @@ impl<'a, const T: usize> Board<'a, T> {
         bitboard
     }
 
-    pub fn can_move(&self, team: u16, target: BitBoard<T>, mode: u16) -> bool {
+    pub fn can_move(&self, _team: u16, target: BitBoard<T>, mode: u16) -> bool {
         let board_len = self.state.squares;
 
         let team = self.state.moving_team;
@@ -276,8 +275,8 @@ impl<'a, const T: usize> Board<'a, T> {
         vec![]
     }
 
-    pub fn generate_drop_moves(&self, mode: u16) -> Vec<Move> {
-        let team = self.state.moving_team;
+    pub fn generate_drop_moves(&self, _mode: u16) -> Vec<Move> {
+        let _team = self.state.moving_team;
         let mut actions: Vec<Move> = Vec::with_capacity(self.state.squares as usize);
 
         self.game.controller.add_moves(self, &mut actions);
@@ -338,7 +337,7 @@ impl<'a, const T: usize> Board<'a, T> {
             return None;
         }
 
-        self.history.push_back(action);
+        self.history.push_back(action).ok()?;
 
         if self.history.len() > self.game.saved_last_moves.into() {
             self.history.pop_front()
@@ -354,7 +353,7 @@ impl<'a, const T: usize> Board<'a, T> {
 
         if let Some(first_history_move) = first_history_move {
             self.history.pop_back();
-            self.history.push_front(first_history_move);
+            self.history.push_front(first_history_move).expect("Won't fully fill history allocation.");
         }
     }
 
@@ -407,7 +406,7 @@ impl<'a, const T: usize> Board<'a, T> {
                 };
             }
             None => {
-                // We panic instead of making it an error because this is an incredible unlikely error that almost 
+                // We panic instead of making it an error because this is an incredibly unlikely error that almost 
                 // certainly won't happen in monster-chess's code, and consumers would easily be able 
                 // to come across and handle this.
                 // It isn't worth the effort having to propagate the error through so many functions.

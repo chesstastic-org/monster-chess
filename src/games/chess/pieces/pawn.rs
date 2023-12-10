@@ -1,10 +1,9 @@
 use crate::{
-    bitboard::{Direction, BitBoard},
+    bitboard::{BitBoard},
     board::{
         actions::{
             Action, HistoryMove, HistoryState, HistoryUpdate, IndexedPreviousBoard, PreviousBoard, Move, ActionInfo, TurnInfo,
         },
-        edges::Edges,
         pieces::{Piece, PieceSymbol},
         AttackDirections, Board, Cols, PieceType,
     },
@@ -103,7 +102,7 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
         true
     }
 
-    fn generate_lookup_moves(&self, board: &Board<T>, mut from: BitBoard<T>) -> AttackDirections<T> {
+    fn generate_lookup_moves(&self, board: &Board<T>, from: BitBoard<T>) -> AttackDirections<T> {
         let mut attack_dirs: AttackDirections<T> = vec![];
         let edges = board.state.edges[0];
         for team in 0..board.game.teams {
@@ -166,12 +165,12 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
     fn can_move_mask(
         &self,
         board: &Board<T>,
-        from: BitBoard<T>,
+        _from: BitBoard<T>,
         from_bit: u16,
         piece_type: PieceType,
         team: u16,
-        mode: u16,
-        to: BitBoard<T>,
+        _mode: u16,
+        _to: BitBoard<T>,
     ) -> BitBoard<T> {
         self.get_attack_lookup(board, piece_type).expect("Could not find pawn attack lookup")[from_bit as usize][team as usize]
     }
@@ -185,7 +184,7 @@ impl<const T: usize> Piece<T> for PawnPiece<T> {
         mode: u16,
     ) -> BitBoard<T> {
         let cols = board.state.cols;
-        let edges = &board.state.edges[0];
+        let _edges = &board.state.edges[0];
 
         if mode == ATTACKS_MODE {
             return self.get_attack_lookup(board, piece_type).expect("Could not find pawn attack lookup")

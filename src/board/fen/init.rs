@@ -1,10 +1,8 @@
 use shell_words::split;
 
 use super::super::{
-    actions::{Action, HistoryMove, UndoMoveError},
     game::Game,
-    pieces::Piece,
-    Board, Cols, Rows,
+    Board,
 };
 
 impl<const T: usize> Game<T> {

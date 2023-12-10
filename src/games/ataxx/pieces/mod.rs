@@ -1,6 +1,6 @@
 use std::usize;
 
-use crate::{board::{pieces::{Piece, PieceSymbol}, Board, AttackLookup, AttackDirections, actions::{Action, PreviousBoard, HistoryMove, HistoryState, HistoryUpdate, IndexedPreviousBoard, Move}, edges::Edges, Cols, update_turns, PieceType}, bitboard::BitBoard};
+use crate::{board::{pieces::{Piece, PieceSymbol}, Board, AttackDirections, actions::{Action, PreviousBoard, HistoryMove, HistoryState, HistoryUpdate, IndexedPreviousBoard, Move}, edges::Edges, Cols, update_turns, PieceType}, bitboard::BitBoard};
 
 use super::is_single_move;
 
@@ -39,7 +39,7 @@ impl<const T: usize> Piece<T> for StonePiece {
         true
     }
 
-    fn generate_lookup_moves(&self, board: &Board<T>, mut from: BitBoard<T>) -> AttackDirections<T> {
+    fn generate_lookup_moves(&self, board: &Board<T>, from: BitBoard<T>) -> AttackDirections<T> {
         let cols = board.state.cols;
         let edges = &board.state.edges[0];
 
@@ -54,8 +54,8 @@ impl<const T: usize> Piece<T> for StonePiece {
         board: &Board<T>,
         from: BitBoard<T>,
         piece_type: PieceType,
-        team: u16,
-        mode: u16,
+        _team: u16,
+        _mode: u16,
     ) -> BitBoard<T> {
         let lookup = self.get_attack_lookup(board, piece_type);
         let base_moves = match lookup {

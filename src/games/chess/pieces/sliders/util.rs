@@ -1,6 +1,5 @@
 use crate::{board::{
-    pieces::{Piece, PieceSymbol},
-    AttackDirections, AttackLookup, Board, PieceType,
+    AttackLookup, Board,
 }, bitboard::BitBoard};
 
 pub fn get_moves_ray<const T: usize>(

@@ -143,12 +143,12 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
     fn can_move_mask(
         &self,
         board: &Board<T>,
-        from: BitBoard<T>,
+        _from: BitBoard<T>,
         from_bit: u16,
         piece_type: PieceType,
-        team: u16,
-        mode: u16,
-        to: BitBoard<T>,
+        _team: u16,
+        _mode: u16,
+        _to: BitBoard<T>,
     ) -> BitBoard<T> {
         self.get_attack_lookup(board, piece_type).expect("Could not find move lookup table for king")[from_bit as usize][0]
     }
@@ -248,7 +248,7 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
         team: u16,
         mode: u16,
     ) {
-        let rows = board.state.rows;
+        let _rows = board.state.rows;
         let cols = board.state.cols;
         let board_len = board.state.squares;
 

@@ -55,8 +55,8 @@ impl<const T: usize> Piece<T> for BishopPiece {
         from: BitBoard<T>,
         from_bit: u16,
         piece_type: PieceType,
-        team: u16,
-        mode: u16,
+        _team: u16,
+        _mode: u16,
         to: BitBoard<T>,
     ) -> BitBoard<T> {
         let lookup = self

@@ -1,10 +1,7 @@
 use crate::bitboard::BitBoard;
 
 use super::{
-    actions::{Action, HistoryMove, UndoMoveError},
-    game::Game,
-    pieces::Piece,
-    Board, Cols, Rows,
+    Cols, Rows,
 };
 
 pub type EdgeBuffer = u16;
@@ -24,7 +21,7 @@ pub fn generate_edges<const T: usize>(buffer: EdgeBuffer, rows: Rows, cols: Cols
 
     let mut left = BitBoard::max() & (!(BitBoard::max() << (buffer)));
     for _ in 1..rows {
-        left |= (left << (cols));
+        left |= left << (cols);
     }
 
     let right = left << (cols - buffer);

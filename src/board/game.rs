@@ -36,13 +36,18 @@ pub fn get_theoretical_moves_bound<const T: usize>(board: &Board<T>, max_info: A
     theoretical_moves
 }
 
+pub struct MoveLegalResponse<const T: usize> {
+    pub is_legal: bool,
+    pub made_move: Option<Option<HistoryMove<T>>>
+}
+
 pub trait MoveController<const T: usize> : Debug + Send + Sync {
     fn transform_moves(&self, board: &mut Board<T>, mode: u16, actions: Vec<Move>) -> Vec<Move>;
-    fn is_legal(&self, board: &mut Board<T>, action: &Move) -> bool;
+    fn is_legal(&self, board: &mut Board<T>, action: &Move, unmake_move: bool) -> MoveLegalResponse<T>;
     fn use_pseudolegal(&self) -> bool;
 
-    fn add_moves(&self, board: &Board<T>, actions: &mut Vec<Move>) {}
-    fn make_drop_move(&self, board: &mut Board<T>, action: &Action) -> Option<HistoryMove<T>> {
+    fn add_moves(&self, _board: &Board<T>, _actions: &mut Vec<Move>) {}
+    fn make_drop_move(&self, _board: &mut Board<T>, _action: &Action) -> Option<HistoryMove<T>> {
         panic!("Drop moves aren't supported. Make sure to override `make_drop_move` in your game's MoveController to support them.");
     }
 
@@ -92,7 +97,7 @@ pub trait MoveController<const T: usize> : Debug + Send + Sync {
         }
     }
 
-    fn update(&self, action: &Move, state: &BoardState<T>) -> TurnUpdate {
+    fn update(&self, _action: &Move, _state: &BoardState<T>) -> TurnUpdate {
         TurnUpdate {
             turns: CounterUpdate::Next,
             sub_moves: CounterUpdate::Next,
@@ -117,7 +122,7 @@ pub trait Resolution<const T: usize> : Debug + Send + Sync {
 
 pub trait ZobristController<const T: usize> : Debug + Send + Sync {
     fn get_extra_hashes(&self) -> usize { 0 }
-    fn apply(&self, hash: &mut u64, zobrist: &mut ZobristHashTable<T>, board: &mut Board<T>) {}
+    fn apply(&self, _hash: &mut u64, _zobrist: &mut ZobristHashTable<T>, _board: &mut Board<T>) {}
 }
 
 #[derive(Debug)]

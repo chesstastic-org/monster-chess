@@ -1,9 +1,7 @@
 use crate::{board::pieces::PieceSymbol, bitboard::BitBoard};
 
 use super::super::{
-    actions::{Action, HistoryMove, UndoMoveError},
     game::Game,
-    pieces::Piece,
     Board, Cols, Rows,
 };
 

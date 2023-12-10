@@ -1,15 +1,10 @@
 use crate::{
     bitboard::{Direction, BitBoard},
     board::{
-        actions::{Action, HistoryMove, HistoryState, IndexedPreviousBoard, PreviousBoard, Move},
-        edges::Edges,
+        actions::{Action, Move},
         fen::{
-            FenArgument, FenDecodeError, FenFullMoves, FenOptions, FenState, FenSubMoves,
-            FenTeamArgument, PostProcess,
-        },
-        game::{Game, MoveController},
-        pieces::{Piece, PieceSymbol},
-        AttackDirections, Board, Cols, PieceType,
+            FenArgument, FenDecodeError,
+        }, Board,
     },
 };
 
@@ -154,7 +149,8 @@ impl<const T: usize> FenArgument<T> for ChessEnPassant {
             move_type: 0
         };
 
-        board.history.push_back(Move::Action(action));
+        board.history.push_back(Move::Action(action))
+            .expect("No reason why adding en passant move to history will error, right?");
 
         Ok(())
     }
