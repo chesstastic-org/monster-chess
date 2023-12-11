@@ -11,10 +11,10 @@ use crate::{
     games::chess::game::ATTACKS_MODE,
 };
 
-const NORMAL_KING_MOVE: u16 = 0;
-const CASTLING_MOVE: u16 = 1;
+use super::{ROOK, KING};
 
-const ROOK_PIECE_TYPE: PieceType = 3;
+pub const NORMAL_KING_MOVE: u16 = 0;
+pub const CASTLING_MOVE: u16 = 1;
 
 #[derive(Debug)] pub struct KingPiece<const T: usize>;
 
@@ -71,12 +71,12 @@ impl<const T: usize> KingPiece<T> {
                 updates: vec![
                     HistoryUpdate::Team(IndexedPreviousBoard(color, board.state.teams[color])),
                     HistoryUpdate::Piece(IndexedPreviousBoard(
-                        piece_type,
-                        board.state.pieces[piece_type],
+                        KING,
+                        board.state.pieces[KING],
                     )),
                     HistoryUpdate::Piece(IndexedPreviousBoard(
-                        ROOK_PIECE_TYPE as usize,
-                        board.state.pieces[ROOK_PIECE_TYPE as usize],
+                        ROOK,
+                        board.state.pieces[ROOK],
                     )),
                 ],
             },
@@ -85,16 +85,16 @@ impl<const T: usize> KingPiece<T> {
         board.state.teams[color] ^= from;
         board.state.teams[color] ^= to;
 
-        board.state.pieces[piece_type] ^= from;
-        board.state.pieces[ROOK_PIECE_TYPE as usize] ^= to;
+        board.state.pieces[KING] ^= from;
+        board.state.pieces[ROOK] ^= to;
 
         board.state.all_pieces ^= from;
         board.state.all_pieces ^= to;
 
         match dir {
             Direction::LEFT => {
-                board.state.pieces[piece_type] |= castle_left_king;
-                board.state.pieces[ROOK_PIECE_TYPE as usize] |= castle_left_rook;
+                board.state.pieces[KING] |= castle_left_king;
+                board.state.pieces[ROOK] |= castle_left_rook;
 
                 board.state.teams[color] |= castle_left_king;
                 board.state.teams[color] |= castle_left_rook;
@@ -103,8 +103,8 @@ impl<const T: usize> KingPiece<T> {
                 board.state.all_pieces |= castle_left_rook;
             }
             Direction::RIGHT => {
-                board.state.pieces[piece_type] |= castle_right_king;
-                board.state.pieces[ROOK_PIECE_TYPE as usize] |= castle_right_rook;
+                board.state.pieces[KING] |= castle_right_king;
+                board.state.pieces[ROOK] |= castle_right_rook;
 
                 board.state.teams[color] |= castle_right_king;
                 board.state.teams[color] |= castle_right_rook;
@@ -211,8 +211,8 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
                         board.state.teams[captured_color],
                     )),
                     HistoryUpdate::Piece(IndexedPreviousBoard(
-                        piece_type,
-                        board.state.pieces[piece_type],
+                        KING,
+                        board.state.pieces[KING],
                     )),
                     HistoryUpdate::Piece(IndexedPreviousBoard(
                         captured_piece_type,
@@ -227,8 +227,8 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
         board.state.teams[color] |= to;
 
         board.state.pieces[captured_piece_type] ^= to;
-        board.state.pieces[piece_type] ^= from;
-        board.state.pieces[piece_type] |= to;
+        board.state.pieces[KING] ^= from;
+        board.state.pieces[KING] |= to;
 
         board.state.all_pieces ^= from;
 
@@ -267,7 +267,7 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
                 team,
                 info: NORMAL_KING_MOVE,
                 move_type: NORMAL_KING_MOVE,
-                piece_type,
+                piece_type
             }));
         }
 
@@ -291,7 +291,7 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
             return;
         }
 
-        let rooks = board.state.pieces[ROOK_PIECE_TYPE as usize] & team_board & first_move & bottom_row;
+        let rooks = board.state.pieces[ROOK] & team_board & first_move & bottom_row;
 
         /*
             FRC Castling brings us to the same positions that traditional chess castling would.

@@ -1,4 +1,6 @@
-use crate::{board::{game::{MoveController, get_theoretical_moves_bound, MoveLegalResponse}, Board, actions::{Move, TheoreticalMove, CounterUpdate, TurnUpdate}, BoardState}, bitboard::BitBoard};
+use std::sync::Arc;
+
+use crate::{board::{game::{MoveController, get_theoretical_moves_bound, MoveLegalResponse}, Board, actions::{Move, TheoreticalMove, CounterUpdate, TurnUpdate}, BoardState}, bitboard::BitBoard, games::chess::pieces::CASTLING_MOVE};
 
 use super::{ATTACKS_MODE, pieces::KING};
 
@@ -65,22 +67,38 @@ impl<const T: usize> MoveController<T> for ChessMoveController<T> {
     }
 
     fn encode_action(&self, board: &Board<T>, action: &Move) -> Vec<String> {
-        vec![
-            match action {
-                Move::Action(action) => {
-                    match action.from {
-                        Some(from) => format!(
-                            "{}{}{}",
-                            board.encode_position(from),
-                            board.encode_position(action.to),
-                            board.game.pieces[action.piece_type as usize].format_info(board, action.info)
-                        ),
-                        None => "----".to_string()
-                    }
-                },
-                Move::Pass => "0000".to_string()
-            }   
-        ]
+        match action {
+            Move::Action(action) => {
+                match action.from {
+                    Some(from) => {
+                        let mut moves = vec![
+                            format!(
+                                "{}{}{}",
+                                board.encode_position(from),
+                                board.encode_position(action.to),
+                                board.game.pieces[action.piece_type as usize].format_info(board, action.info)
+                            )
+                        ];
+
+                        if action.piece_type == KING as u16 && action.move_type == CASTLING_MOVE {
+                            let direction = ((from as i32) - (action.to as i32)).signum();
+                            let new_pos = ((from as i32) + (direction * 2)) as u16;
+
+                            moves.push(format!(
+                                "{}{}{}",
+                                board.encode_position(from),
+                                board.encode_position(new_pos),
+                                board.game.pieces[action.piece_type as usize].format_info(board, action.info)
+                            ))
+                        }
+
+                        moves
+                    },
+                    None => vec![ "----".to_string() ]
+                }
+            },
+            Move::Pass => vec! [ "0000".to_string() ]
+        }   
     }
 
     fn update(&self, action: &Move, state: &BoardState<T>) -> TurnUpdate {
