@@ -59,7 +59,6 @@ impl<const T: usize> KingPiece<T> {
         };
 
         let color: usize = action.team as usize;
-        let piece_type = action.piece_type as usize;
 
         let history_move = HistoryMove {
             action: Move::Action(*action),
@@ -173,7 +172,7 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
         &self,
         board: &mut Board<T>,
         action: &Action,
-        piece_type: PieceType,
+        _piece_type: PieceType,
         from: BitBoard<T>,
         to: BitBoard<T>,
         turn_info: TurnInfo
@@ -183,7 +182,6 @@ impl<const T: usize> Piece<T> for KingPiece<T> {
         }
 
         let color: usize = action.team as usize;
-        let piece_type = piece_type as usize;
         let captured_color: usize = if (to & board.state.teams[0]).is_set() {
             0
         } else {

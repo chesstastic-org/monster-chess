@@ -1,7 +1,4 @@
-use std::sync::Arc;
-
 use crate::{board::{game::{MoveController, get_theoretical_moves_bound, MoveLegalResponse}, Board, actions::{Move, TheoreticalMove, CounterUpdate, TurnUpdate}, BoardState}, bitboard::BitBoard, games::chess::pieces::CASTLING_MOVE};
-
 use super::{ATTACKS_MODE, pieces::KING};
 
 #[derive(Debug)]
