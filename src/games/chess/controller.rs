@@ -78,7 +78,7 @@ impl<const T: usize> MoveController<T> for ChessMoveController<T> {
                         ];
 
                         if action.piece_type == KING as u16 && action.move_type == CASTLING_MOVE {
-                            let direction = ((from as i32) - (action.to as i32)).signum();
+                            let direction = ((action.to as i32) - (from as i32)).signum();
                             let new_pos = ((from as i32) + (direction * 2)) as u16;
 
                             moves.push(format!(
