@@ -137,3 +137,5 @@ impl<const T: usize> Piece<T> for StonePiece {
         }
     }
 }
+
+pub const STONE: usize = 0;

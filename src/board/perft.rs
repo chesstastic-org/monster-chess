@@ -102,7 +102,7 @@ impl<'a, const T: usize> Board<'a, T> {
 
         let mut nodes = 0;
         let mut branches: Vec<PerftBranch> = vec![];
-        for node in self.generate_legal_moves(0) {
+        for node in self.generate_legal_moves(NORMAL_MODE) {
             let undo = self.make_move(&node);
             let results = self.branch_perft(depth - 1);
             nodes += results.nodes;

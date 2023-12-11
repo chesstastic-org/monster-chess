@@ -1,8 +1,8 @@
 
 
-use crate::board::{game::{Resolution, GameResults}, Board, actions::{Move}};
+use crate::board::{game::{Resolution, GameResults}, Board, actions::Move};
 
-use super::ATTACKS_MODE;
+use super::{ATTACKS_MODE, pieces::KING};
 
 #[derive(Debug)]
 pub struct ChessResolution<const T: usize>;
@@ -10,7 +10,7 @@ pub struct ChessResolution<const T: usize>;
 impl<const T: usize> Resolution<T> for ChessResolution<T> {
     fn resolve(&self, board: &mut Board<T>, legal_moves: &[Move]) -> GameResults {
         if legal_moves.len() == 0 {
-            let kings = board.state.pieces[5];
+            let kings = board.state.pieces[KING];
             let king_board = board.state.teams[board.state.moving_team as usize] & kings;
 
             let next_team = board.state.team_lookup[board.state.moving_team as usize];

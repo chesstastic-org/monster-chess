@@ -1,6 +1,6 @@
 use crate::{board::{game::{MoveController, get_theoretical_moves_bound, MoveLegalResponse}, Board, actions::{Move, TheoreticalMove, CounterUpdate, TurnUpdate}, BoardState}, bitboard::BitBoard};
 
-use super::ATTACKS_MODE;
+use super::{ATTACKS_MODE, pieces::KING};
 
 #[derive(Debug)]
 pub struct ChessMoveController<const T: usize>;
@@ -21,7 +21,7 @@ impl<const T: usize> MoveController<T> for ChessMoveController<T> {
         match action {
             Move::Action(action) => {
                 let to_board = BitBoard::from_lsb(action.to);
-                let kings = board.state.pieces[5];
+                let kings = board.state.pieces[KING];
                 if (to_board & kings).is_set() {
                     return MoveLegalResponse {
                         made_move: None,
@@ -32,7 +32,7 @@ impl<const T: usize> MoveController<T> for ChessMoveController<T> {
                 let current_team = board.state.moving_team;
 
                 let undo = board.make_move(&Move::Action(*action));
-                let kings = board.state.pieces[5];
+                let kings = board.state.pieces[KING];
                 let king_board = board.state.teams[current_team as usize] & kings;
                 let in_check = board.can_move(board.state.moving_team, king_board, ATTACKS_MODE);
                 if unmake_move { 

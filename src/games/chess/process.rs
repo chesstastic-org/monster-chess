@@ -1,4 +1,5 @@
-use crate::{board::{fen::PostProcess, Board}};
+use crate::board::{fen::PostProcess, Board};
+use super::pieces::PAWN;
 
 #[derive(Debug)]
 pub struct ChessPostProcess;
@@ -12,9 +13,9 @@ impl<const T: usize> PostProcess<T> for ChessPostProcess {
         bottom |= bottom.up(1, cols);
         top |= top.down(1, cols);
 
-        let first_move = (board.state.pieces[0] & board.state.teams[0] & bottom)
-            | (board.state.pieces[0] & board.state.teams[1] & top)
-            | (board.state.all_pieces ^ board.state.pieces[0]);
+        let first_move = (board.state.pieces[PAWN] & board.state.teams[0] & bottom)
+            | (board.state.pieces[PAWN] & board.state.teams[1] & top)
+            | (board.state.all_pieces ^ board.state.pieces[PAWN]);
         board.state.first_move &= first_move;
     }
 }

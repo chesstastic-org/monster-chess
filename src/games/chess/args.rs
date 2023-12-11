@@ -8,7 +8,7 @@ use crate::{
     },
 };
 
-use super::pieces::{down, up};
+use super::pieces::{down, up, KING, ROOK};
 
 
 #[derive(Debug)]
@@ -16,7 +16,7 @@ pub struct ChessCastlingRights;
 impl<const T: usize> FenArgument<T> for ChessCastlingRights {
     fn decode(&self, board: &mut Board<T>, arg: &str) -> Result<(), FenDecodeError> {
         if arg == "-" {
-            board.state.first_move &= !board.state.pieces[3];
+            board.state.first_move &= !board.state.pieces[ROOK];
             Ok(())
         } else {
             let mut lost_castling_rights = vec!['Q', 'K', 'q', 'k'];
@@ -51,7 +51,7 @@ impl<const T: usize> FenArgument<T> for ChessCastlingRights {
                     }
                 };
 
-                let rook_board = board.state.pieces[3] & board.state.teams[team];
+                let rook_board = board.state.pieces[ROOK] & board.state.teams[team];
                 if rook_board.is_empty() {
                     continue;
                 }
@@ -59,7 +59,7 @@ impl<const T: usize> FenArgument<T> for ChessCastlingRights {
                 let rook = rook_board.bitscan(scan_dir);
                 let rook_board = BitBoard::from_lsb(rook);
 
-                let king_board = board.state.pieces[5] & board.state.teams[team];
+                let king_board = board.state.pieces[KING] & board.state.teams[team];
                 let king = king_board.bitscan_forward();
 
                 if (rook < king && scan_dir == Direction::LEFT) || (rook > king && scan_dir == Direction::RIGHT) {
@@ -74,12 +74,12 @@ impl<const T: usize> FenArgument<T> for ChessCastlingRights {
     fn encode(&self, board: &Board<T>) -> String {
         let mut castling_rights: Vec<char> = Vec::with_capacity(4);
         for team in 0..board.state.teams.len() {
-            let king = board.state.pieces[5] & board.state.teams[team] & board.state.first_move;
+            let king = board.state.pieces[KING] & board.state.teams[team] & board.state.first_move;
             if king.is_empty() {
                 continue;
             }
 
-            let rooks = board.state.pieces[3] & board.state.teams[team] & board.state.first_move;
+            let rooks = board.state.pieces[ROOK] & board.state.teams[team] & board.state.first_move;
             let mut one_bits = rooks
                 .iter_set_bits(board.state.rows * board.state.cols)
                 .collect::<Vec<_>>();

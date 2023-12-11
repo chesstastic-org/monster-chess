@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use crate::{board::{game::{MoveController, NORMAL_MODE, get_theoretical_moves_bound, MoveLegalResponse}, Board, actions::{Move, TheoreticalMove, TurnUpdate, CounterUpdate}, BoardState}, bitboard::BitBoard};
 
-use super::is_single_move;
+use super::{is_single_move, pieces::STONE};
 
 #[derive(Debug)]
 pub struct AtaxxMoveController;
@@ -22,7 +22,7 @@ impl<const T: usize> MoveController<T> for AtaxxMoveController {
         // No Legal Moves
         if actions.len() == 0 {
             let board_mask = BitBoard::starting_at_lsb(0, 49);
-            let filled_squares = board.state.pieces[0];
+            let filled_squares = board.state.pieces[STONE];
             let empty_squares = board_mask & !filled_squares;
 
             let team_squares = board.state.teams[board.state.moving_team as usize];
