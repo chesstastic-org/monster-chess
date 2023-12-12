@@ -38,6 +38,20 @@ impl<const T: usize> FenArgument<T> for ChessCastlingRights {
                 lost_castling_rights.retain(|el| el != &char);
             }
 
+            let team_pairs = vec![
+                ( [ 'Q', 'K' ], 0 ),
+                ( [ 'q', 'k' ], 1 )
+            ];
+
+            for (letters, team) in team_pairs {
+                if !letters.iter().all(|el| lost_castling_rights.contains(el)) { continue; }
+
+                let king_board = board.state.pieces[KING] & board.state.teams[team];
+                board.state.first_move &= !king_board;
+
+                lost_castling_rights.retain(|el| !letters.contains(&el));
+            }
+
             for char in lost_castling_rights {
                 let (team, scan_dir) = match char {
                     'Q' => (0, Direction::LEFT),
@@ -64,7 +78,6 @@ impl<const T: usize> FenArgument<T> for ChessCastlingRights {
 
                 if (rook < king && scan_dir == Direction::LEFT) || (rook > king && scan_dir == Direction::RIGHT) {
                     board.state.first_move &= !rook_board;
-
                 }
             }
             Ok(())
